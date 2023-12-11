@@ -28,6 +28,27 @@ def set_lambda_jk (network):
     df_capac.replace([np.inf,-np.inf], 0, inplace=True)
     df_capac.fillna(0,inplace=True)
     
+def set_lambda_ijk (network):
+    import numpy as np
+    from hcndp.data_functions import reshape_matrix
+
+    # Calculo los lambdas para cada ijk
+    # Se calculan a través de un loop asumiendo que solo hay arribos en cada i
+    g=np.array(network.file['df_asignacion']['tao_ijk']) # Lista de arribos externos ijk
+    g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
+
+
+    # Puedo calcular los lambda ijk basado en redes de Jackson
+    network.file['df_asignacion']["lambda_ijk"] = 0.0
+    probs=network.file['df_arcos']['p_jjkk']
+    probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
+    
+    #Para cada i calculo el lambda ijk
+    _i=0
+    for i in network.file['df_asignacion'].index.levels[0]: 
+        #df_asignacion.loc[i,'lambda_ijk']=1
+        network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+        _i+=1
 
 if __name__ == "__main__":
     import hcndp

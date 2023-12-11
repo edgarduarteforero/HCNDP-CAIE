@@ -80,7 +80,7 @@ def figure_network_cartesian(network):
     ax.set_xlim(ax.get_xlim()[0] - 0.1, ax.get_xlim()[1] + 0.1)
     ax.set_ylim(ax.get_ylim()[0] - 0.1, ax.get_ylim()[1] + 0.1)
     #ax.grid()
-    plt.show()
+    #plt.show()
   
 def figure_chord_diagram(network):
     # Es necesario tener en cuenta que existen flujos entre los servidores de la red. Cada flujo se da 

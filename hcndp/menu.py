@@ -100,6 +100,7 @@ def show_menu_show_network(network):
 def calculate_kpi(network):
     from hcndp import kpi
     kpi.set_lambda_jk(network)
+    kpi.set_lambda_ijk(network)
         
 
 if __name__ == "__main__":
