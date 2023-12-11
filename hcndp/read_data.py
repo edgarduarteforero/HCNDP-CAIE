@@ -110,8 +110,9 @@ def create_df_asignacion(network):
 
     network.file['df_flujos_ijk']=network.file['df_flujos_ijk'].set_index(['nombre_I','nombre_J','servicio_K']).sort_index()
     network.file['df_asignacion']=network.file['df_asignacion'].drop(['tao_ijk','z_ijk'], axis=1, errors='ignore')
+    network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
+    network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
     network.file['df_asignacion']=pd.merge(network.file['df_asignacion'], network.file['df_flujos_ijk'],left_index=True, right_index=True)
-    network.file['df_asignacion'] = network.file['df_asignacion'].drop('nombre_I', axis=1)
 def create_df_probs_kk(network):
     import numpy as np
     import pandas as pd

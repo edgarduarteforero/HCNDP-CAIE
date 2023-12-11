@@ -14,8 +14,9 @@ def show_menu_main(network):
         print("Selecciona una opción:")
         print("1. Cargar datos")
         print("2. Representación de la red")
-        print("3. Solución del problema (Pendiente)")
-        print("4. Salir")
+        print("3. Calcular medidas de desempeño")
+        print("4. Solución del problema (Pendiente)")
+        print("5. Salir")
 
         opcion = input("Selecciona una opción: \n")
 
@@ -29,9 +30,12 @@ def show_menu_main(network):
             
         elif opcion == "3":
             print("Has seleccionado la Opción 3.")
-            # Lógica para la Opción 3
+            calculate_kpi(network)
             
         elif opcion == "4":
+            print("Has seleccionado la Opción 4.")
+            
+        elif opcion == "5":
             print("Saliendo del programa.")
             break
         
@@ -50,7 +54,7 @@ def show_menu_read_data(network):
         
         print("1. Importar datos desde Excel")
         print("2. Ingresar datos manualmente (Pendiente)")
-        print("3. Salir")
+        print("3. Regresar al menú principal")
         opcion1 = input("Selecciona una opción: \n")
         if opcion1 == "1":
             print("Has seleccionado la Opción 1.")
@@ -61,6 +65,7 @@ def show_menu_read_data(network):
             read_data.create_df_asignacion(network)
             read_data.create_df_probs_kk(network)
             read_data.create_df_arcos(network)
+            
         elif opcion1 == "2":
             print("Has seleccionado la Opción 2.")
             read_data.data_by_hand()
@@ -91,6 +96,11 @@ def show_menu_show_network(network):
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
+
+def calculate_kpi(network):
+    from hcndp import kpi
+    kpi.set_lambda_jk(network)
+        
 
 if __name__ == "__main__":
     from main import I,J,K

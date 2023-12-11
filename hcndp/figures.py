@@ -95,32 +95,21 @@ def figure_chord_diagram(network):
 
     # Construyo un dataframe con jjpkkp y pjjkk
     df_arcos=network.file['df_arcos'].reset_index()
+    df_arcos['origen'],df_arcos['destino']=0,0
     df_prueba = pd.DataFrame()
-    df_prueba=df_arcos[['nombre_J','nombre_Jp','servicio_K','servicio_Kp','p_jjkk']]
+    df_prueba=df_arcos[['nombre_J','nombre_Jp','servicio_K','servicio_Kp','p_jjkk','origen','destino']]
     
     # Ajusto el contenido de df_prueba para que quede así:
     # origen - destino - pjjkk
-    #df_prueba["origen"] = df_prueba["nombre_J"] +  df_prueba["servicio_K"].astype(str)
-    #df_prueba.loc[:, "origen"] = df_prueba["nombre_J"] + df_prueba["servicio_K"].astype(str)
-    #df_prueba["destino"] = df_prueba["nombre_Jp"] + df_prueba["servicio_Kp"].astype(str)
-    #df_prueba.loc[:,"destino"] = df_prueba["nombre_Jp"] + df_prueba["servicio_Kp"].astype(str)
-    
-    # for _i,_j in df_prueba.iterrows():
-    #     print (_i)
-    #     df_prueba.iloc[_i]["origen"]=df_prueba.iloc[_i]["nombre_J"] + df_prueba.iloc[_i]["servicio_K"] #.astype(str)
-    #     df_prueba.iloc[_i]["destino"]=df_prueba.iloc[_i]["nombre_Jp"] + df_prueba.iloc[_i]["servicio_Kp"] #.astype(str)
-    df_prueba.set_index(['nombre_J','nombre_Jp','servicio_K','servicio_Kp'])
-    #df_prueba.loc[:, 'origen'] = df_prueba.apply(lambda row: row['nombre_J'] + row['servicio_K'], axis=1)
-    #df_prueba.loc[:, 'destino'] = df_prueba.apply(lambda row: row['nombre_Jp'] + row['servicio_Kp'], axis=1)
-    #df_prueba['origen'] = df_prueba['nombre_J'] + df_prueba['servicio_K']
-    #df_prueba['origen'] = pd.concat([df_prueba['nombre_J'], df_prueba['servicio_K']], axis=1).agg(''.join, axis=1)
+    df_prueba.loc[:,'origen']=df_prueba['nombre_J']+df_prueba['servicio_K']
+    df_prueba.loc[:,'destino']=df_prueba['nombre_Jp']+df_prueba['servicio_Kp']
     
     df_prueba = df_prueba[['origen', 'destino', 'p_jjkk']]
     
     # Multiplico la probabilidad por 100 y convierto a enteros para mejor visualización
-    df_prueba['p_jjkk'] = df_prueba[['p_jjkk']]*100
-    df_prueba['p_jjkk'] = df_prueba[['p_jjkk']].astype(int)
-    
+
+    df_prueba.loc[:,'p_jjkk'] = df_prueba['p_jjkk']*100
+    df_prueba.loc[:,'p_jjkk'] = df_prueba['p_jjkk'].astype(int)    
     df_prueba=df_prueba[(df_prueba != 0).all(1)] # Elimino ceros
     df_prueba=df_prueba.reset_index(drop=True) # Ajusto el índice
     

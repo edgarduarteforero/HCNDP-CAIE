@@ -52,6 +52,10 @@ def decay_gauss(d_ij,do):
         f=0
     return f
 
+def reshape_matrix(matrix,rows,columns):
+    import numpy as np
+    return np.reshape(matrix,([rows,columns]))
+
 if __name__ == "__main__":
     
     import numpy as np
