@@ -73,7 +73,6 @@ def set_phi_ijkjk (network):
                                left_index=True, right_index=True)
         
     network.file['df_flujos_ijkjk']['fi_ijkjk']=network.file['df_flujos_ijkjk']['lambda_ijk']*network.file['df_flujos_ijkjk']['p_jjkk']*network.file['df_flujos_ijkjk']['x_jjp']
-    #df_flujos_ijkjk['fi_ijkjk']=(df_flujos_ijkjk['lambda_ijk']!=1)*1*(df_flujos_ijkjk['p_kkp']!=0)*1*(df_flujos_ijkjk['x_jjp']!=0)*1
     
     network.file['df_flujos_ijkjk'] = network.file['df_flujos_ijkjk'].reorder_levels(['nombre_I', 'nombre_J', 'servicio_K','nombre_Jp', 'servicio_Kp'])
         
@@ -129,18 +128,13 @@ def p_total(sum_y,s,c,f): #Suma de probabilidades en estado estable hasta un est
         for i in range(int(f+1)):
             if i==0:
                 p_total+=p__0
-                #print (0,'i','p__0','p_total')
-                #print (0,i,p__0,p_total)
+                
             elif 0<i<s:
                 p_total+=p_f1(p__0,sum_y,s,c,i)
-                #print (1,'i','p_f1(p__0,sum_y,s,c,i)','p_total')
-                #print (1,i,p_f1(p__0,sum_y,s,c,i),p_total)
+                
             elif i>=s:
                 p_total+=p_f2(p__0,sum_y,s,c,i)
-                #print ('p__0','sum_y','s','c','i')
-                #print (p__0,sum_y,s,c,i)
-                #print (2,'i','p_f2(p__0,sum_y,s,c,i)','p_total')
-                #print (2,i,p_f2(p__0,sum_y,s,c,i),p_total)
+                
     else:
         p_total=float('NaN')
     return p_total
@@ -161,6 +155,21 @@ def p_wqt(sum_y,s,c,t):
         
         p_wqt=float('NaN')
     return p_wqt
+
+
+def L_q(r,rho,s,c,p_o):
+    import math
+    s=int(s)
+    Lq=((r**s)*rho/(math.factorial(s)*(1-rho)**2))*p_o
+    return Lq
+
+def W_q(L_q,lambdas,rho):
+    import pandas as pd
+    if pd.isna(L_q) or lambdas==0: #Valido que se pueda calcular p_total
+       W_q=float('NaN')
+    else:
+       W_q=L_q/lambdas
+    return W_q
 
 ##########################################
 
@@ -192,8 +201,14 @@ def set_prob_wait_time (network,t):
     # Detallamos el valor de t
     
     network.file['df_capac']['prob_t'+str(t)]=network.file['df_capac'].apply(lambda row: p_wqt(row["lambdas"],row["sigma_jk"],row["c_jk"],t),axis='columns')    
-    #network.file['prob_t'+str(t)]='prob_t'+str(t)
-    
+
+def set_kpi_per_node(network):
+    df_capac=network.file['df_capac']
+    df_capac['L_q']=df_capac.apply(lambda row: L_q(row["r"],row["rho"],row["sigma_jk"],row["c_jk"],row["prob_b0"]),axis='columns')
+    df_capac['W_q']=df_capac.apply(lambda row: W_q(row["L_q"],row["lambdas"],row['rho']),axis='columns')
+    df_capac['L']=df_capac['L_q']+df_capac['r']
+    df_capac['W']=df_capac['W_q']+1/(df_capac['sigma_jk']+df_capac['c_jk'])
+
 if __name__ == "__main__":
     import hcndp
     from hcndp import network_data

@@ -139,12 +139,13 @@ def calculate_kpi(network):
     kpi.set_prob_custom_queue(network,customers)
     network.file['customers']=customers
     
-    
     print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
     time = int(input("Ingresa un valor para t: \n"))
     kpi.set_prob_wait_time (network,time)
     network.file['time']=time
     
+    kpi.set_kpi_per_node(network)
+
 if __name__ == "__main__":
     from main import I,J,K
     print (I)

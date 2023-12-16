@@ -82,7 +82,6 @@ def figure_network_cartesian(network):
     ax.set_title("Naranja: Enlaces ijk. Grises: Enlaces jk j'k'")
     ax.set_xlim(ax.get_xlim()[0] - 0.1, ax.get_xlim()[1] + 0.1)
     ax.set_ylim(ax.get_ylim()[0] - 0.1, ax.get_ylim()[1] + 0.1)
-    #ax.grid()
     plt.show()
     #plt.pause(0.1) #Muestra imagen en pestaña Plots a medida que se ejecuta el código
     path=os.getcwd()+'/output/'+'network_cartesian.png'
