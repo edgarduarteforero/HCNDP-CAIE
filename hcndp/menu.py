@@ -84,15 +84,38 @@ def show_menu_show_network(network):
         
         print("1. Plano cartesiano")
         print("2. Chord diagram")
-        print("3. Salir")
+        print("3. Probabilidades de espera")
+        print("4. Salir")
         opcion1 = input("Selecciona una opción: \n")
         if opcion1 == "1":
             print("Has seleccionado la Opción 1.")
-            figures.figure_network_cartesian(network)
+            try:     
+                figures.figure_network_cartesian(network)
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has importado los datos.")
+        
         elif opcion1 == "2":
             print("Has seleccionado la Opción 2.")
-            figures.figure_chord_diagram(network)
+            try: 
+                figures.figure_chord_diagram(network)
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has importado los datos.")
+        
         elif opcion1 == "3":
+            print("Has seleccionado la Opción 3.")
+            try:
+                figures.figure_prob_custom_queue(network)    
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+                
+            
+        elif opcion1 == "4":
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
@@ -101,8 +124,18 @@ def calculate_kpi(network):
     from hcndp import kpi
     kpi.set_lambda_jk(network)
     kpi.set_lambda_ijk(network)
-        
+    kpi.set_phi_ijkjk(network)
+    kpi.set_prop_tao(network)
+    
+    print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
+    customers = int(input("Ingresa un valor para x: \n"))
+    kpi.set_prob_custom_queue(network,customers)
+    
+    print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
+    time = int(input("Ingresa un valor para t: \n"))
+    kpi.set_prob_wait_time (network,time)
 
+    
 if __name__ == "__main__":
     from main import I,J,K
     print (I)

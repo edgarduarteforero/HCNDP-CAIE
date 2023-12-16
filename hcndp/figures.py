@@ -10,6 +10,9 @@ def figure_network_cartesian(network):
     import matplotlib.pyplot as plt
     import pandas as pd
     plt.rcdefaults()
+    import matplotlib
+    import os
+    
 
     fig, ax = plt.subplots(1,figsize=(6,6*1),constrained_layout=True) #Figura con 1 axes, que contiene toda la red
     fig.suptitle('Direcciones de flujos entre nodos',fontsize=14,weight="bold")
@@ -80,8 +83,12 @@ def figure_network_cartesian(network):
     ax.set_xlim(ax.get_xlim()[0] - 0.1, ax.get_xlim()[1] + 0.1)
     ax.set_ylim(ax.get_ylim()[0] - 0.1, ax.get_ylim()[1] + 0.1)
     #ax.grid()
-    #plt.show()
+    plt.show()
+    #plt.pause(0.1) #Muestra imagen en pestaña Plots a medida que se ejecuta el código
+    path=os.getcwd()+'/output/'+'network_cartesian.png'
+    plt.savefig(path, dpi=300)
   
+    
 def figure_chord_diagram(network):
     # Es necesario tener en cuenta que existen flujos entre los servidores de la red. Cada flujo se da 
     # entre un par de nodos de servicio y un par de servicios: jj'kk'
@@ -130,6 +137,45 @@ def figure_chord_diagram(network):
     hv.save(chord, path+'chord2', fmt='html') # Se exporta la imagen
     html_file_path = path+'chord2'+'.html'
     webbrowser.open('file://' + html_file_path, new=2)
+    
+    #hv.save(chord, path+'chord2', fmt='png')
+
+
+
+def figure_prob_custom_queue(network):
+    # Construyo gráficos para representar las probabilidades de tener clientes en cola
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import os
+    plt.rcdefaults()
+    
+    df_capac=network.file['df_capac'].reset_index()
+
+    labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
+    serie1 = df_capac['prob_b0']
+    serie2 = df_capac[network.file['prob_b_mas']]
+    
+    x = np.arange(len(labels))  # the label locations
+    width = 0.35  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/2, serie1, width, label='prob_b0')
+    rects2 = ax.bar(x + width/2, serie2, width, label=network.file['prob_b_mas'])
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Prob. acumulada de número de clientes en cola')
+    ax.set_title('Probabilidades por nodo de servicio')
+    ax.set_xticks(x, labels)
+    ax.legend()
+
+    ax.bar_label(rects1, padding=3)
+    ax.bar_label(rects2, padding=3)
+
+    fig.tight_layout()
+
+    plt.show()
+    path=os.getcwd()+'/output/'+'prob_custom_queue.png'
+    plt.savefig(path, dpi=300)
 
 if __name__ == "__main__":
     import hcndp
