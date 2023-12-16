@@ -138,6 +138,7 @@ def figure_chord_diagram(network):
     html_file_path = path+'chord2'+'.html'
     webbrowser.open('file://' + html_file_path, new=2)
     
+    # TODO La imagen chord debe ser exporada como un png.
     #hv.save(chord, path+'chord2', fmt='png')
 
 
@@ -151,16 +152,17 @@ def figure_prob_custom_queue(network):
     
     df_capac=network.file['df_capac'].reset_index()
 
+    customers=network.file['customers']
     labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
     serie1 = df_capac['prob_b0']
-    serie2 = df_capac[network.file['prob_b_mas']]
+    serie2 = df_capac['prob_b'+str(customers)]
     
     x = np.arange(len(labels))  # the label locations
     width = 0.35  # the width of the bars
 
     fig, ax = plt.subplots()
     rects1 = ax.bar(x - width/2, serie1, width, label='prob_b0')
-    rects2 = ax.bar(x + width/2, serie2, width, label=network.file['prob_b_mas'])
+    rects2 = ax.bar(x + width/2, serie2, width, label='prob_b'+str(customers))
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Prob. acumulada de número de clientes en cola')
@@ -174,7 +176,42 @@ def figure_prob_custom_queue(network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+'prob_custom_queue.png'
+    path=os.getcwd()+'/output/'+str(customers)+'_prob_custom_queue.png'
+    plt.savefig(path, dpi=300)
+    
+    
+def figure_prob_time_in_queue(network):
+    # Construyo gráficos para representar las probabilidades de tiempo en cola
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import os
+    plt.rcdefaults()
+
+    df_capac=network.file['df_capac'].reset_index()
+
+    time=network.file['time']
+    labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
+    #serie1 = df_capac['prob_t0.25']
+    serie1 = df_capac['prob_t'+str(time)]
+
+    x = np.arange(len(labels))  # the label locations
+    width = 0.35  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/2, serie1, width, label='prob_t'+str(time))
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Probabilidad acumulada de tiempo en espera')
+    ax.set_title('Probabilidades por nodo de servicio')
+    ax.set_xticks(x, labels)
+    ax.legend()
+
+    ax.bar_label(rects1, padding=3)
+
+    fig.tight_layout()
+
+    plt.show()
+    path=os.getcwd()+'/output/'+str(time)+'prob_time_in_queue.png'
     plt.savefig(path, dpi=300)
 
 if __name__ == "__main__":

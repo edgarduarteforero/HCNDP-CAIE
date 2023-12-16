@@ -51,7 +51,6 @@ def show_menu_read_data(network):
         print("\n----------------------------------------------------------")
         print("Cargue de datos")
         print("----------------------------------------------------------\n")
-        
         print("1. Importar datos desde Excel")
         print("2. Ingresar datos manualmente (Pendiente)")
         print("3. Regresar al menú principal")
@@ -81,11 +80,11 @@ def show_menu_show_network(network):
         print("\n----------------------------------------------------------")
         print("Representaciones de la red")
         print("----------------------------------------------------------\n")
-        
         print("1. Plano cartesiano")
         print("2. Chord diagram")
-        print("3. Probabilidades de espera")
-        print("4. Salir")
+        print("3. Probabilidades de x clientes en espera")
+        print("4. Probabilidades de esperar t tiempo")
+        print("5. Salir")
         opcion1 = input("Selecciona una opción: \n")
         if opcion1 == "1":
             print("Has seleccionado la Opción 1.")
@@ -114,8 +113,16 @@ def show_menu_show_network(network):
                 print ("No puedo imprimir las imágenes.")
                 print ("Revisa si has obtenido los KPI.")
                 
-            
         elif opcion1 == "4":
+            print("Has seleccionado la Opción 4.")
+            try:
+                figures.figure_prob_time_in_queue(network)    
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+            
+        elif opcion1 == "5":
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
@@ -128,13 +135,15 @@ def calculate_kpi(network):
     kpi.set_prop_tao(network)
     
     print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
-    customers = int(input("Ingresa un valor para x: \n"))
+    customers = int(input("Ingresa un valor para clientes: \n"))
     kpi.set_prob_custom_queue(network,customers)
+    network.file['customers']=customers
+    
     
     print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
     time = int(input("Ingresa un valor para t: \n"))
     kpi.set_prob_wait_time (network,time)
-
+    network.file['time']=time
     
 if __name__ == "__main__":
     from main import I,J,K

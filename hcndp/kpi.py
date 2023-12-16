@@ -161,7 +161,9 @@ def p_wqt(sum_y,s,c,t):
         
         p_wqt=float('NaN')
     return p_wqt
+
 ##########################################
+
 def set_prob_custom_queue (network,customers):
     # Cálculo de probabilidades Pbjk en estado estable para MMs
     # Consiste en la probabilidad de encontrar b o menos usuarios en cola
@@ -190,7 +192,7 @@ def set_prob_wait_time (network,t):
     # Detallamos el valor de t
     
     network.file['df_capac']['prob_t'+str(t)]=network.file['df_capac'].apply(lambda row: p_wqt(row["lambdas"],row["sigma_jk"],row["c_jk"],t),axis='columns')    
-    network.file['prob_b_mas']='prob_t'+str(t)
+    #network.file['prob_t'+str(t)]='prob_t'+str(t)
     
 if __name__ == "__main__":
     import hcndp
