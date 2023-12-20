@@ -221,11 +221,13 @@ def calculate_kpi(network):
     kpi.set_e2sfca(network)
     kpi.set_accessibility_per_node(network)
     kpi.set_accessibility_per_service(network)
-    kpi.set_accessibility_network(network)
+    kpi.set_continuity_per_node(network)
+    kpi.set_kpi_network(network)
     
 def export_to_excel(network):
     from hcndp import export
     export.export_data(network)
+    export.create_index_sheet(network)
     
 if __name__ == "__main__":
     from main import I,J,K

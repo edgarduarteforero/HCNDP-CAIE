@@ -256,20 +256,12 @@ def set_prob_wait_time (network,t):
     network.file['df_capac']['prob_t'+str(t)]=network.file['df_capac'].apply(lambda row: p_wqt(row["lambdas"],row["sigma_jk"],row["c_jk"],t),axis='columns')    
 
 def set_kpi_per_node(network):
-    import pandas as pd
+
     df_capac=network.file['df_capac']
     df_capac['L_q']=df_capac.apply(lambda row: L_q(row["r"],row["rho"],row["sigma_jk"],row["c_jk"],row["prob_b0"]),axis='columns')
     df_capac['W_q']=df_capac.apply(lambda row: W_q(row["L_q"],row["lambdas"],row['rho']),axis='columns')
     df_capac['L']=df_capac['L_q']+df_capac['r']
     df_capac['W']=df_capac['W_q']+1/(df_capac['sigma_jk']+df_capac['c_jk'])
-
-    df_medidas_sistema=pd.DataFrame()
-    df_medidas_sistema['Wtotal']=[df_capac['L'].sum()/df_capac['Sum_tao_ij'].sum()]
-    df_medidas_sistema['Wqtotal']= [df_capac['L_q'].sum()/df_capac['Sum_tao_ij'].sum()]
-    df_medidas_sistema['Ltotal']= [df_capac['L'].sum()]
-    df_medidas_sistema['Lqtotal']= [df_capac['L_q'].sum()]
-    network.file['df_medidas']=df_medidas_sistema
-
 
 #%% <codecell> Funciones para accesibilidad
 
@@ -369,7 +361,61 @@ def set_accessibility_network(network):
     network.file['df_medidas']['Alpha_total']= [prueba.sum()]
 
 #%% <codecell> Funciones para continuidad
+
+def set_continuity_per_node(network):
+    import pandas as pd 
     
+    
+    df_asignacion=network.file['df_asignacion'].copy()
+    df_asignacion['gamma_ijk']= df_asignacion['lambda_ijk'].apply(lambda x: 1 if x != 0 else 0)
+
+    #Calculo los delta_ij
+    df_asignacion=pd.merge(df_asignacion,df_asignacion.groupby(['nombre_I','nombre_J']).gamma_ijk.sum(),on=['nombre_I','nombre_J'],how='left')
+    df_asignacion=df_asignacion.rename(columns={"gamma_ijk_x":"gamma_ijk","gamma_ijk_y":"delta_ij"})
+    
+    #Calculo delta para cada i 
+    df_continuidad=df_asignacion[['nombre_I','nombre_J','demanda_i','delta_ij']].drop_duplicates()
+    df_continuidad['delta_ij']= df_continuidad['delta_ij'].apply(lambda x: 1 if x != 0 else 0)
+    
+    df_continuidad=pd.merge(df_continuidad,df_continuidad.groupby(['nombre_I']).delta_ij.sum(),on=['nombre_I'],how='left')
+    df_continuidad=df_continuidad.rename(columns={"delta_ij_x":"delta_ij","delta_ij_y":"delta_i"})
+    df_continuidad=df_continuidad.drop_duplicates(subset = ['nombre_I']).drop(['delta_ij'], axis=1)
+    df_continuidad['delta_i']=network.J-df_continuidad['delta_i']
+    network.file['df_continuidad']=df_continuidad
+
+
+#%% <codecell> Funciones para medidas globales
+
+def set_kpi_network(network):    
+    import pandas as pd    
+    import numpy as np
+    
+    df_capac=network.file['df_capac'].copy()
+    df_continuidad=network.file['df_continuidad'].copy()
+    df_accesibilidad=network.file['df_accesibilidad'].copy()
+    df_demanda=network.file['df_demanda'].copy()
+           
+    df_medidas=pd.DataFrame()
+    df_medidas['Wtotal']=[df_capac['L'].sum()/df_capac['Sum_tao_ij'].sum()]
+    df_medidas['Wqtotal']= [df_capac['L_q'].sum()/df_capac['Sum_tao_ij'].sum()]
+    df_medidas['Ltotal']= [df_capac['L'].sum()]
+    df_medidas['Lqtotal']= [df_capac['L_q'].sum()]
+
+    df_medidas['Delta_total']= [np.average(a=df_continuidad['delta_i'], weights=df_continuidad['demanda_i'])]
+    
+    df_medidas['rho_max']= [df_capac['rho'].max()]
+    df_medidas['alpha_min']= [df_accesibilidad['R'].min()]
+    df_medidas['delta_min']=[df_continuidad['delta_i'].min()]
+
+
+    #df_demanda['h_ik'] = df_demanda['h_ik'].astype(int)
+    #prueba=df_demanda['lambda_ijk']*df_demanda['acces_H2SFCA']/df_demanda['lambda_ijk'].sum()
+    prueba=df_demanda['demanda_i']*df_demanda['acces_H2SFCA']/(df_demanda['demanda_i'].sum())
+    df_medidas['Alpha_total']= [prueba.sum()]
+
+
+    network.file['df_medidas']=df_medidas
+
 #%% <codecell> Main    
 if __name__ == "__main__":
     import hcndp

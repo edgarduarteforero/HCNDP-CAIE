@@ -756,7 +756,7 @@ def figure_digraph(network):
     
     df_arcos=network.file['df_arcos'].copy()
     df_capac=network.file['df_capac'].reset_index().copy()
-    df_capac.set_index(['nombre_J','servicio_K'],inplace=True,drop=True)
+    df_capac.set_index(['nombre_J','servicio_K'],inplace=True)
     df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
     df_temporal['lambdas*probs']=df_temporal['lambdas']*df_temporal['p_jjkk']
     df_temporal=df_temporal.reset_index()
