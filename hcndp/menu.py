@@ -17,7 +17,9 @@ def show_menu_main(network):
         print("3. Calcular medidas de desempeño")
         print("4. Solución del problema (Pendiente)")
         print("5. Exportar a Excel")
-        print("6. Salir")
+        print("6. Exportar a data.dat")
+        
+        print("7. Salir")
 
         opcion = input("Selecciona una opción: \n")
 
@@ -41,6 +43,10 @@ def show_menu_main(network):
             export_to_excel(network)
         
         elif opcion == "6":
+            print("Has seleccionado la Opción 6.")
+            export_data_dat(network)
+        
+        elif opcion == "7":
             print("Saliendo del programa.")
             break
         
@@ -69,6 +75,7 @@ def show_menu_read_data(network):
             read_data.create_df_asignacion(network)
             read_data.create_df_probs_kk(network)
             read_data.create_df_arcos(network)
+            #read_data.create_df_sigma_max(network)
             
         elif opcion1 == "2":
             print("Has seleccionado la Opción 2.")
@@ -188,6 +195,7 @@ def show_menu_show_network(network):
                 figures.figure_flows_f_jpkpjk(network)
                 figures.figure_digraph(network)
                 figures.figure_digraph_complete(network)
+                figures.figure_sankey(network)
 
             except AssertionError as error:
                 print(error)
@@ -223,12 +231,17 @@ def calculate_kpi(network):
     kpi.set_accessibility_per_service(network)
     kpi.set_continuity_per_node(network)
     kpi.set_kpi_network(network)
+    kpi.set_df_grafo_flujo_jkjk(network)
     
 def export_to_excel(network):
     from hcndp import export
     export.export_data(network)
     export.create_index_sheet(network)
-    
+
+def export_data_dat(network):
+    from hcndp import export
+    export.create_instance(network)
+
 if __name__ == "__main__":
     from main import I,J,K
     print (I)

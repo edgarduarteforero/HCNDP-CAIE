@@ -20,6 +20,7 @@ def create_index_sheet(network):
     # TODO Personalizar el texto que explica cada hoja. 
     # Específicamente la variable sheet_ref
     
+    #Creo una hoja con índices en el archivo de excel
     import openpyxl
     import os
     from openpyxl import Workbook
@@ -61,3 +62,112 @@ def create_index_sheet(network):
         
     # Guardar el archivo actualizado
     workbook.save(excel_file)
+
+def create_instance(network):
+    import os
+    from hcndp.data_functions import indices
+    
+    path=os.getcwd()+'/data/'+'datos.dat'
+
+    I=network.I
+    J=network.J
+    K=network.K 
+    
+    file= open(path,"w+")
+    
+    def indices_data_dat(letra,cantidad): # Se generan listas tipo j01,j02,j03
+        file.write("set %s := "% letra)
+        for i in range (1,cantidad+1):
+            file.write(letra.lower()+f"{i:02d}"+" ")
+        file.write(";\n\n")
+    
+    indices("I",I)
+    indices("J",J)
+    indices("K",K)
+
+
+    df_probs_kk=network.file['df_probs_kk']
+    df_demanda=network.file['df_demanda']   
+    df_capac=network.file['df_capac']
+    df_flujos_jj=network.file['df_flujos_jj']
+    df_asignacion=network.file['df_asignacion']
+    df_w_ij=network.file['df_w_ij']
+    df_sigma_max=network.file['df_sigma_max']
+    
+    
+    #Escribo los r_q
+    file.write("param %s := \n"%"r_q")
+    file.write(df_probs_kk[['servicio_K','servicio_Kp','p_kkp']].to_string(header=False, index=False))
+    file.write(";\n\n")
+    
+    #Escribo los h
+    file.write("param %s := \n"%"h")
+    file.write(df_demanda.reset_index()[['nombre_I','servicio_K','h_ik']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    #Escribo los s
+    file.write("param %s := \n"%"s")
+    file.write(df_capac.reset_index()[['nombre_J','servicio_K','s_jk']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    #Escribo los c
+    file.write("param %s := \n"%"c")
+    file.write(df_capac.reset_index()[['nombre_J','servicio_K','c_jk']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    #Escribo los x
+    file.write("param %s := \n"%"x")
+    file.write(df_flujos_jj.reset_index()[['nombre_J','nombre_Jp','x_jjp']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    
+    #Escribo los d
+    file.write("param %s := \n"%"d")
+    file.write(df_asignacion[['nombre_I','nombre_J','servicio_K','f_dij']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    #Escribo los w
+    file.write("param %s := \n"%"w")
+    file.write(df_w_ij.reset_index()[['nombre_I','nombre_J','w_ij']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    # Escribo M. El número máximo de servidores en un solo jk (max de los s_jk)
+    file.write("#Número máximo de s_jk \n")
+    file.write("param %s := \n"%"M")
+    file.write(str(df_capac['s_jk'].max()))
+    file.write(";\n\n")
+    
+    # Escribo CDemanda máxima en los nodos de demandae haber en un solo jk (max de los s_jk *c_jk)
+    file.write("#Máximo de los s_jk * c_jk \n")
+    file.write("param %s := \n"%"cap_max")
+    file.write(str(df_capac['s_jk*c_jk'].max()))
+    file.write(";\n\n")
+    
+    # Escribo H (Demanda máxima en los nodos de demanda)
+    file.write("#Demanda máxima en los nodos de demanda \n")
+    file.write("param %s := \n"%"H")
+    file.write(str(df_demanda['demanda_i'].max()))
+    file.write(";\n\n")
+    
+    file.write("param %s := \n"%"e")
+    file.write("10e-3")
+    file.write(";\n\n")
+    
+    file.write("param %s := \n"%"r_bin_kk")
+    file.write(df_probs_kk[['servicio_K','servicio_Kp','bin']].to_string(header=False, index=False))
+    file.write(";\n\n")
+    
+    file.write("param %s := \n"%"sigma_max")
+    file.write(df_sigma_max[['servicio_K','sigma_max']].to_string(header=False,index=False))
+    file.write(";\n\n")
+    
+    file.write("param %s := \n"%"K_size")
+    file.write(str(K))
+    file.write(";\n\n")
+    
+    file.write("param %s := \n"%"J_size")
+    file.write(str(J))
+    file.write(";\n\n")
+    
+    file.close()
+

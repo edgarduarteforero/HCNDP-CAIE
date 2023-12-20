@@ -745,29 +745,9 @@ def figure_digraph(network):
     import networkx as nx
     import matplotlib.pyplot as plt
     import pygraphviz
+    import os
     
-    # Build a dataframe with 4 connections
-    #df = pd.DataFrame({ 'from':['A', 'B', 'C','A'], 'to':['D', 'A', 'E','C']})
-    
-    df_grafo=network.file['df_arcos'].reset_index().copy()
-    df_grafo = df_grafo.loc[df_grafo['p_jjkk'] != 0]
-    df_grafo['jk']= df_grafo['nombre_J']+df_grafo['servicio_K']
-    df_grafo['jpkp']= df_grafo["nombre_Jp"]+df_grafo['servicio_Kp']
-    
-    df_arcos=network.file['df_arcos'].copy()
-    df_capac=network.file['df_capac'].reset_index().copy()
-    df_capac.set_index(['nombre_J','servicio_K'],inplace=True)
-    df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
-    df_temporal['lambdas*probs']=df_temporal['lambdas']*df_temporal['p_jjkk']
-    df_temporal=df_temporal.reset_index()
-    df_temporal['jk_origen']=df_temporal['nombre_J']+df_temporal['servicio_K']
-    df_temporal['jk_destino']=df_temporal['nombre_Jp']+df_temporal['servicio_Kp']
-    df_grafo=df_temporal.reset_index()
-    df_grafo = df_grafo.loc[df_grafo['lambdas*probs'] != 0]
-    #df_grafo['jk']= df_grafo['nombre_J']+df_grafo['servicio_K']
-    #df_grafo['jpkp']= df_grafo["nombre_Jp"]+df_grafo['servicio_Kp']
-    df_flujos_jkjk=df_temporal
-    
+    df_grafo=network.file['df_grafo']
     
     # Build your graph
     G=nx.from_pandas_edgelist(df_grafo,"jk_origen", 'jk_destino',create_using=nx.DiGraph() )
@@ -776,8 +756,9 @@ def figure_digraph(network):
     nx.draw(G, with_labels=True, font_size=8,node_size=1000, node_color='lightgrey',alpha=1, arrows=True, edge_color=df_grafo['p_jjkk'],
             edge_cmap=plt.cm.Oranges,pos=nx.nx_agraph.graphviz_layout(G, prog="neato"))
     
-    
+    path=os.getcwd()+'/output/'+'figure_digraph.png'
     plt.show()
+    plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
 
 def figure_digraph_complete(network):
     # GRAFICO
@@ -788,6 +769,7 @@ def figure_digraph_complete(network):
     import numpy as np
     import networkx as nx
     import matplotlib.pyplot as plt
+    import os
     
     # Build a dataframe with 4 connections
     #df = pd.DataFrame({ 'from':['A', 'B', 'C','A'], 'to':['D', 'A', 'E','C']})
@@ -805,7 +787,124 @@ def figure_digraph_complete(network):
             edge_cmap=plt.cm.Oranges,pos=nx.circular_layout(G))
     
     
+    path=os.getcwd()+'/output/'+'figure_digraph_complete.png'
     plt.show()
+    plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
+    
+def figure_sankey(network):
+    import re
+    import pandas as pd
+    import plotly.graph_objects as go
+    import plotly.io as io
+    io.renderers.default='browser'
+    from plotly.offline import plot
+    import os 
+    import plotly.express as px
+    
+    # GRAFICO sankey
+    # Obtengo los nodos de la red en una lista
+    # Obtengo los nombres de los nodos de demnada
+    # Obtengo los nombres de los nodos de oferta
+    # Uno las dos listas anteriores e una sola lista y la numero
+    
+    df_demanda=network.file['df_demanda']
+    df_capac=network.file['df_capac']
+    df_asignacion=network.file['df_asignacion']
+    df_arcos=network.file['df_arcos']
+    df_flujos_jkjk=network.file['df_flujos_jkjk']
+    
+    df_lista_nodos = df_demanda.reset_index()['nombre_I'].unique()    
+    df_lista_nodos = pd.DataFrame(df_lista_nodos, columns=["Nodos"])
+    _df_lista_nodos1 = df_capac.reset_index()['nombre_J']+df_capac.reset_index()['servicio_K']
+    _df_lista_nodos1 = pd.DataFrame(_df_lista_nodos1, columns=["Nodos"])
+    
+    df_lista_nodos = pd.concat([df_lista_nodos, 
+                                _df_lista_nodos1],
+                               ignore_index=True)
+    
+    df_lista_nodos.reset_index(inplace=True)
+    df_lista_nodos = df_lista_nodos.rename(columns = {'index':'Consecutivo'})
+    df_lista_nodos['Posicion']=df_lista_nodos.apply(lambda row: re.findall(r'\d+', row['Nodos']),axis='columns')
+    df_lista_nodos['Posicion']=df_lista_nodos.apply(lambda row: row['Posicion'] + ['00'] if len(row['Posicion'])==1 else row['Posicion'],axis='columns')
+    df_lista_nodos['Posicion_y']=df_lista_nodos.apply(lambda row: row['Posicion'][0],axis='columns')
+    df_lista_nodos['Posicion_x']=df_lista_nodos.apply(lambda row: row['Posicion'][1],axis='columns')
+    df_lista_nodos['Posicion_y'] = df_lista_nodos['Posicion_y'].astype('int')
+    df_lista_nodos['Posicion_x'] = df_lista_nodos['Posicion_x'].astype('int')
+    
+    # Normalizo las posiciones
+    df_lista_nodos['Posicion_x_norm'] = (df_lista_nodos['Posicion_x']-df_lista_nodos['Posicion_x'].min()+0.1)/(df_lista_nodos['Posicion_x'].max()-df_lista_nodos['Posicion_x'].min()+0.1)
+    df_lista_nodos['Posicion_y_norm'] = (df_lista_nodos['Posicion_y']-df_lista_nodos['Posicion_y'].min()+0.1)/(df_lista_nodos['Posicion_y'].max()-df_lista_nodos['Posicion_y'].min()+0.1)
+
+    # Construyo una matriz con origen, destino y valor
+    # Construcción para los flujos entre i y j (df_asignacion)
+    prueba=df_asignacion[['nombre_I','nombre_J','servicio_K','prop_tao_ijk','tao_ijk']]
+    prueba.loc[:, 'destino'] = prueba['nombre_J'] + prueba['servicio_K']
+    prueba=prueba.drop(['nombre_J','servicio_K'],axis=1)
+    prueba=prueba.rename(columns={'nombre_I':'origen','prop_tao_ijk':'flujo'})
+    print ("avance")
+    # Construcción para los flujos entre jk y jk
+    prueba2=df_arcos.reset_index()[['nombre_J','servicio_K','nombre_Jp','servicio_Kp','p_jjkk']]
+    prueba2['origen']=prueba2['nombre_J']+prueba2['servicio_K']
+    prueba2['destino']=prueba2['nombre_Jp']+prueba2['servicio_Kp']
+    prueba2=prueba2[['origen','destino','p_jjkk']]
+    prueba2=prueba2.rename(columns={'p_jjkk':'flujo'})
+    prueba=pd.concat([prueba, prueba2])
+
+    #Combino prueba y df_lista_nodos para obtener los flujos numerados
+    prueba=pd.merge(prueba,df_lista_nodos,left_on='origen',right_on="Nodos")
+    prueba=pd.merge(prueba,df_lista_nodos[['Nodos','Consecutivo']],left_on='destino',right_on="Nodos",how='left')
+
+    #Incluyo los datos de df_flujos_jkjk
+    df_flujos_jkjk=df_flujos_jkjk.set_index(['jk_origen','jk_destino'])
+    prueba=pd.merge(prueba,df_flujos_jkjk[['lambdas*probs']],left_on=['origen','destino'],right_index=True,how='left')
+    prueba.fillna(0,inplace=True)
+    prueba['lambdas*probs']=prueba['tao_ijk']+prueba['lambdas*probs']
+    
+    #Incluyo columnas con los valores de k origen y k destino
+    prueba['k_origen']=prueba.apply(lambda row: re.findall(r'k\d+', row['origen']),axis='columns')
+    prueba['k_destino']=prueba.apply(lambda row: re.findall(r'k\d+', row['destino']),axis='columns')
+    prueba['k_origen']=prueba.apply(lambda row: row['k_origen'][0] if len(row['k_origen'])==1 else row['Nodos_x'] ,axis='columns')
+    prueba['k_destino']=prueba.apply(lambda row: row['k_destino'][0],axis='columns')
+
+
+
+
+    #https://plotly.com/python/sankey-diagram/
+    # Construyo gráfico con flujos en términos de proporciones o flujos
+    
+    # Si necesito gráfico para un k específico, quito el comentario siguiente:
+    #prueba=prueba[(prueba['k_origen']=="k02") ]#| (prueba['k_destino']=="k02")]
+    #prueba=prueba[(prueba['k_origen']=="k01") | (prueba['k_origen']=="i01") | (prueba['k_destino']=="k01")]
+    
+    fig = go.Figure(data=[go.Sankey(
+        arrangement = "freeform", 
+        textfont = {"size":20},
+        node = {
+
+          "pad" : 20, # Espacio entre nodos
+          "thickness" : 20, #Ancho de cada nodo
+          #line = dict(color = "black", width = 0.5), #Línea de cada nodo
+          "label" : df_lista_nodos['Nodos'].tolist(), #label = ["i1", "i2", "i3", "i4", "j1k1", "j1k2" , "j1k3"],
+          "x": df_lista_nodos['Posicion_x_norm'],
+          "y": df_lista_nodos['Posicion_y_norm'],
+          #color = "blue"
+        },
+         link = {
+          "source":prueba['Consecutivo_x'].tolist(),        
+          "target":prueba['Consecutivo_y'].tolist(),
+          #"value":prueba['flujo'].tolist()
+          "value":prueba['lambdas*probs'].tolist(),
+             "arrowlen":15
+
+            #source = [0,1], # indices correspond to labels, eg A1, A2, A1, B1, ...
+            #target = [4,2], 
+          #value = [8,3]
+        }
+        )])
+
+    fig.update_layout(title_text="Proporciones de flujo entre nodos", font_size=18,  width=2200, height=900, margin_t=200)
+    fig.show()
+    fig.write_html(os.getcwd()+'/output/'+'figure_sankey.html')
 
 #%% <codecell> main
 

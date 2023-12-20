@@ -228,6 +228,14 @@ def create_df_arcos(network):
     network.file['df_arcos']=pd.merge(network.file['df_arcos'],network.file['df_oferta'].set_index('nombre_J'),
                                       left_index=True,right_index=True,how='outer')
     
+# def create_df_sigma_max(network):
+#     # Cargo la capacidad máxima de servidores en el sistema
+#     #df_sigma_max= pd.read_excel (archivo, sheet_name='sigma_max')
+#     import numpy as np
+#     archivo=network.archivo
+#     df_sigma_max = archivo['sigma_max']
+    
+#     network.file['df_sigma_max']=df_sigma_max.loc[np.arange(network.K)]
     
 if __name__ == "__main__":
 

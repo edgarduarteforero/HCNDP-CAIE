@@ -416,6 +416,42 @@ def set_kpi_network(network):
 
     network.file['df_medidas']=df_medidas
 
+def set_df_grafo_flujo_jkjk(network):
+    import pandas as pd 
+
+    df_grafo=network.file['df_arcos'].reset_index().copy()
+    df_capac=network.file['df_capac'].copy()
+    df_flujos_jj=network.file['df_flujos_jj'].copy()
+    df_probs_kk=network.file['df_probs_kk'].copy()
+    df_arcos=network.file['df_arcos'].copy()
+    df_capac=network.file['df_capac'].reset_index().copy()
+    df_capac.set_index(['nombre_J','servicio_K'],inplace=True)
+    df_capac['t_jk']=df_capac.apply (lambda row: 1 if row['s_jk*c_jk']>0 else 1, axis=1)
+    
+    df_grafo = df_grafo.loc[df_grafo['p_jjkk'] != 0]
+    df_grafo['jk']= df_grafo['nombre_J']+df_grafo['servicio_K']
+    df_grafo['jpkp']= df_grafo["nombre_Jp"]+df_grafo['servicio_Kp']
+    
+    df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
+    df_temporal['lambdas*probs']=df_temporal['lambdas']*df_temporal['p_jjkk']
+    df_temporal=df_temporal.reset_index()
+    df_temporal['jk_origen']=df_temporal['nombre_J']+df_temporal['servicio_K']
+    df_temporal['jk_destino']=df_temporal['nombre_Jp']+df_temporal['servicio_Kp']
+    df_grafo=df_temporal.reset_index()
+    df_grafo = df_grafo.loc[df_grafo['lambdas*probs'] != 0]
+    
+    network.file['df_grafo']=df_grafo
+    network.file['df_flujos_jkjk']=df_temporal
+    df_flujos_jkjk=network.file['df_flujos_jkjk']
+
+    #Hago el merge para t_jk
+    df_flujos_jkjk=pd.merge(df_flujos_jkjk,df_capac['t_jk'],left_on=['nombre_Jp','servicio_Kp']
+                  ,right_on=['nombre_J','servicio_K'],how='left')
+    df_flujos_jkjk=pd.merge(df_flujos_jkjk,df_flujos_jj,left_on=['nombre_J','nombre_Jp'],right_on=['nombre_J','nombre_Jp'], how='left')
+    df_flujos_jkjk=pd.merge(df_flujos_jkjk,df_probs_kk,left_on=['servicio_K','servicio_Kp'],right_on=['servicio_K','servicio_Kp'], how='left')
+    df_flujos_jkjk['p_kkp_True_False']=df_flujos_jkjk['p_kkp']>0 # Flujos posibles
+    df_flujos_jkjk['p_jjkk_True_False']=df_flujos_jkjk['p_jjkk']>0 #Flujos asignados
+
 #%% <codecell> Main    
 if __name__ == "__main__":
     import hcndp
