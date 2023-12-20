@@ -92,27 +92,25 @@ def create_df_asignacion(network):
     network.file['df_asignacion']=network.file['df_capac'].reset_index().set_index('nombre_J')
 
     #Fusiono matrices de oferta y distancia creando arcos
-    network.file['df_asignacion']=\
-            (pd.merge(network.file['df_asignacion'], \
-            network.file['df_dist_ij'].set_index(['nombre_J']),
-            left_index=True,right_index=True,how='outer').sort_values('dist_IJ').reset_index())
+    network.file['df_asignacion']=pd.merge(network.file['df_asignacion'], 
+                                           network.file['df_dist_ij'].set_index(['nombre_J']),
+                                           left_index=True,right_index=True,how='outer').sort_values('dist_IJ').reset_index()
     
     #Creo una matriz con las distancias de cobertura que se digitaron como parámetros
     network.file['df_asignacion']=pd.merge(network.file['df_asignacion'], 
-            network.file['df_demanda'].reset_index()[['nombre_I','ubicacionesI_x','ubicacionesI_y']] 
-            ,on='nombre_I',how='inner').drop_duplicates()
+                                           network.file['df_demanda'].reset_index()[['nombre_I','ubicacionesI_x','ubicacionesI_y']],
+                                           on='nombre_I',how='inner').drop_duplicates()
      
     # Calculo las distancias ajustadas por la función de decaimiento con el título f_dij
-    network.file['df_asignacion']['f_dij']=network.file['df_asignacion']. \
-                apply(lambda row: decay_gauss(row["dist_IJ"],row["d_o_k"]),axis='columns')
-    network.file['df_asignacion']=network.file['df_asignacion']. \
-                set_index(['nombre_J','servicio_K'])
+    network.file['df_asignacion']['f_dij']=network.file['df_asignacion'].apply(lambda row: decay_gauss(row["dist_IJ"],row["d_o_k"]),axis='columns')
+    network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_J','servicio_K'])
 
     network.file['df_flujos_ijk']=network.file['df_flujos_ijk'].set_index(['nombre_I','nombre_J','servicio_K']).sort_index()
     network.file['df_asignacion']=network.file['df_asignacion'].drop(['tao_ijk','z_ijk'], axis=1, errors='ignore')
     network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
     network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
     network.file['df_asignacion']=pd.merge(network.file['df_asignacion'], network.file['df_flujos_ijk'],left_index=True, right_index=True)
+
 def create_df_probs_kk(network):
     import numpy as np
     import pandas as pd
