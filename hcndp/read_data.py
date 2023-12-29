@@ -67,24 +67,44 @@ def delete_surplus_data(network):
     network.file['df_niveles']=network.file['df_niveles'].query('servicio_K in @items')
     network.file['df_capac']=network.file['df_capac'].query('servicio_K in @items')
     network.file['df_flujos_ijk']=network.file['df_flujos_ijk'].query('servicio_K in @items')
+    network.file['df_sigma_max']=network.file['df_sigma_max'].query('servicio_K in @items')
 
 
-def merge_niveles_capac(network):
+def merge_niveles_capac(network,post_optima):
     #Agrego las columna nivel de atención y ubicaciones
     import pandas as pd
+    import os
+    
     network.file['df_capac']=pd.merge(network.file['df_capac'],network.file['df_niveles'],on='servicio_K',how='left')
     network.file['df_capac']=pd.merge(network.file['df_capac'],network.file['df_oferta'],on='nombre_J',how='inner')
     network.file['df_capac']=network.file['df_capac'].set_index(['nombre_J','servicio_K'],drop=True)
     
-    if network.file['df_capac']['s_jk'].sum() < network.file['df_capac']['sigma_jk'].sum():
-        print ("""Hay un error en la capacidad.
-               La suma de los s_jk es menor a la suma de los sigma_jk asignados.
-               """)
-        raise SystemExit("Stop right there!")
+    if post_optima==True:
+        output_file=os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
+
+        data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+                                 index_col=0)
+        network.file['df_capac']= pd.merge(network.file['df_capac'],data.set_index(['nombre_J','servicio_K']),left_index=True,right_index=True)
+    
+        network.file['df_capac'].drop(['sigma_jk_x'],axis=1,inplace=True)
+        network.file['df_capac'].insert(4,'sigma_jk',network.file['df_capac'].pop('sigma_jk_y'))
         
-def create_df_asignacion(network):
+        network.file['df_capac']['sigma_jk'] = network.file['df_capac']['sigma_jk'].round(0).astype('int')
+    
+    if post_optima==False:   
+        if network.file['df_capac']['s_jk'].sum() < network.file['df_capac']['sigma_jk'].sum():
+            print ("""Hay un error en la capacidad.
+                   La suma de los s_jk es menor a la suma de los sigma_jk asignados.
+                   """)
+            raise SystemExit("Stop right there!")
+        
+def create_df_asignacion(network,post_optima):
     import pandas as pd
     from hcndp.data_functions import decay_gauss
+    import os
+    from hcndp.data_functions import indices
+    import numpy as np
+
     
     # Creo la matriz df_asignación para construir los arcos de la red
     # En la matriz df_asignacion creamos las columnas para incorporar la función de decaimiento de la distancia
@@ -110,6 +130,38 @@ def create_df_asignacion(network):
     network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
     network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
     network.file['df_asignacion']=pd.merge(network.file['df_asignacion'], network.file['df_flujos_ijk'],left_index=True, right_index=True)
+
+    if post_optima == True:
+        # Cargo los resultados obtenidos de la optimización
+        path=os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
+        archivo_salida_optim = pd.read_excel(path, sheet_name=None)
+
+        network.file['df_flujos_ijk']=archivo_salida_optim['f_ijk']
+        network.file['df_fi_ijkjk'] = archivo_salida_optim['fi_ijkjk']
+        
+        # Elimino los flujos que no quiero contemplar en el ejercicio
+        delete_surplus_data(network)
+        
+        # Creo la variable z_ijk que tiene valores 1 o 0
+        df_flujos_ijk=network.file['df_flujos_ijk'].copy()
+        df_flujos_ijk['z_ijk']= np.where(df_flujos_ijk['tao_ijk']!=0, 1,0)
+        df_flujos_ijk=df_flujos_ijk.set_index(['nombre_I','nombre_J','servicio_K']).sort_index()
+        
+        # Creo copias de df_asignacion y df_w_ij
+        df_asignacion=network.file['df_asignacion'].copy()
+        df_w_ij=network.file['df_w_ij'].copy()
+        
+        # Actualizo df_asignacion
+        df_asignacion=df_asignacion.reset_index(level=['servicio_K']).\
+                    merge(df_w_ij.set_index(['nombre_I','nombre_J']),
+                          left_index=True,right_index=True).rename(columns={"w_ij": "Flujo_w_ij"})
+        df_asignacion=df_asignacion.reset_index()
+        df_asignacion=df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'])
+        df_asignacion=df_asignacion.drop(['tao_ijk','z_ijk'], axis=1, errors='ignore')
+        df_asignacion=pd.merge(df_asignacion, df_flujos_ijk,left_index=True, right_index=True)
+        network.file['df_asignacion']=df_asignacion
+        network.file['df_flujos']=df_flujos_ijk
+
 
 def create_df_probs_kk(network):
     import numpy as np
@@ -147,13 +199,13 @@ def create_df_probs_kk(network):
                                 rename(columns={"index": "nombre_J", "variable": "nombre_Jp","value":"x_jjp"})
 
 
-def create_df_arcos(network): 
+def create_df_arcos(network,post_optima): 
     # Creo df_arcos con los índices de j y de k. Es un df con [j j' k k']
     # Explicación en p- 9B Notas del doctorado
-    
     from hcndp.data_functions import indices
     import pandas as pd
     import numpy as np
+    import os
     
     lista=[]
     j=indices("j",network.J)
@@ -166,51 +218,72 @@ def create_df_arcos(network):
     
     network.file['df_arcos']=pd.DataFrame(lista,columns=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'])
     network.file['df_arcos'].sort_values(by=['nombre_J','servicio_K'], inplace=True)
+
     
-    # Construyo la matriz a partir de las probabilidades de transferencia entre servicios kk' y 
-    # los flujos habilitados jj'
-    # Obtengo las probabilidades de transferencia entre servicios y lo covierto en un df kk'
-    data1 = network.file['prob_serv'].drop(['Unnamed: 0'], axis=1)
-    data1 = data1.loc[np.arange(network.K)]
-    data1 = data1[np.arange(network.K)+1]
-    data1 = np.nan_to_num(data1) 
-
-    # Obtengo los flujos habilitados entre j y j'
-    data2 = network.file['flujos_jj']
-    data2=data2.loc[np.arange(network.J)]
-    data2=data2.iloc[:,np.arange(network.J)+1]
-    data2=np.nan_to_num(data2) 
-
-    # Construyo una matriz con las probabilidades 
-    matriz=network.file['df_capac'].loc[:]['sigma_jk'].to_numpy().reshape(network.J,network.K) #Matriz con los valores de sigma_jk. 
-    matriz=np.where(matriz == 0, 0, 1) #Convierto matriz a binario
-    probs=[]
-    for j_ in range (network.J):
-        for k_ in range (network.K):
-            #data1:probabilidades entre servicios k
-            #data2:enlaces entre instalaciones j
-            #matriz: capacidad de recibir en jk
-            data4=np.where(data1== 0, 0, 1) #Convierto matriz de data1 a binario
-            data4=np.tile(data4[k_], (network.J, 1)) #Construyo una matriz de J filas y k columnas 
-            # Cada fila indica si puedo enviar desde cada j y k_ a cualquier otro k
-            data4=np.multiply(data4,matriz) # Combino matrices. 
-            # Data4 indica si puedo enviar desde J y K1 a cualquier destino k de acuerdo con las probabilidades
-            # Matriz indica si la combinación j k puede recibir de acuerdo con la capacidad sigma_jk
-            # Estoy en un bucle. La matriz indica desde j_ y k_ a qué j__ y k__ puedo remitir
-            data4=np.multiply(data4,np.transpose(np.tile(data2[j_],(network.K,1)))) #Combino con los enlaces entre j1 y j2
-            #La suma de cada columna en j4 indica a cuántos destinos puedo enviar desde j1 y k1
-            for j__ in range (network.J):
-                for k__ in range (network.K):
-                    a = data2[j_,j__]*data1[k_,k__]*matriz[j__,k__]/np.sum(data4[:,k__]) if np.sum(data4[:,k__])!=0 else 0
-                    #probs.append([j_,k_,j__,k__,data2[j_,j__],data1[k_,k__],matriz[j__,k__],np.sum(data4[:,k__]),a])
-                    
-                    probs.append(a)
-                    # Probs depende de si existe p_kk (data1), si existe x_jj (data2), si hay capacidad sigma_jk (matriz) y el número de destinos
-                    # Probs de ir de jk a j'k'. Se divide por el número de destinos para
-                    # no incurrir en que la suma de las probabilidades sea mayor a 1.
-
-    probs = np.reshape(probs,([len(data1)*len(data2),len(data1)*len(data2)]))
+    if post_optima==True:
+        path=os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
+        archivo_salida_optim = pd.read_excel(path, sheet_name=None)
+        data = archivo_salida_optim['prob_fi_jkjk']
+        #data = pd.read_excel (archivo, sheet_name='df_probs')
+        #data = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/FLNDP/datos.xlsx',sheet_name='probs')
+        data= data.drop(['Unnamed: 0'], axis=1)
+        #data= data.drop(['Unnamed: 1'], axis=1)
+        #data= data.drop(index=0)
+        #probs = np.array(data)
+         
+        probs=data.loc[:]['Probs'].to_numpy().reshape(network.J*network.K,network.J*network.K)
     
+
+    if post_optima==False:
+
+        
+        # network.file['df_arcos']=pd.DataFrame(lista,columns=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'])
+        # network.file['df_arcos'].sort_values(by=['nombre_J','servicio_K'], inplace=True)
+        
+        # Construyo la matriz a partir de las probabilidades de transferencia entre servicios kk' y 
+        # los flujos habilitados jj'
+        # Obtengo las probabilidades de transferencia entre servicios y lo covierto en un df kk'
+        data1 = network.file['prob_serv'].drop(['Unnamed: 0'], axis=1)
+        data1 = data1.loc[np.arange(network.K)]
+        data1 = data1[np.arange(network.K)+1]
+        data1 = np.nan_to_num(data1) 
+    
+        # Obtengo los flujos habilitados entre j y j'
+        data2 = network.file['flujos_jj']
+        data2=data2.loc[np.arange(network.J)]
+        data2=data2.iloc[:,np.arange(network.J)+1]
+        data2=np.nan_to_num(data2) 
+    
+        # Construyo una matriz con las probabilidades 
+        matriz=network.file['df_capac'].loc[:]['sigma_jk'].to_numpy().reshape(network.J,network.K) #Matriz con los valores de sigma_jk. 
+        matriz=np.where(matriz == 0, 0, 1) #Convierto matriz a binario
+        probs=[]
+        for j_ in range (network.J):
+            for k_ in range (network.K):
+                #data1:probabilidades entre servicios k
+                #data2:enlaces entre instalaciones j
+                #matriz: capacidad de recibir en jk
+                data4=np.where(data1== 0, 0, 1) #Convierto matriz de data1 a binario
+                data4=np.tile(data4[k_], (network.J, 1)) #Construyo una matriz de J filas y k columnas 
+                # Cada fila indica si puedo enviar desde cada j y k_ a cualquier otro k
+                data4=np.multiply(data4,matriz) # Combino matrices. 
+                # Data4 indica si puedo enviar desde J y K1 a cualquier destino k de acuerdo con las probabilidades
+                # Matriz indica si la combinación j k puede recibir de acuerdo con la capacidad sigma_jk
+                # Estoy en un bucle. La matriz indica desde j_ y k_ a qué j__ y k__ puedo remitir
+                data4=np.multiply(data4,np.transpose(np.tile(data2[j_],(network.K,1)))) #Combino con los enlaces entre j1 y j2
+                #La suma de cada columna en j4 indica a cuántos destinos puedo enviar desde j1 y k1
+                for j__ in range (network.J):
+                    for k__ in range (network.K):
+                        a = data2[j_,j__]*data1[k_,k__]*matriz[j__,k__]/np.sum(data4[:,k__]) if np.sum(data4[:,k__])!=0 else 0
+                        #probs.append([j_,k_,j__,k__,data2[j_,j__],data1[k_,k__],matriz[j__,k__],np.sum(data4[:,k__]),a])
+                        
+                        probs.append(a)
+                        # Probs depende de si existe p_kk (data1), si existe x_jj (data2), si hay capacidad sigma_jk (matriz) y el número de destinos
+                        # Probs de ir de jk a j'k'. Se divide por el número de destinos para
+                        # no incurrir en que la suma de las probabilidades sea mayor a 1.
+    
+        probs = np.reshape(probs,([len(data1)*len(data2),len(data1)*len(data2)]))
+        
     # Cada fila es un par jk y cada columna es un par j'k'
     # Con base en la matriz de probabilidades construyo los arcos
     network.file['df_arcos']['p_jjkk']=probs.flatten()
@@ -227,7 +300,7 @@ def create_df_arcos(network):
     network.file['df_arcos']=network.file['df_arcos'].set_index(['nombre_J'])
     network.file['df_arcos']=pd.merge(network.file['df_arcos'],network.file['df_oferta'].set_index('nombre_J'),
                                       left_index=True,right_index=True,how='outer')
-    
+        
 # def create_df_sigma_max(network):
 #     # Cargo la capacidad máxima de servidores en el sistema
 #     #df_sigma_max= pd.read_excel (archivo, sheet_name='sigma_max')
@@ -247,7 +320,7 @@ if __name__ == "__main__":
     import os
     network=network_data.Network(_I,_J,_K,_archivo)
     #path=os.getcwd()+'\\data\'+network.archivo
-    path=os.path.dirname(os.getcwd())+'/data/'+network.archivo
+    path=os.path.dirname(os.getcwd())+'/data/'+network.name+'/'+network.archivo 
     read_file_excel(network,path)
     delete_surplus_data(network)
     merge_niveles_capac(network)

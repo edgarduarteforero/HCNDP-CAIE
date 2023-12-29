@@ -1,3 +1,9 @@
+set I := i01 i02 i03 i04 ;
+
+set J := j01 j02 j03 j04 ;
+
+set K := k01 k02 k03 k04 ;
+
 param r_q := 
 k01 k01 0.1
 k02 k01 0.0
@@ -209,13 +215,7 @@ param sigma_max :=
 k01 150
 k02 150
 k03 150
-k04 150
-k05 150
-k06 100
-k07 100
-k08 100
-k09 100
-k10 100;
+k04 150;
 
 param K_size := 
 4;

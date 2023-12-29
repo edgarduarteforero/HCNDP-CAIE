@@ -86,7 +86,7 @@ def figure_network_cartesian(network):
     ax.set_ylim(ax.get_ylim()[0] - 0.1, ax.get_ylim()[1] + 0.1)
     plt.show()
     #plt.pause(0.1) #Muestra imagen en pestaña Plots a medida que se ejecuta el código
-    path=os.getcwd()+'/output/'+'network_cartesian.png'
+    path=os.getcwd()+'/output/'+network.name+'/network_cartesian.png'
     plt.savefig(path, dpi=300)
   
     
@@ -99,7 +99,7 @@ def figure_chord_diagram(network):
     hv.extension('bokeh','matplotlib')
     import webbrowser
     import os
-    path=os.getcwd()+'/output/'
+    path=os.getcwd()+'/output/'+network.name+'/'
 
     # Construyo un dataframe con jjpkkp y pjjkk
     df_arcos=network.file['df_arcos'].reset_index()
@@ -178,7 +178,7 @@ def figure_prob_custom_queue(network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+str(customers)+'_prob_custom_queue.png'
+    path=os.getcwd()+'/output/'+network.name+'/'+str(customers)+'_prob_custom_queue.png'
     plt.savefig(path, dpi=300)
      
 def figure_prob_time_in_queue(network):
@@ -212,7 +212,7 @@ def figure_prob_time_in_queue(network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+str(time)+'prob_time_in_queue.png'
+    path=os.getcwd()+'/output/'+network.name+'/'+str(time)+'prob_time_in_queue.png'
     plt.savefig(path, dpi=300)
 
 #%% <codecell> Congestion and Queuing theory figures
@@ -250,7 +250,7 @@ def figure_Lq_per_node (network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+'figure_Lq_per_node.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_Lq_per_node.png'
     plt.savefig(path, dpi=300)
     
 def figure_Wq_per_node (network):
@@ -282,7 +282,7 @@ def figure_Wq_per_node (network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+'figure_Wq_per_node.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_Wq_per_node.png'
     plt.savefig(path, dpi=300)
       
 def figure_service_rate_per_node(network):
@@ -299,7 +299,7 @@ def figure_service_rate_per_node(network):
     sns.set(rc = {'figure.figsize':(5,5)})
     ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,annot=True,annot_kws={"size": 7},cbar_kws={'label': 'Number of servers'})
     ax.set(xlabel='Services (k)', ylabel='Facilities (j)')
-    path=os.getcwd()+'/output/'+'service_rate_per_node.png'
+    path=os.getcwd()+'/output/'+network.name+'/service_rate_per_node.png'
     ax.figure.savefig(path,dpi=300) 
     print (ax)
     
@@ -316,7 +316,7 @@ def figure_rho_per_node(network):
     sns.set(rc = {'figure.figsize':(6,6)})
     ax1=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,vmin=0, vmax=1,annot=True,annot_kws={"size": 7},cbar_kws={'label': 'Rho'})
     ax1.set(xlabel='Services (k)', ylabel='Facilities (j)')
-    path=os.getcwd()+'/output/'+'rho_per_node.png'
+    path=os.getcwd()+'/output/'+network.name+'/rho_per_node.png'
     ax1.figure.savefig(path,dpi=300)
     print (ax1)
 
@@ -346,7 +346,7 @@ def figure_rho_weighted(network):
     ax.set_xticks(x,labels)
     ax.legend()
     fig.tight_layout()
-    path=os.getcwd()+'/output/'+'rho_weighted.png'
+    path=os.getcwd()+'/output/'+network.name+'/rho_weighted.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)    
 
@@ -434,7 +434,7 @@ def figure_nodes_coverage(network):
         plt.colorbar(im_oferta,ax=ax[k],label="Oferta (Servidores)")
         plt.colorbar(im_demanda,ax=ax[k],location='bottom',label="Demanda (Pacientes)")
     plt.show()
-    path=os.getcwd()+'/output/'+'figure_nodes_coverage.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_nodes_coverage.png'
     plt.savefig(path, dpi=300)
 
 def figure_gaussian(network):
@@ -451,7 +451,7 @@ def figure_gaussian(network):
     
     # Mostrar el gráfico
     plt.show()
-    path=os.getcwd()+'/output/'+'figure_gaussian.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_gaussian.png'
     plt.savefig(path, dpi=300)
 
 def figure_accessibility(network):
@@ -550,7 +550,7 @@ def figure_accessibility(network):
         plt.colorbar(im_demanda,ax=ax[i],location='bottom',label="Demand (Patients/unit of time)")
         
     plt.show()
-    path=os.getcwd()+'/output/'+'figure_accessibility.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_accessibility.png'
     plt.savefig(path, dpi=300)
 
 def figure_heatmap_accessibility(network):
@@ -567,7 +567,7 @@ def figure_heatmap_accessibility(network):
     ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,annot=True,annot_kws={"size": 7})#,vmin=0, vmax=5000)
     ax.set(xlabel='Services (k)', ylabel='Demand nodes (i)')
     
-    path=os.getcwd()+'/output/'+'figure_heatmap_accessibility.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_heatmap_accessibility.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)    
     
@@ -598,7 +598,7 @@ def figure_accessibility_per_node(network):
     ax.legend()
     fig.tight_layout()
 
-    path=os.getcwd()+'/output/'+'figure_accessibility_per_node.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_node.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)    
 
@@ -630,7 +630,7 @@ def figure_accessibility_per_service(network):
     ax.legend()
     fig.tight_layout()
 
-    path=os.getcwd()+'/output/'+'figure_accessibility_per_service.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_service.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)  
 
@@ -656,7 +656,7 @@ def figure_flows_f_ijk(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (ik)',title='Patient flow between demand and supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+'figure_flows_f_ijk.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)  
 
@@ -681,7 +681,7 @@ def figure_flows_f_ijk_k1(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (ik)',title='Patient flow between demand and supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+'figure_flows_f_ijk_k1.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk_k1.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)  
 
@@ -704,7 +704,7 @@ def figure_flows_f_ijkjk(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (jk)',title='Proportions of patients between supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+'figure_flows_f_ijkjk.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijkjk.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)  
 
@@ -732,7 +732,7 @@ def figure_flows_f_jpkpjk(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (jk)',title='Patient flow between supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+'figure_flows_f_jpkpjk.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_jpkpjk.png'
     plt.show()
     ax.figure.savefig(path,dpi=300)  
 
@@ -756,7 +756,7 @@ def figure_digraph(network):
     nx.draw(G, with_labels=True, font_size=8,node_size=1000, node_color='lightgrey',alpha=1, arrows=True, edge_color=df_grafo['p_jjkk'],
             edge_cmap=plt.cm.Oranges,pos=nx.nx_agraph.graphviz_layout(G, prog="neato"))
     
-    path=os.getcwd()+'/output/'+'figure_digraph.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_digraph.png'
     plt.show()
     plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
 
@@ -787,7 +787,7 @@ def figure_digraph_complete(network):
             edge_cmap=plt.cm.Oranges,pos=nx.circular_layout(G))
     
     
-    path=os.getcwd()+'/output/'+'figure_digraph_complete.png'
+    path=os.getcwd()+'/output/'+network.name+'/figure_digraph_complete.png'
     plt.show()
     plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
     
@@ -904,7 +904,7 @@ def figure_sankey(network):
 
     fig.update_layout(title_text="Proporciones de flujo entre nodos", font_size=18,  width=2200, height=900, margin_t=200)
     fig.show()
-    fig.write_html(os.getcwd()+'/output/'+'figure_sankey.html')
+    fig.write_html(os.getcwd()+'/output/'+network.name+'/figure_sankey.html')
 
 #%% <codecell> main
 

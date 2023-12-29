@@ -8,7 +8,7 @@ Created on Tue Dec 19 18:29:12 2023
 def export_data(network):
     import pandas as pd
     import os
-    output_file=os.getcwd()+'/output/'+'salida.xlsx'
+    output_file=os.getcwd()+'/output/'+network.name+'/salida_medicion.xlsx'
         
     with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
         # Iterar a través del diccionario y escribir cada DataFrame en una hoja
@@ -34,7 +34,7 @@ def create_index_sheet(network):
 
     
     # Nombre del archivo Excel
-    excel_file = os.getcwd()+'/output/'+'salida.xlsx'
+    excel_file = os.getcwd()+'/output/'+network.name+'/salida_medicion.xlsx'
     
     # Cargar el archivo existente
     workbook = openpyxl.load_workbook(excel_file)
@@ -63,11 +63,11 @@ def create_index_sheet(network):
     # Guardar el archivo actualizado
     workbook.save(excel_file)
 
-def create_instance(network):
+def create_data_dat(network):
     import os
     from hcndp.data_functions import indices
     
-    path=os.getcwd()+'/data/'+'datos.dat'
+    path=os.getcwd()+'/data/'+network.name+'/datos.dat'
 
     I=network.I
     J=network.J
@@ -81,9 +81,9 @@ def create_instance(network):
             file.write(letra.lower()+f"{i:02d}"+" ")
         file.write(";\n\n")
     
-    indices("I",I)
-    indices("J",J)
-    indices("K",K)
+    indices_data_dat("I",I)
+    indices_data_dat("J",J)
+    indices_data_dat("K",K)
 
 
     df_probs_kk=network.file['df_probs_kk']

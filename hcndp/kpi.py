@@ -110,6 +110,7 @@ def set_lambda_jk (network):
 
     # SEGUNDO BLOQUE
     # Cálculo de lambdas y rho para cada par j k
+    # if post_optima==False:
     df_capac=network.file['df_capac']
     probs=network.file['df_arcos']['p_jjkk']
     probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
@@ -119,6 +120,19 @@ def set_lambda_jk (network):
     df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
     df_capac.replace([np.inf,-np.inf], 0, inplace=True)
     df_capac.fillna(0,inplace=True)
+    
+    # if post_optima==True:
+    # #TERCER BLOQUE
+    # ## También puedo importar los datos de lambda_jk desde el archivo datos.xlxs
+    # #df_capac['lambdas']=pd.read_excel (r'datos.xlsx', sheet_name='df_capac')
+    # #data = pd.read_excel ('salida_optimizacion.xlsx',sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)
+    # data = archivo_salida_optim['l_jk']
+    # df_capac=df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')
+    # df_capac=df_capac.rename(columns={"lambda_jk": "lambdas"})
+    # df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
+    # df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
+    # df_capac.fillna(0,inplace=True)
+    # df_capac.replace([np.inf, -np.inf], 0, inplace=True)
     
 def set_lambda_ijk (network):
     import numpy as np
@@ -462,7 +476,7 @@ if __name__ == "__main__":
     import os
     
     network=network_data.Network(_I,_J,_K,_archivo)
-    path=os.path.dirname(os.getcwd())+'/data/'+network.archivo
+    path=os.path.dirname(os.getcwd())+'/data/'+network.name+'/'+network.archivo
     read_file_excel(network,path)
     #read_data.read_parameters(network)
     read_file_excel(network,path)
