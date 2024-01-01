@@ -315,49 +315,189 @@ class Network:
             objective = int (input("Selecciona una opción: \n"))
             if 1 <= objective <= 6:
                 self.objective=objective
+                self.optimizar=True
                 return [objective,_menu_options[str(objective)]]
-            
-            elif objective == "7":
-              break
+                
+            elif objective == 7:
+                self.optimizar=False
+                break
+          
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
         
             
-    def calculate_exact_optima(self,objective,networks) :
-        from hcndp import optima
-        from hcndp import network_data
-        from hcndp.network_data import _I,_J,_K,_archivo,_name_network,_models
-
-        _menu_options = {
-        '1': 'Minimizar congestión máxima (rho)',
-        '2': 'Maximizar accesibilidad mínima (alpha)',
-        '3': 'Maximizar continuidad mínimia (delta)',
-        '4': 'Maximizar accesibilidad total (alpha)',
-        '5': 'Minimizar usuarios en espera total (Lq_total)',
-        '6': 'Maximizar continuidad total (delta total)',
-        '7': 'Salir al menú anterior'
-        }
-        _name=str(f"objective_{_menu_options[str(objective)]}")
-        optima.set_model_abstract(objetivo=objective,
-                                  nombre_modelo=_name,
-                                  _menu_options=_menu_options,
-                                  self=self,
-                                  networks=networks)
-        model=self.models[_name]
-        optima.read_data_dat(self,model)
-        optima.set_instance(model.model_abstract , model.data_dat, objective, model)
-        if objective == 5:
-            optima.solve_ipopt(self, model,model.instance)
-        else:
-            optima.solve_gurobi(self, model,model.instance)          
-        optima.get_degrees_freedom(model.instance)           
-        optima.set_solution_excel(self, model.instance)
-        optima.set_solution_txt(self, model.instance)
+    # def calculate_exact_optima(self,objective,networks) :
+    #     from hcndp import optima
+    #     from hcndp import network_data
+    #     from hcndp.network_data import _I,_J,_K,_archivo,_name_network,_models
+    #     from hcndp import kpi 
         
-        # Actualizo la red original con una nueva red
-        optima.update_solution_post_optima(original_network=self,
-                                           new_network=networks[_name])
+    #     _menu_options = {
+    #     '1': 'Minimizar congestión máxima (rho)',
+    #     '2': 'Maximizar accesibilidad mínima (alpha)',
+    #     '3': 'Maximizar continuidad mínimia (delta)',
+    #     '4': 'Maximizar accesibilidad total (alpha)',
+    #     '5': 'Minimizar usuarios en espera total (Lq_total)',
+    #     '6': 'Maximizar continuidad total (delta total)',
+    #     '7': 'Salir al menú anterior'
+    #     }
+    #     _name=str(f"objective_{_menu_options[str(objective)]}")
+        
+    #     optima.set_model_abstract(objetivo=objective,
+    #                               nombre_modelo=_name,
+    #                               _menu_options=_menu_options,
+    #                               self=self,
+    #                               networks=networks)
+    #     model=self.models[_name]
+    
+        
+    #     optima.read_data_dat(self,model)
+    #     optima.set_instance(model.model_abstract , model.data_dat, objective, model)
+    #     if objective == 5:
+    #         optima.solve_ipopt(self, model,model.instance)
+    #     else:
+    #         optima.solve_gurobi(self, model,model.instance)          
+    #     optima.get_degrees_freedom(model.instance)           
+    #     optima.set_solution_excel(self, model.instance)
+    #     optima.set_solution_txt(self, model.instance)
+        
+    #     # Actualizo la red original con una nueva red
+    #     optima.update_solution_post_optima(original_network=self,
+    #                                        new_network=networks[_name])
 
         
         
+    def create_data_dat(self):
+        import os
+        from hcndp.data_functions import indices
+        
+        path=os.getcwd()+'/data/'+self.name+'/datos.dat'
+    
+        I=self.I
+        J=self.J
+        K=self.K 
+        
+        file= open(path,"w+")
+        
+        def indices_data_dat(letra,cantidad): # Se generan listas tipo j01,j02,j03
+            file.write("set %s := "% letra)
+            for i in range (1,cantidad+1):
+                file.write(letra.lower()+f"{i:02d}"+" ")
+            file.write(";\n\n")
+        
+        indices_data_dat("I",I)
+        indices_data_dat("J",J)
+        indices_data_dat("K",K)
+    
+    
+        df_probs_kk=self.file['df_probs_kk']
+        df_demanda=self.file['df_demanda']   
+        df_capac=self.file['df_capac']
+        df_flujos_jj=self.file['df_flujos_jj']
+        df_asignacion=self.file['df_asignacion']
+        df_w_ij=self.file['df_w_ij']
+        df_sigma_max=self.file['df_sigma_max']
+        
+        
+        #Escribo los r_q
+        file.write("param %s := \n"%"r_q")
+        file.write(df_probs_kk[['servicio_K','servicio_Kp','p_kkp']].to_string(header=False, index=False))
+        file.write(";\n\n")
+        
+        #Escribo los h
+        file.write("param %s := \n"%"h")
+        file.write(df_demanda.reset_index()[['nombre_I','servicio_K','h_ik']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        #Escribo los s
+        file.write("param %s := \n"%"s")
+        file.write(df_capac.reset_index()[['nombre_J','servicio_K','s_jk']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        #Escribo los c
+        file.write("param %s := \n"%"c")
+        file.write(df_capac.reset_index()[['nombre_J','servicio_K','c_jk']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        #Escribo los x
+        file.write("param %s := \n"%"x")
+        file.write(df_flujos_jj.reset_index()[['nombre_J','nombre_Jp','x_jjp']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        
+        #Escribo los d
+        file.write("param %s := \n"%"d")
+        file.write(df_asignacion[['nombre_I','nombre_J','servicio_K','f_dij']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        #Escribo los w
+        file.write("param %s := \n"%"w")
+        file.write(df_w_ij.reset_index()[['nombre_I','nombre_J','w_ij']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        # Escribo M. El número máximo de servidores en un solo jk (max de los s_jk)
+        file.write("#Número máximo de s_jk \n")
+        file.write("param %s := \n"%"M")
+        file.write(str(df_capac['s_jk'].max()))
+        file.write(";\n\n")
+        
+        # Escribo CDemanda máxima en los nodos de demandae haber en un solo jk (max de los s_jk *c_jk)
+        file.write("#Máximo de los s_jk * c_jk \n")
+        file.write("param %s := \n"%"cap_max")
+        file.write(str(df_capac['s_jk*c_jk'].max()))
+        file.write(";\n\n")
+        
+        # Escribo H (Demanda máxima en los nodos de demanda)
+        file.write("#Demanda máxima en los nodos de demanda \n")
+        file.write("param %s := \n"%"H")
+        file.write(str(df_demanda['demanda_i'].max()))
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"e")
+        file.write("10e-3")
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"r_bin_kk")
+        file.write(df_probs_kk[['servicio_K','servicio_Kp','bin']].to_string(header=False, index=False))
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"sigma_max")
+        file.write(df_sigma_max[['servicio_K','sigma_max']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"K_size")
+        file.write(str(K))
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"J_size")
+        file.write(str(J))
+        file.write(";\n\n")
+        
+        file.close()
 
+    def calculate_kpi_before_optim(self):
+        from hcndp import kpi
+        kpi.set_lambda_jk(self)
+        kpi.set_lambda_ijk(self)
+        kpi.set_phi_ijkjk(self)
+        kpi.set_prop_tao(self)
+        kpi.set_prob_k(self)
+        
+        #print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
+        #customers = int(input("Ingresa un valor para clientes: \n"))
+        #kpi.set_prob_custom_queue(self,customers)
+        #self.file['customers']=customers
+        
+        #print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
+        #time = int(input("Ingresa un valor para t: \n"))
+        #kpi.set_prob_wait_time (self,time)
+        #self.file['time']=time
+        
+        #kpi.set_kpi_per_node(self)
+        #kpi.set_e2sfca(self)
+        #kpi.set_accessibility_per_node(self)
+        #kpi.set_accessibility_per_service(self)
+        #kpi.set_continuity_per_node(self)
+        #kpi.set_kpi_network(self)
+        #kpi.set_df_grafo_flujo_jkjk(self)
+        

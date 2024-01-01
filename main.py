@@ -40,7 +40,7 @@ networks_dict={} #Diccionario con las redes utilizadas en el programa
 solutions_dict={} #Diccionario con las soluciones a las redes del programa
 networks_dict[_name] = network.Network(I,J,K,archivo,_name)
 networks_dict[_name].create_folders()
-
+_optimizar=False
 print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 
@@ -48,7 +48,6 @@ print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 networks_dict[_name].read_file_excel(archivo)
 networks_dict[_name].delete_surplus_data()
-
 print (f"\nSe han creado exitosamente los datos en el objeto {_name}.")
 
 
@@ -57,6 +56,7 @@ print (f"\nSe han creado exitosamente los datos en el objeto {_name}.")
 from hcndp import solutions
 # Indicamos origen de datos y definimos valores I,J,K
 solutions.menu_solutions(network_original=networks_dict[_name],
-                         solutions_dict=solutions_dict)
+                         solutions_dict=solutions_dict,
+                         )
 
 
