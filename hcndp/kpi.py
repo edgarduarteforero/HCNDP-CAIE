@@ -18,13 +18,18 @@ def calculate_kpi(current_solution,_post_optima):
     set_prop_tao(current_solution,network)
     set_prob_k(current_solution,network)
     
-    print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
-    customers = int(input("Ingresa un valor para clientes: \n"))
+    
+    if 'customers' not in network.file:
+        print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
+        customers = int(input("Ingresa un valor para clientes: \n"))
+    
     set_prob_custom_queue(network,customers)
     network.file['customers']=customers
     
-    print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
-    time = int(input("Ingresa un valor para t: \n"))
+    if 'time' not in network.file:
+        print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
+        time = int(input("Ingresa un valor para t: \n"))
+        
     set_prob_wait_time (network,time)
     network.file['time']=time
     
@@ -35,7 +40,9 @@ def calculate_kpi(current_solution,_post_optima):
     set_continuity_per_node(network)
     set_kpi_network(network)
     set_df_grafo_flujo_jkjk(network)
-
+    
+    print ("Se calcularon todos los KPI de la solución.")
+    
 
 #%% <codecell> Funciones para cálculo de probabilidades por teoría de colas
 

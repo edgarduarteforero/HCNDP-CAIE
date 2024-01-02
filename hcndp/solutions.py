@@ -16,10 +16,15 @@ def menu_solutions(network_original, solutions_dict):
         print("1. Cargar tu propia solución")
         print("2. Obtener soluciones óptimas")
         print("3. Obtener soluciones por algoritmos de búsqueda")
-        print("4. Análisis de soluciones")
+        print("4. Indicadores (KPI) y gráficos de soluciones")
         print("9. Salir")
 
         opcion = input("Selecciona una opción: \n")
+
+        def mostrar_soluciones(solutions_dict):
+            print("Selecciona una opción:")
+            for i, (clave, descripcion) in enumerate(solutions_dict.items(), start=1):
+                print(f"{i}. {clave}")
 
         if opcion == "1":
             print("Has seleccionado la Opción 1.")
@@ -32,6 +37,8 @@ def menu_solutions(network_original, solutions_dict):
                   en partes iguales. Consulta la matriz df_arcos."""))
             create_solution_object(
                 network_original, solutions_dict, name_solution="solución_subóptima")
+            
+
             print("Se ha cargado tu solución propia.")
             input("Pulsa una tecla para continuar.")
 
@@ -53,7 +60,8 @@ def menu_solutions(network_original, solutions_dict):
             current_solution.menu_exact_optimization(new_network=current_solution.network_copy,
                                                      solutions_dict=solutions_dict)
             
-            
+
+
             if current_solution.optimizar==True:
                 # Calculo la solución óptima
                 current_solution.calculate_exact_optima()
@@ -66,21 +74,17 @@ def menu_solutions(network_original, solutions_dict):
 
         elif opcion == "4":
             print("\nHas seleccionado la Opción 4.")
-            print ("Análisis de soluciones.")
+            print ("KPI de soluciones y gráficos.")
             print ("Estas son las soluciones construidas:/n")
             
             # Listar las soluciones existentes
-            
-            def mostrar_opciones(solutions_dict):
-                print("Selecciona una opción:")
-                for i, (clave, descripcion) in enumerate(solutions_dict.items(), start=1):
-                    print(f"{i}. {clave}")
-
-            mostrar_opciones(solutions_dict)
+            mostrar_soluciones(solutions_dict)
 
             # Obtener la elección del usuario
             try:
                 from hcndp import kpi
+                from hcndp import figures
+                
                 numero_elegido = int(input("Ingresa el número de la solución elegida: "))
                 solucion_elegida = list(solutions_dict.keys())[numero_elegido - 1]
                 
@@ -92,28 +96,52 @@ def menu_solutions(network_original, solutions_dict):
                     # Si no hay función objetivo (Solución ingresada por usuario)
                     _post_optima=False
                     kpi.calculate_kpi(current_solution,_post_optima)
-                    input ("Iniciaré con post_optima_false")
+                    print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
+                    figures.show_menu_figures(current_solution)
+
                 else:
                     # Si hay función objetivo (resultado de optimización)
                     _post_optima=True
                     kpi.calculate_kpi(current_solution,_post_optima)
-                    input ("Iniciaré con post_optima_true")
+                    print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
+                    figures.show_menu_figures(current_solution)
+
             
             except (ValueError, IndexError) as e:
                 print (e)
                 print("Error: Ingresa un número válido de la lista.")
+
             
+        elif opcion == "5":
+            print("\nHas seleccionado la Opción 4.")
+            print ("Generación de gráficos.")
+            print ("Estas son las soluciones construidas:/n")
             
-            # Seleccionar una solución
+            # Listar las soluciones existentes
+            mostrar_soluciones(solutions_dict)
             
-            # Generar gráficos y  KPI
+            # Obtener la elección del usuario
+            try:
+                from hcndp import figures
+                numero_elegido = int(input("Ingresa el número de la solución elegida: "))
+                solucion_elegida = list(solutions_dict.keys())[numero_elegido - 1]
+                
+                # Realizar el procedimiento con la opción seleccionada
+                print(f"\nRealizando el procedimiento para la opción: {solucion_elegida}")
+                current_solution=solutions_dict[solucion_elegida]
+                
+                if current_solution.objective=="Nulo":
+                    # Si no hay función objetivo (Solución ingresada por usuario)
+                    _post_optima=False
+                    figures.show_menu_figures(current_solution)
+                else:
+                    # Si hay función objetivo (resultado de optimización)
+                    _post_optima=True
+                    figures.show_menu_figures(current_solution)
             
-            
-            
-            
-        # elif opcion == "5":
-        #     print("Has seleccionado la Opción 5.")
-        #     export_to_excel(network)
+            except (ValueError, IndexError) as e:
+                print (e)
+                print("Error: Ingresa un número válido de la lista.")
 
         # elif opcion == "6":
         #     print("Has seleccionado la Opción 6.")
@@ -149,14 +177,18 @@ def create_solution_object(network_original, solutions_dict, name_solution):
 
     # Inserto una copia de network original en la solución como network_copy
     solution.insert_network_object(network_original)
-
+    
     # Actualizo las matrices de solution.network_copy
     solution.network_copy.merge_niveles_capac(_post_optima=False)
     solution.network_copy.create_df_asignacion(_post_optima=False)
     solution.network_copy.create_df_probs_kk()
     solution.network_copy.create_df_arcos(_post_optima=False)
+    
+    # Actualizar nombre de solution.network_copy
+    solution.network_copy.name_solution=solution.name_solution
 
-
+    
+    
 # %% <codecell> Clase Solution
 
 class Solution:
@@ -195,6 +227,9 @@ class Solution:
                     solucion_temporal = solutions_dict[clave_temporal]
                     solutions_dict[solucion_temporal.description_objective] = solutions_dict.pop(
                         clave_temporal)
+                    solutions_dict[solucion_temporal.description_objective].network_copy.name_solution = \
+                        solutions_dict[solucion_temporal.description_objective].name_solution 
+
                     break 
                 
                 elif self.network_copy.optimizar==False:
@@ -469,7 +504,9 @@ class Solution:
         self.network_copy.create_data_dat()
 
         # %% Instanciar (model)
-        self.pyo_model.data_dat = os.getcwd()+'/data/'+self.network_copy.name+'/datos.dat'
+        #self.pyo_model.data_dat = os.getcwd()+'/data/'+self.network_copy.name+'/datos.dat'
+        self.pyo_model.data_dat = os.getcwd()+'/data/'+self.name_network+'/datos.dat'
+        
         self.pyo_model.instance = self.pyo_model.model_abstract.create_instance(
             self.pyo_model.data_dat)
 

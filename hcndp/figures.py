@@ -5,6 +5,129 @@ Created on Sat Dec  9 17:42:37 2023
 @author: edgar
 """
 
+def show_menu_figures(solution):
+    network=solution.network_copy
+    
+    from hcndp import figures
+    while True:
+        print("\n----------------------------------------------------------")
+        print("Representaciones de la red")
+        print("----------------------------------------------------------\n")
+        print(" 1. Plano cartesiano")
+        print(" 2. Chord diagram")
+        print(" 3. Probabilidades de x clientes en espera")
+        print(" 4. Probabilidades de esperar t tiempo")
+        print(" 5. Longitud de cola y tiempo en espera por nodo")
+        print(" 6. Plano cartesiano nodos y cobertura")
+        print(" 7. Distancias gaussianas")
+        print(" 8. Accesibilidad en cartesiano, mapa de calor y nodos")
+        print(" 9. Flujos entre ik y jk")
+        print("10. Salir")
+        opcion1 = input("Selecciona una opción: \n")
+        if opcion1 == "1":
+            print("Has seleccionado la Opción 1.")
+            try:     
+                figures.figure_network_cartesian(network)
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has importado los datos.")
+        
+        elif opcion1 == "2":
+            print("Has seleccionado la Opción 2.")
+            try: 
+                figures.figure_chord_diagram(network)
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has importado los datos.")
+        
+        elif opcion1 == "3":
+            print("Has seleccionado la Opción 3.")
+            try:
+                figures.figure_prob_custom_queue(network)    
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+                
+        elif opcion1 == "4":
+            print("Has seleccionado la Opción 4.")
+            try:
+                figures.figure_prob_time_in_queue(network)    
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+        
+        elif opcion1 == "5":
+            print("Has seleccionado la Opción 5.")
+            try:
+                figures.figure_Lq_per_node(network)
+                figures.figure_Wq_per_node(network)
+                figures.figure_service_rate_per_node(network)
+                figures.figure_rho_per_node(network)
+                figures.figure_rho_weighted(network)
+                
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+            
+        elif opcion1 == "6":
+            print("Has seleccionado la Opción 6.")
+            try:
+                figures.figure_nodes_coverage(network)
+                
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+            
+        elif opcion1 == "7":
+            print("Has seleccionado la Opción 7.")
+            try:
+                figures.figure_gaussian(network)
+                
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+        
+        elif opcion1 == "8":
+            print("Has seleccionado la Opción 8.")
+            try:
+                figures.figure_accessibility(network)
+                figures.figure_heatmap_accessibility(network)
+                figures.figure_accessibility_per_node(network)
+                figures.figure_accessibility_per_service(network)
+                
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+         
+        elif opcion1 == "9":
+            print("Has seleccionado la Opción 9.")
+            try:
+                figures.figure_flows_f_ijk(network) 
+                figures.figure_flows_f_ijk_k1(network)
+                figures.figure_flows_f_ijkjk(network)
+                figures.figure_flows_f_jpkpjk(network)
+                figures.figure_digraph(network)
+                figures.figure_digraph_complete(network)
+                figures.figure_sankey(network)
+
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+         
+        elif opcion1 == "10":
+            break
+        else:
+            print("Opción no válida. Inténtalo de nuevo.")
+
 #%% <codecell> Descriptive basic figures
 
 def figure_network_cartesian(network):
@@ -86,7 +209,10 @@ def figure_network_cartesian(network):
     ax.set_ylim(ax.get_ylim()[0] - 0.1, ax.get_ylim()[1] + 0.1)
     plt.show()
     #plt.pause(0.1) #Muestra imagen en pestaña Plots a medida que se ejecuta el código
-    path=os.getcwd()+'/output/'+network.name+'/network_cartesian.png'
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/network_cartesian.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/network_cartesian.png'
     plt.savefig(path, dpi=300)
   
     
@@ -153,7 +279,16 @@ def figure_prob_custom_queue(network):
     plt.rcdefaults()
     
     df_capac=network.file['df_capac'].reset_index()
-
+    
+    if 'customers' not in network.file:
+        print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
+        customers = int(input("Ingresa un valor para clientes: \n"))
+        network.file['customers']=customers
+        from hcndp import kpi
+        kpi.set_prob_custom_queue(network,customers)
+        network.file['customers']=customers
+        
+    
     customers=network.file['customers']
     labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
     serie1 = df_capac['prob_b0']
@@ -178,7 +313,13 @@ def figure_prob_custom_queue(network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/'+str(customers)+'_prob_custom_queue.png'
+    #path=os.getcwd()+'/output/'+network.name+'/'+str(customers)+'_prob_custom_queue.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/_prob_custom_queue.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/_prob_custom_queue.png'
+        
     plt.savefig(path, dpi=300)
      
 def figure_prob_time_in_queue(network):
@@ -190,6 +331,13 @@ def figure_prob_time_in_queue(network):
 
     df_capac=network.file['df_capac'].reset_index()
 
+    if 'time' not in network.file:
+        from hcndp import kpi
+        print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
+        time = int(input("Ingresa un valor para t: \n"))
+        kpi.set_prob_wait_time (network,time)
+        network.file['time']=time
+        
     time=network.file['time']
     labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
     #serie1 = df_capac['prob_t0.25']
@@ -212,7 +360,13 @@ def figure_prob_time_in_queue(network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/'+str(time)+'prob_time_in_queue.png'
+    #path=os.getcwd()+'/output/'+network.name+'/'+str(time)+'prob_time_in_queue.png'
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/prob_time_in_queue.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/prob_time_in_queue.png'
+     
+    
     plt.savefig(path, dpi=300)
 
 #%% <codecell> Congestion and Queuing theory figures
@@ -250,7 +404,13 @@ def figure_Lq_per_node (network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/figure_Lq_per_node.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_Lq_per_node.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_Lq_per_node.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_Lq_per_node.png'
+   
     plt.savefig(path, dpi=300)
     
 def figure_Wq_per_node (network):
@@ -282,7 +442,13 @@ def figure_Wq_per_node (network):
     fig.tight_layout()
 
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/figure_Wq_per_node.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_Wq_per_node.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_Wq_per_node.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_Wq_per_node.png'
+  
     plt.savefig(path, dpi=300)
       
 def figure_service_rate_per_node(network):
@@ -299,7 +465,14 @@ def figure_service_rate_per_node(network):
     sns.set(rc = {'figure.figsize':(5,5)})
     ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,annot=True,annot_kws={"size": 7},cbar_kws={'label': 'Number of servers'})
     ax.set(xlabel='Services (k)', ylabel='Facilities (j)')
-    path=os.getcwd()+'/output/'+network.name+'/service_rate_per_node.png'
+    #path=os.getcwd()+'/output/'+network.name+'/service_rate_per_node.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/service_rate_per_node.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/service_rate_per_node.png'
+  
+    
     ax.figure.savefig(path,dpi=300) 
     print (ax)
     
@@ -316,7 +489,14 @@ def figure_rho_per_node(network):
     sns.set(rc = {'figure.figsize':(6,6)})
     ax1=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,vmin=0, vmax=1,annot=True,annot_kws={"size": 7},cbar_kws={'label': 'Rho'})
     ax1.set(xlabel='Services (k)', ylabel='Facilities (j)')
-    path=os.getcwd()+'/output/'+network.name+'/rho_per_node.png'
+    #path=os.getcwd()+'/output/'+network.name+'/rho_per_node.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/rho_per_node.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/rho_per_node.png'
+  
+    
     ax1.figure.savefig(path,dpi=300)
     print (ax1)
 
@@ -346,8 +526,16 @@ def figure_rho_weighted(network):
     ax.set_xticks(x,labels)
     ax.legend()
     fig.tight_layout()
-    path=os.getcwd()+'/output/'+network.name+'/rho_weighted.png'
+    #path=os.getcwd()+'/output/'+network.name+'/rho_weighted.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/rho_weighted.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/rho_weighted.png'
+  
+    
+    
     ax.figure.savefig(path,dpi=300)    
 
 #%% <codecell> Accessibility and coverage figures
@@ -434,7 +622,14 @@ def figure_nodes_coverage(network):
         plt.colorbar(im_oferta,ax=ax[k],label="Oferta (Servidores)")
         plt.colorbar(im_demanda,ax=ax[k],location='bottom',label="Demanda (Pacientes)")
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/figure_nodes_coverage.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_nodes_coverage.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_nodes_coverage.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_nodes_coverage.png'
+  
+    
     plt.savefig(path, dpi=300)
 
 def figure_gaussian(network):
@@ -451,7 +646,13 @@ def figure_gaussian(network):
     
     # Mostrar el gráfico
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/figure_gaussian.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_gaussian.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_gaussian.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_gaussian.png'
+ 
     plt.savefig(path, dpi=300)
 
 def figure_accessibility(network):
@@ -550,7 +751,14 @@ def figure_accessibility(network):
         plt.colorbar(im_demanda,ax=ax[i],location='bottom',label="Demand (Patients/unit of time)")
         
     plt.show()
-    path=os.getcwd()+'/output/'+network.name+'/figure_accessibility.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility.png'
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_accessibility.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_accessibility.png'
+ 
+    
     plt.savefig(path, dpi=300)
 
 def figure_heatmap_accessibility(network):
@@ -567,8 +775,15 @@ def figure_heatmap_accessibility(network):
     ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,annot=True,annot_kws={"size": 7})#,vmin=0, vmax=5000)
     ax.set(xlabel='Services (k)', ylabel='Demand nodes (i)')
     
-    path=os.getcwd()+'/output/'+network.name+'/figure_heatmap_accessibility.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_heatmap_accessibility.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_heatmap_accessibility.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_heatmap_accessibility.png'
+ 
+    
     ax.figure.savefig(path,dpi=300)    
     
 
@@ -598,8 +813,14 @@ def figure_accessibility_per_node(network):
     ax.legend()
     fig.tight_layout()
 
-    path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_node.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_node.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_accessibility_per_node.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_accessibility_per_node.png'
+ 
     ax.figure.savefig(path,dpi=300)    
 
 
@@ -630,8 +851,14 @@ def figure_accessibility_per_service(network):
     ax.legend()
     fig.tight_layout()
 
-    path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_service.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_service.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_accessibility_per_service.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_accessibility_per_service.png'
+
     ax.figure.savefig(path,dpi=300)  
 
 #%% <codecell> Flows
@@ -656,8 +883,14 @@ def figure_flows_f_ijk(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (ik)',title='Patient flow between demand and supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_ijk.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_ijk.png'
+
     ax.figure.savefig(path,dpi=300)  
 
 def figure_flows_f_ijk_k1(network):
@@ -681,8 +914,14 @@ def figure_flows_f_ijk_k1(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (ik)',title='Patient flow between demand and supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk_k1.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk_k1.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_ijk_k1.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_ijk_k1.png'
+
     ax.figure.savefig(path,dpi=300)  
 
 def figure_flows_f_ijkjk(network):
@@ -704,8 +943,14 @@ def figure_flows_f_ijkjk(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (jk)',title='Proportions of patients between supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijkjk.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijkjk.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_ijkjk.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_ijkjk.png'
+
     ax.figure.savefig(path,dpi=300)  
 
 def figure_flows_f_jpkpjk(network):
@@ -732,8 +977,14 @@ def figure_flows_f_jpkpjk(network):
     ax.set(xlabel='Destinations (jk)', ylabel='Origins (jk)',title='Patient flow between supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
-    path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_jpkpjk.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_jpkpjk.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_jpkpjk.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_jpkpjk.png'
+
     ax.figure.savefig(path,dpi=300)  
 
 def figure_digraph(network):
@@ -756,8 +1007,14 @@ def figure_digraph(network):
     nx.draw(G, with_labels=True, font_size=8,node_size=1000, node_color='lightgrey',alpha=1, arrows=True, edge_color=df_grafo['p_jjkk'],
             edge_cmap=plt.cm.Oranges,pos=nx.nx_agraph.graphviz_layout(G, prog="neato"))
     
-    path=os.getcwd()+'/output/'+network.name+'/figure_digraph.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_digraph.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_digraph.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_digraph.png'
+
     plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
 
 def figure_digraph_complete(network):
@@ -787,8 +1044,15 @@ def figure_digraph_complete(network):
             edge_cmap=plt.cm.Oranges,pos=nx.circular_layout(G))
     
     
-    path=os.getcwd()+'/output/'+network.name+'/figure_digraph_complete.png'
+    #path=os.getcwd()+'/output/'+network.name+'/figure_digraph_complete.png'
     plt.show()
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_digraph_complete.png'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_digraph_complete.png'
+
+
     plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
     
 def figure_sankey(network):
@@ -904,7 +1168,14 @@ def figure_sankey(network):
 
     fig.update_layout(title_text="Proporciones de flujo entre nodos", font_size=18,  width=2200, height=900, margin_t=200)
     fig.show()
-    fig.write_html(os.getcwd()+'/output/'+network.name+'/figure_sankey.html')
+    
+    if network.name_solution == "solución_subóptima":
+        path=os.getcwd()+'/output/'+'red_original'+'/figure_sankey.html'
+    else:
+        path=os.getcwd()+'/output/'+network.name_solution+'/figure_sankey.html'
+
+    
+    fig.write_html(path)
 
 #%% <codecell> main
 
