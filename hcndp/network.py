@@ -475,29 +475,4 @@ class Network:
         
         file.close()
 
-    def calculate_kpi_before_optim(self):
-        from hcndp import kpi
-        kpi.set_lambda_jk(self)
-        kpi.set_lambda_ijk(self)
-        kpi.set_phi_ijkjk(self)
-        kpi.set_prop_tao(self)
-        kpi.set_prob_k(self)
-        
-        #print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
-        #customers = int(input("Ingresa un valor para clientes: \n"))
-        #kpi.set_prob_custom_queue(self,customers)
-        #self.file['customers']=customers
-        
-        #print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
-        #time = int(input("Ingresa un valor para t: \n"))
-        #kpi.set_prob_wait_time (self,time)
-        #self.file['time']=time
-        
-        #kpi.set_kpi_per_node(self)
-        #kpi.set_e2sfca(self)
-        #kpi.set_accessibility_per_node(self)
-        #kpi.set_accessibility_per_service(self)
-        #kpi.set_continuity_per_node(self)
-        #kpi.set_kpi_network(self)
-        #kpi.set_df_grafo_flujo_jkjk(self)
         

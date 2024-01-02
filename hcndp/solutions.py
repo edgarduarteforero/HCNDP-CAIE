@@ -16,6 +16,7 @@ def menu_solutions(network_original, solutions_dict):
         print("1. Cargar tu propia solución")
         print("2. Obtener soluciones óptimas")
         print("3. Obtener soluciones por algoritmos de búsqueda")
+        print("4. Análisis de soluciones")
         print("9. Salir")
 
         opcion = input("Selecciona una opción: \n")
@@ -63,9 +64,53 @@ def menu_solutions(network_original, solutions_dict):
         #     print("Has seleccionado la Opción 3.")
         #     calculate_kpi(network)
 
-        # elif opcion == "4":
-        #     print("Has seleccionado la Opción 4.")
+        elif opcion == "4":
+            print("\nHas seleccionado la Opción 4.")
+            print ("Análisis de soluciones.")
+            print ("Estas son las soluciones construidas:/n")
+            
+            # Listar las soluciones existentes
+            
+            def mostrar_opciones(solutions_dict):
+                print("Selecciona una opción:")
+                for i, (clave, descripcion) in enumerate(solutions_dict.items(), start=1):
+                    print(f"{i}. {clave}")
 
+            mostrar_opciones(solutions_dict)
+
+            # Obtener la elección del usuario
+            try:
+                from hcndp import kpi
+                numero_elegido = int(input("Ingresa el número de la solución elegida: "))
+                solucion_elegida = list(solutions_dict.keys())[numero_elegido - 1]
+                
+                # Realizar el procedimiento con la opción seleccionada
+                print(f"\nRealizando el procedimiento para la opción: {solucion_elegida}")
+                current_solution=solutions_dict[solucion_elegida]
+                
+                if current_solution.objective=="Nulo":
+                    # Si no hay función objetivo (Solución ingresada por usuario)
+                    _post_optima=False
+                    kpi.calculate_kpi(current_solution,_post_optima)
+                    input ("Iniciaré con post_optima_false")
+                else:
+                    # Si hay función objetivo (resultado de optimización)
+                    _post_optima=True
+                    kpi.calculate_kpi(current_solution,_post_optima)
+                    input ("Iniciaré con post_optima_true")
+            
+            except (ValueError, IndexError) as e:
+                print (e)
+                print("Error: Ingresa un número válido de la lista.")
+            
+            
+            # Seleccionar una solución
+            
+            # Generar gráficos y  KPI
+            
+            
+            
+            
         # elif opcion == "5":
         #     print("Has seleccionado la Opción 5.")
         #     export_to_excel(network)
@@ -373,9 +418,16 @@ class Solution:
 
         print(f"Se exportó exitosamente el archivo de texto en {output}")
 
+    
+    def calculate_kpi_before_optim(self,network_copy,_post_optima=False):
+        from hcndp import kpi
+        kpi.set_lambda_jk(self,network_copy,_post_optima=False)
+        kpi.set_lambda_ijk(self,network_copy,_post_optima=False)
+        kpi.set_phi_ijkjk(self,network_copy)
+        kpi.set_prop_tao(self,network_copy)
+        kpi.set_prob_k(self,network_copy)
 
 # %% Función principal
-
 
     def calculate_exact_optima(self):
         import os
@@ -409,8 +461,9 @@ class Solution:
                                           new_network=self.network_copy
                                           )
 
-        # Calculo kpi necesarios (network)
-        self.network_copy.calculate_kpi_before_optim()
+        # Calculo kpi necesarios (solution)
+        self.calculate_kpi_before_optim(network_copy=self.network_copy,
+                                        _post_optima=False)
 
         # Creo el archivo data_dat (network)
         self.network_copy.create_data_dat()

@@ -59,4 +59,5 @@ solutions.menu_solutions(network_original=networks_dict[_name],
                          solutions_dict=solutions_dict,
                          )
 
+#%% <codecell> Menú análisis
 

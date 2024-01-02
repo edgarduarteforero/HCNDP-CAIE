@@ -5,38 +5,6 @@ Created on Mon Dec 11 12:20:02 2023
 @author: edgar
 """
 
-#%% Calcular kpi para una solución
-
-def calculate_kpi(current_solution,_post_optima):    
-    import os
-    network=current_solution.network_copy
-    print (_post_optima)
-
-    set_lambda_jk(current_solution, network,_post_optima)
-    set_lambda_ijk(current_solution, network,_post_optima)
-    set_phi_ijkjk(current_solution,network)
-    set_prop_tao(current_solution,network)
-    set_prob_k(current_solution,network)
-    
-    print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
-    customers = int(input("Ingresa un valor para clientes: \n"))
-    set_prob_custom_queue(network,customers)
-    network.file['customers']=customers
-    
-    print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
-    time = int(input("Ingresa un valor para t: \n"))
-    set_prob_wait_time (network,time)
-    network.file['time']=time
-    
-    set_kpi_per_node(network)
-    set_e2sfca(network)
-    set_accessibility_per_node(network)
-    set_accessibility_per_service(network)
-    set_continuity_per_node(network)
-    set_kpi_network(network)
-    set_df_grafo_flujo_jkjk(network)
-
-
 #%% <codecell> Funciones para cálculo de probabilidades por teoría de colas
 
 
@@ -129,15 +97,10 @@ def W_q(L_q,lambdas,rho):
 
 
 
-def set_lambda_jk (current_solution, network,_post_optima):
+def set_lambda_jk (network):
     import numpy as np
     from hcndp.data_functions import reshape_matrix
-    import os 
-    import pandas as pd
-
-
-    path=os.getcwd()+'/output/'+current_solution.name_solution+'/salida_optimizacion.xlsx'
-        
+    
     
     # Matriz de arribos externos g
     g=np.array(network.file['df_asignacion']['tao_ijk']) # Lista de arribos externos ijk
@@ -147,38 +110,31 @@ def set_lambda_jk (current_solution, network,_post_optima):
 
     # SEGUNDO BLOQUE
     # Cálculo de lambdas y rho para cada par j k
-    if _post_optima==False:
-        df_capac=network.file['df_capac']
-        probs=network.file['df_arcos']['p_jjkk']
-        probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
-        df_capac['lambdas']=np.matmul(g,np.linalg.inv(np.identity(len(probs))-(probs)))
-        df_capac.replace([np.inf,-np.inf], 0, inplace=True)
-        df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
-        df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
-        df_capac.replace([np.inf,-np.inf], 0, inplace=True)
-        df_capac.fillna(0,inplace=True)
+    # if post_optima==False:
+    df_capac=network.file['df_capac']
+    probs=network.file['df_arcos']['p_jjkk']
+    probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
+    df_capac['lambdas']=np.matmul(g,np.linalg.inv(np.identity(len(probs))-(probs)))
+    df_capac.replace([np.inf,-np.inf], 0, inplace=True)
+    df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
+    df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
+    df_capac.replace([np.inf,-np.inf], 0, inplace=True)
+    df_capac.fillna(0,inplace=True)
     
-    if _post_optima==True:
-        #TERCER BLOQUE
-        ## También puedo importar los datos de lambda_jk desde el archivo datos.xlxs
-        #df_capac['lambdas']=pd.read_excel (r'datos.xlsx', sheet_name='df_capac')
-        
-        data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)
-        
-        df_capac=network.file['df_capac']
-
-        #data = path['l_jk']
-        df_capac=df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')
-        #df_capac=df_capac.rename(columns={"lambda_jk": "lambdas"})
-        df_capac['lambdas'] = df_capac['lambda_jk']
-        df_capac = df_capac.drop(columns=['lambda_jk'])
-        df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
-        df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
-        df_capac.fillna(0,inplace=True)
-        df_capac.replace([np.inf, -np.inf], 0, inplace=True)
-        print ("\n Se actualizaron exitosamente los lambda_jk")
-        
-def set_lambda_ijk (solution, network,_post_optima):
+    # if post_optima==True:
+    # #TERCER BLOQUE
+    # ## También puedo importar los datos de lambda_jk desde el archivo datos.xlxs
+    # #df_capac['lambdas']=pd.read_excel (r'datos.xlsx', sheet_name='df_capac')
+    # #data = pd.read_excel ('salida_optimizacion.xlsx',sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)
+    # data = archivo_salida_optim['l_jk']
+    # df_capac=df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')
+    # df_capac=df_capac.rename(columns={"lambda_jk": "lambdas"})
+    # df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
+    # df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
+    # df_capac.fillna(0,inplace=True)
+    # df_capac.replace([np.inf, -np.inf], 0, inplace=True)
+    
+def set_lambda_ijk (network):
     import numpy as np
     from hcndp.data_functions import reshape_matrix
 
@@ -195,22 +151,13 @@ def set_lambda_ijk (solution, network,_post_optima):
     
     #Para cada i calculo el lambda ijk
     _i=0
-    
-    if _post_optima==False:
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        print ("\n Se actualizaron exitosamente los lambda_ijk")
-    if _post_optima==True:
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        network.file['df_asignacion'].sort_index(inplace=True)
-        for i in network.file['df_asignacion'].index.levels[0]: 
-            #df_asignacion.loc[i,'lambda_ijk']=1
-            network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
-            _i+=1
-        print ("\n Se actualizaron exitosamente los lambda_ijk")
+    network.file['df_asignacion'].sort_index(inplace=True)
+    for i in network.file['df_asignacion'].index.levels[0]: 
+        #df_asignacion.loc[i,'lambda_ijk']=1
+        network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+        _i+=1
 
-def set_phi_ijkjk (solution,network):
+def set_phi_ijkjk (network):
     #Calculo flujos fi_ijkjk cuando estoy usando escenario 1. Estos fi vienen de lambda según la fórmula de abajo:
     # l_ijk*p_jjkk*x_jj
         
@@ -234,9 +181,8 @@ def set_phi_ijkjk (solution,network):
     network.file['df_flujos_ijkjk']['fi_ijkjk']=network.file['df_flujos_ijkjk']['lambda_ijk']*network.file['df_flujos_ijkjk']['p_jjkk']*network.file['df_flujos_ijkjk']['x_jjp']
     
     network.file['df_flujos_ijkjk'] = network.file['df_flujos_ijkjk'].reorder_levels(['nombre_I', 'nombre_J', 'servicio_K','nombre_Jp', 'servicio_Kp'])
-    print ("\n Se actualizaron exitosamente los phi_ijkjk")
-   
-def set_prop_tao (solution,network):
+        
+def set_prop_tao (network):
     # Calculo los valores de prop_tao_ijk. Proporción de clientes que son dirigidos desde ik a jk
     import pandas as pd
     df_demanda=network.file['df_demanda'].drop(['servicio_K'],axis=1)
@@ -244,9 +190,8 @@ def set_prop_tao (solution,network):
     network.file['df_asignacion']['prop_tao_ijk']=network.file['df_asignacion']['tao_ijk']/network.file['df_asignacion']['demanda_i']
     network.file['df_asignacion'].drop(['demanda_i'],axis=1,inplace=True)
     network.file['df_asignacion']['prop_tao_ijk'] = network.file['df_asignacion']['prop_tao_ijk'].fillna(0)
-    print ("\n Se actualizaron exitosamente los tao_ijk (prop)")
 
-def set_prob_k (solution,network):
+def set_prob_k (network):
     # Construyo las probabilidades de estado estable utilizando ecuaciones estacionarias. Son las π_k.
     import numpy as np
     import pandas as pd
@@ -285,7 +230,6 @@ def set_prob_k (solution,network):
     
     df_demanda=network.file['df_demanda']
     df_demanda=df_demanda.drop(['servicio_K'], axis=1)
-    df_demanda = df_demanda.loc[:, ~df_demanda.columns.str.startswith('index')] #Elimino columnas con texto "index"
     df_demanda=pd.merge(df_demanda.reset_index(),df_pi_k.reset_index(),how="cross")
     
     #Si voy a utilizar probabilidades de estado estable para definir la demanda en la red habilito esta línea
