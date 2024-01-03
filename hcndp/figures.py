@@ -207,14 +207,14 @@ def figure_network_cartesian(network):
     ax.set_title("Naranja: Enlaces ijk. Grises: Enlaces jk j'k'")
     ax.set_xlim(ax.get_xlim()[0] - 0.1, ax.get_xlim()[1] + 0.1)
     ax.set_ylim(ax.get_ylim()[0] - 0.1, ax.get_ylim()[1] + 0.1)
-    plt.show()
     #plt.pause(0.1) #Muestra imagen en pestaña Plots a medida que se ejecuta el código
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/network_cartesian.png'
     else:
         path=os.getcwd()+'/output/'+network.name_solution+'/network_cartesian.png'
     plt.savefig(path, dpi=300)
-  
+    plt.show()
+
     
 def figure_chord_diagram(network):
     # Es necesario tener en cuenta que existen flujos entre los servidores de la red. Cada flujo se da 
@@ -312,7 +312,6 @@ def figure_prob_custom_queue(network):
 
     fig.tight_layout()
 
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/'+str(customers)+'_prob_custom_queue.png'
     
     if network.name_solution == "solución_subóptima":
@@ -321,7 +320,8 @@ def figure_prob_custom_queue(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/_prob_custom_queue.png'
         
     plt.savefig(path, dpi=300)
-     
+    plt.show()
+    
 def figure_prob_time_in_queue(network):
     # Construyo gráficos para representar las probabilidades de tiempo en cola
     import matplotlib.pyplot as plt
@@ -359,16 +359,14 @@ def figure_prob_time_in_queue(network):
 
     fig.tight_layout()
 
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/'+str(time)+'prob_time_in_queue.png'
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/prob_time_in_queue.png'
     else:
         path=os.getcwd()+'/output/'+network.name_solution+'/prob_time_in_queue.png'
-     
     
     plt.savefig(path, dpi=300)
-
+    plt.show()
 #%% <codecell> Congestion and Queuing theory figures
 
 def figure_Lq_per_node (network):
@@ -403,7 +401,6 @@ def figure_Lq_per_node (network):
 
     fig.tight_layout()
 
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/figure_Lq_per_node.png'
     
     if network.name_solution == "solución_subóptima":
@@ -412,6 +409,7 @@ def figure_Lq_per_node (network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_Lq_per_node.png'
    
     plt.savefig(path, dpi=300)
+    plt.show()
     
 def figure_Wq_per_node (network):
     # Construyo gráficos para representar las medidas de desempeño
@@ -441,7 +439,6 @@ def figure_Wq_per_node (network):
 
     fig.tight_layout()
 
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/figure_Wq_per_node.png'
     
     if network.name_solution == "solución_subóptima":
@@ -450,7 +447,7 @@ def figure_Wq_per_node (network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_Wq_per_node.png'
   
     plt.savefig(path, dpi=300)
-      
+    plt.show()  
 def figure_service_rate_per_node(network):
     # Construyo gráficos de calor para analizar los recursos disponibles en cada par j k
     import matplotlib.pyplot as plt
@@ -527,17 +524,15 @@ def figure_rho_weighted(network):
     ax.legend()
     fig.tight_layout()
     #path=os.getcwd()+'/output/'+network.name+'/rho_weighted.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/rho_weighted.png'
     else:
         path=os.getcwd()+'/output/'+network.name_solution+'/rho_weighted.png'
   
-    
-    
     ax.figure.savefig(path,dpi=300)    
-
+    plt.show()
+    
 #%% <codecell> Accessibility and coverage figures
 
 def figure_nodes_coverage(network):
@@ -621,17 +616,16 @@ def figure_nodes_coverage(network):
         ax[k].grid()
         plt.colorbar(im_oferta,ax=ax[k],label="Oferta (Servidores)")
         plt.colorbar(im_demanda,ax=ax[k],location='bottom',label="Demanda (Pacientes)")
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/figure_nodes_coverage.png'
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_nodes_coverage.png'
     else:
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_nodes_coverage.png'
-  
-    
+      
     plt.savefig(path, dpi=300)
-
+    plt.show()
+    
 def figure_gaussian(network):
     import matplotlib.pyplot as plt
     plt.rcdefaults()
@@ -645,7 +639,6 @@ def figure_gaussian(network):
     figura_gaussian.set_title('Gráfico de Dispersión: dist_IJ vs f_dij')
     
     # Mostrar el gráfico
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/figure_gaussian.png'
     
     if network.name_solution == "solución_subóptima":
@@ -654,7 +647,8 @@ def figure_gaussian(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_gaussian.png'
  
     plt.savefig(path, dpi=300)
-
+    plt.show()
+    
 def figure_accessibility(network):
     import matplotlib.pyplot as plt
     plt.rcdefaults()
@@ -750,7 +744,6 @@ def figure_accessibility(network):
         plt.colorbar(im_oferta,ax=ax[i],label="Capacity (Supply nodes)")
         plt.colorbar(im_demanda,ax=ax[i],location='bottom',label="Demand (Patients/unit of time)")
         
-    plt.show()
     #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility.png'
     
     if network.name_solution == "solución_subóptima":
@@ -758,9 +751,9 @@ def figure_accessibility(network):
     else:
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_accessibility.png'
  
-    
     plt.savefig(path, dpi=300)
-
+    plt.show()
+    
 def figure_heatmap_accessibility(network):
     import seaborn as sns
     import os
@@ -776,7 +769,6 @@ def figure_heatmap_accessibility(network):
     ax.set(xlabel='Services (k)', ylabel='Demand nodes (i)')
     
     #path=os.getcwd()+'/output/'+network.name+'/figure_heatmap_accessibility.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_heatmap_accessibility.png'
@@ -785,7 +777,7 @@ def figure_heatmap_accessibility(network):
  
     
     ax.figure.savefig(path,dpi=300)    
-    
+    plt.show()
 
 def figure_accessibility_per_node(network):    
     # Construyo gráficos para representar las accesibilidades
@@ -814,7 +806,6 @@ def figure_accessibility_per_node(network):
     fig.tight_layout()
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_node.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_accessibility_per_node.png'
@@ -822,7 +813,7 @@ def figure_accessibility_per_node(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_accessibility_per_node.png'
  
     ax.figure.savefig(path,dpi=300)    
-
+    plt.show()
 
 
 def figure_accessibility_per_service(network):
@@ -852,7 +843,6 @@ def figure_accessibility_per_service(network):
     fig.tight_layout()
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_service.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_accessibility_per_service.png'
@@ -860,7 +850,8 @@ def figure_accessibility_per_service(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_accessibility_per_service.png'
 
     ax.figure.savefig(path,dpi=300)  
-
+    plt.show()
+    
 #%% <codecell> Flows
     
 def figure_flows_f_ijk(network):
@@ -884,7 +875,6 @@ def figure_flows_f_ijk(network):
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_ijk.png'
@@ -892,7 +882,8 @@ def figure_flows_f_ijk(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_ijk.png'
 
     ax.figure.savefig(path,dpi=300)  
-
+    plt.show()
+    
 def figure_flows_f_ijk_k1(network):
     # Creo un mapa de calor con los flujos fijk PERO SOLO PARA K1
     # en las filas van los orígenes ij
@@ -915,7 +906,6 @@ def figure_flows_f_ijk_k1(network):
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk_k1.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_ijk_k1.png'
@@ -923,6 +913,7 @@ def figure_flows_f_ijk_k1(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_ijk_k1.png'
 
     ax.figure.savefig(path,dpi=300)  
+    plt.show()
 
 def figure_flows_f_ijkjk(network):
     # Creo un mapa de calor con los porcentajes fi_jkjk
@@ -944,7 +935,6 @@ def figure_flows_f_ijkjk(network):
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijkjk.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_ijkjk.png'
@@ -952,6 +942,7 @@ def figure_flows_f_ijkjk(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_ijkjk.png'
 
     ax.figure.savefig(path,dpi=300)  
+    plt.show()
 
 def figure_flows_f_jpkpjk(network):
     # Creo un mapa de calor con los flujos fjpkpjk
@@ -978,7 +969,6 @@ def figure_flows_f_jpkpjk(network):
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_jpkpjk.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_flows_f_jpkpjk.png'
@@ -986,6 +976,7 @@ def figure_flows_f_jpkpjk(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_flows_f_jpkpjk.png'
 
     ax.figure.savefig(path,dpi=300)  
+    plt.show()
 
 def figure_digraph(network):
  
@@ -1008,7 +999,6 @@ def figure_digraph(network):
             edge_cmap=plt.cm.Oranges,pos=nx.nx_agraph.graphviz_layout(G, prog="neato"))
     
     #path=os.getcwd()+'/output/'+network.name+'/figure_digraph.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_digraph.png'
@@ -1016,6 +1006,7 @@ def figure_digraph(network):
         path=os.getcwd()+'/output/'+network.name_solution+'/figure_digraph.png'
 
     plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
+    plt.show()
 
 def figure_digraph_complete(network):
     # GRAFICO
@@ -1045,7 +1036,6 @@ def figure_digraph_complete(network):
     
     
     #path=os.getcwd()+'/output/'+network.name+'/figure_digraph_complete.png'
-    plt.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_digraph_complete.png'
@@ -1054,6 +1044,7 @@ def figure_digraph_complete(network):
 
 
     plt.savefig(path, format='png', dpi=300, bbox_inches='tight')
+    plt.show()
     
 def figure_sankey(network):
     import re
@@ -1167,7 +1158,6 @@ def figure_sankey(network):
         )])
 
     fig.update_layout(title_text="Proporciones de flujo entre nodos", font_size=18,  width=2200, height=900, margin_t=200)
-    fig.show()
     
     if network.name_solution == "solución_subóptima":
         path=os.getcwd()+'/output/'+'red_original'+'/figure_sankey.html'
@@ -1176,6 +1166,7 @@ def figure_sankey(network):
 
     
     fig.write_html(path)
+    fig.show()
 
 #%% <codecell> main
 

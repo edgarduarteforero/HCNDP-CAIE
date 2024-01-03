@@ -84,6 +84,7 @@ def menu_solutions(network_original, solutions_dict):
             try:
                 from hcndp import kpi
                 from hcndp import figures
+                from hcndp import export
                 
                 numero_elegido = int(input("Ingresa el número de la solución elegida: "))
                 solucion_elegida = list(solutions_dict.keys())[numero_elegido - 1]
@@ -96,8 +97,11 @@ def menu_solutions(network_original, solutions_dict):
                     # Si no hay función objetivo (Solución ingresada por usuario)
                     _post_optima=False
                     kpi.calculate_kpi(current_solution,_post_optima)
-                    print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
+                    print (f"\nAhora escoge el gráfico que deseas para la solución {solucion_elegida}")
                     figures.show_menu_figures(current_solution)
+                    export.export_data(current_solution.network_copy)
+                    export.create_index_sheet(current_solution.network_copy)
+                    print (f"\Gráficos y archivo de datos exportados a la carpeta de la soución {solucion_elegida}")
 
                 else:
                     # Si hay función objetivo (resultado de optimización)
@@ -105,7 +109,9 @@ def menu_solutions(network_original, solutions_dict):
                     kpi.calculate_kpi(current_solution,_post_optima)
                     print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
                     figures.show_menu_figures(current_solution)
-
+                    export.export_data(current_solution.network_copy)
+                    export.create_index_sheet(current_solution.network_copy)
+                    print (f"\Gráficos y archivo de datos exportados a la carpeta de la soución {solucion_elegida}")
             
             except (ValueError, IndexError) as e:
                 print (e)
