@@ -6,7 +6,7 @@ Created on Wed Dec 20 17:58:33 2023
 """
 
 
-def menu_solutions(network_original, solutions_dict):
+def menu_solutions(network_original, problems_dict):
     import textwrap
     while True:
         print("\n----------------------------------------------------------")
@@ -14,16 +14,16 @@ def menu_solutions(network_original, solutions_dict):
         print("----------------------------------------------------------\n")
         print("Selecciona una opción:")
         print("1. Cargar tu propia solución")
-        print("2. Obtener soluciones óptimas")
-        print("3. Obtener soluciones por algoritmos de búsqueda")
+        print("2. Obtener soluciones mono-objetivo")
+        
         print("4. Indicadores (KPI) y gráficos de soluciones")
         print("9. Salir")
 
         opcion = input("Selecciona una opción: \n")
 
-        def mostrar_soluciones(solutions_dict):
+        def mostrar_soluciones(problems_dict):
             print("Selecciona una opción:")
-            for i, (clave, descripcion) in enumerate(solutions_dict.items(), start=1):
+            for i, (clave, descripcion) in enumerate(problems_dict.items(), start=1):
                 print(f"{i}. {clave}")
 
         if opcion == "1":
@@ -36,7 +36,7 @@ def menu_solutions(network_original, solutions_dict):
                   se calculan dividiendo el flujo saliente de cada nodo 
                   en partes iguales. Consulta la matriz df_arcos."""))
             create_solution_object(
-                network_original, solutions_dict, name_solution="solución_subóptima")
+                network_original, problems_dict, name_solution="solución_subóptima")
             
 
             print("Se ha cargado tu solución propia.")
@@ -45,26 +45,31 @@ def menu_solutions(network_original, solutions_dict):
         elif opcion == "2":
             print("Has seleccionado la Opción 2.")
             print(textwrap.dedent(""" \
-                  Vamos a obtener soluciones óptimas.
+                  Vamos a obtener soluciones mono-objetivo.
                   A continuación ingresarás a un menú para escoger
                   la función objetivo y el solver respectivo.
                   """))
 
             # Creo el objeto solution
             create_solution_object(
-                network_original, solutions_dict, name_solution="temporal")
-            current_solution = solutions_dict["temporal"]
+                network_original, problems_dict, name_solution="temporal")
+            current_solution = problems_dict["temporal"]
 
             # Pido al usuario el objetivo
             current_solution.optimizar=True
             current_solution.menu_exact_optimization(new_network=current_solution.network_copy,
-                                                     solutions_dict=solutions_dict)
+                                                     problems_dict=problems_dict,)
             
 
 
             if current_solution.optimizar==True:
                 # Calculo la solución óptima
                 current_solution.calculate_exact_optima()
+                
+                current_solution.construct_model()
+                current_solution.construct_instance()
+                current_solution.execute_solver()
+                
             
             input("Pulsa una tecla para continuar.")
 
@@ -78,7 +83,7 @@ def menu_solutions(network_original, solutions_dict):
             print ("Estas son las soluciones construidas:/n")
             
             # Listar las soluciones existentes
-            mostrar_soluciones(solutions_dict)
+            mostrar_soluciones(problems_dict)
 
             # Obtener la elección del usuario
             try:
@@ -87,11 +92,11 @@ def menu_solutions(network_original, solutions_dict):
                 from hcndp import export
                 
                 numero_elegido = int(input("Ingresa el número de la solución elegida: "))
-                solucion_elegida = list(solutions_dict.keys())[numero_elegido - 1]
+                solucion_elegida = list(problems_dict.keys())[numero_elegido - 1]
                 
                 # Realizar el procedimiento con la opción seleccionada
                 print(f"\nRealizando el procedimiento para la opción: {solucion_elegida}")
-                current_solution=solutions_dict[solucion_elegida]
+                current_solution=problems_dict[solucion_elegida]
                 
                 if current_solution.objective=="Nulo":
                     # Si no hay función objetivo (Solución ingresada por usuario)
@@ -124,17 +129,17 @@ def menu_solutions(network_original, solutions_dict):
             print ("Estas son las soluciones construidas:/n")
             
             # Listar las soluciones existentes
-            mostrar_soluciones(solutions_dict)
+            mostrar_soluciones(problems_dict)
             
             # Obtener la elección del usuario
             try:
                 from hcndp import figures
                 numero_elegido = int(input("Ingresa el número de la solución elegida: "))
-                solucion_elegida = list(solutions_dict.keys())[numero_elegido - 1]
+                solucion_elegida = list(problems_dict.keys())[numero_elegido - 1]
                 
                 # Realizar el procedimiento con la opción seleccionada
                 print(f"\nRealizando el procedimiento para la opción: {solucion_elegida}")
-                current_solution=solutions_dict[solucion_elegida]
+                current_solution=problems_dict[solucion_elegida]
                 
                 if current_solution.objective=="Nulo":
                     # Si no hay función objetivo (Solución ingresada por usuario)
@@ -167,7 +172,7 @@ def menu_solutions(network_original, solutions_dict):
 # %% <codecell> Crear objeto solución
 
 
-def create_solution_object(network_original, solutions_dict, name_solution):
+def create_solution_object(network_original, problems_dict, name_solution):
     import textwrap
 
     # Creamos un objeto solution
@@ -176,10 +181,10 @@ def create_solution_object(network_original, solutions_dict, name_solution):
     # Si pulsas enter se asigna '{name_solution}': """))
     # if not new_name_solution:  # Si la entrada está vacía
     new_name_solution = name_solution
-    solutions_dict[new_name_solution] = Solution(name_solution=new_name_solution,
+    problems_dict[new_name_solution] = Problem(name_solution=new_name_solution,
                                                  objective="Nulo",
                                                  name_network=network_original.name)
-    solution = solutions_dict[new_name_solution]
+    solution = problems_dict[new_name_solution]
 
     # Inserto una copia de network original en la solución como network_copy
     solution.insert_network_object(network_original)
@@ -195,9 +200,9 @@ def create_solution_object(network_original, solutions_dict, name_solution):
 
     
     
-# %% <codecell> Clase Solution
+# %% <codecell> Clase Problem
 
-class Solution:
+class Problem:
 
     def __init__(self, name_solution, objective, name_network):
         self.name_solution = name_solution
@@ -209,13 +214,13 @@ class Solution:
         import copy
         self.network_copy = copy.deepcopy(network_original)
 
-    def menu_exact_optimization(self, new_network, solutions_dict):
+    def menu_exact_optimization(self, new_network, problems_dict):
         while True:
             print("\n----------------------------------------------------------")
-            print("Menú de Optimización exacta")
+            print("Menú de Optimización y Mejora")
             print("----------------------------------------------------------\n")
             print("1. Optimización mono-objetivo")
-            print("2. Optimización multi-objetivo")
+            print("2. Obtener soluciones por algoritmos de búsqueda")
             print("3. Regresar al menú anterior")
 
             opcion1 = input("Selecciona una opción: \n")
@@ -230,21 +235,23 @@ class Solution:
     
                     # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
                     clave_temporal = 'temporal'
-                    solucion_temporal = solutions_dict[clave_temporal]
-                    solutions_dict[solucion_temporal.description_objective] = solutions_dict.pop(
+                    solucion_temporal = problems_dict[clave_temporal]
+                    problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
                         clave_temporal)
-                    solutions_dict[solucion_temporal.description_objective].network_copy.name_solution = \
-                        solutions_dict[solucion_temporal.description_objective].name_solution 
+                    problems_dict[solucion_temporal.description_objective].network_copy.name_solution = \
+                        problems_dict[solucion_temporal.description_objective].name_solution 
 
                     break 
                 
                 elif self.network_copy.optimizar==False:
                     self.optimizar=False
                     break
-                
+                objective_and_description = new_network.get_objective_function()
+
             elif opcion1 == "2":
                 print("Has seleccionado la Opción 2.")
-
+                print ("Algoritmos de búsqueda")
+                
             elif opcion1 == "3":
                 print("Has seleccionado la Opción 3.")
                 self.optimizar=False
@@ -470,9 +477,9 @@ class Solution:
 
 # %% Función principal
 
-    def calculate_exact_optima(self):
-        import os
-        import pyomo.environ as pyo
+    # %% Crear modelo abstracto
+
+    def construct_model(self):
 
         _menu_options = {
             '1': 'Minimizar congestión máxima (rho)',
@@ -485,7 +492,6 @@ class Solution:
         }
         objective = self.objective
 
-        # %% Crear modelo abstracto
         # Creo objeto Model_pyomo dentro de solution
         from hcndp import models
         self.pyo_model = models.Model_pyomo(
@@ -509,21 +515,25 @@ class Solution:
         # Creo el archivo data_dat (network)
         self.network_copy.create_data_dat()
 
-        # %% Instanciar (model)
+    # %% Instanciar (model)
+    def construct_instance(self):
+        import os
+        import pyomo.environ as pyo
+        
         #self.pyo_model.data_dat = os.getcwd()+'/data/'+self.network_copy.name+'/datos.dat'
         self.pyo_model.data_dat = os.getcwd()+'/data/'+self.name_network+'/datos.dat'
         
         self.pyo_model.instance = self.pyo_model.model_abstract.create_instance(
             self.pyo_model.data_dat)
 
-        if objective == 4:
+        if self.objective== 4:
             self.pyo_model.instance.obj = \
                 pyo.Objective(expr=sum(self.pyo_model.instance.alpha_ik[i, k] *
                                        sum(self.pyo_model.instance.h[i, kp]
                                            for kp in self.pyo_model.instance.K) for i in self.pyo_model.instance.I for k in self.pyo_model.instance.K)
                               / sum(sum(self.pyo_model.instance.h[i, kp] for kp in self.pyo_model.instance.K)
                                     for i in self.pyo_model.instance.I for k in self.pyo_model.instance.K), sense=pyo.maximize)
-        if objective == 5:
+        if self.objective == 5:
             for j in self.pyo_model.instance.J:
                 for k in self.pyo_model.instance.K:
                     self.pyo_model.instance.rho_jk[j, k].setlb(
@@ -531,15 +541,16 @@ class Solution:
                     self.pyo_model.instance.rho_jk[j,
                                                    k].value = 0.000000000000001
 
-        if objective == 6:
+        if self.objective == 6:
             self.pyo_model.instance.obj = pyo.Objective(expr=sum(self.pyo_model.instance.delta_i[i] *
                                                         sum(self.pyo_model.instance.h[i, k] for k in self.pyo_model.instance.K) for i in self.pyo_model.instance.I) /
                                                         sum(self.pyo_model.instance.h[i, k]
                                                             for i in self.pyo_model.instance.I for k in self.pyo_model.instance.K),
                                                         sense=pyo.maximize)
 
-        # %% Resolver
-        if objective == 5:
+    # %% Resolver
+    def execute_solver(self):
+        if self.objective == 5:
             self.solve_ipopt()
         else:
             self.solve_gurobi()

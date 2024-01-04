@@ -4,7 +4,7 @@ Created on Tue Dec  5 16:04:10 2023
 
 @author: edgar
 """
-def menu_select_file():
+def menu_select_file(I):
     import textwrap
     print (textwrap.dedent('''\
            Vamos a seleccionar el archivo con los datos de la red.
@@ -21,7 +21,8 @@ def menu_select_file():
         print("Selecciona una opción:")
         print("1. Utilizar archivo existente datos_i16_j10_k10_base.xlsx ")
         print("2. Cargar nuevo archivo")
-        print("3. Salir")
+        if int(I) > 0:
+            print("3. Continuar a crear red")
 
         opcion = input("Selecciona una opción: \n")
 
