@@ -50,7 +50,7 @@ print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 networks_dict[_name].read_file_excel(archivo)
 networks_dict[_name].delete_surplus_data()
-print (f"\nSe han creado exitosamente los datos en el objeto {_name}.")
+print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
 
 
 import textwrap

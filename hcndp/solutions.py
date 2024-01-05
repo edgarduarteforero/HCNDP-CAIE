@@ -523,8 +523,7 @@ class Problem:
         #self.pyo_model.data_dat = os.getcwd()+'/data/'+self.network_copy.name+'/datos.dat'
         self.pyo_model.data_dat = os.getcwd()+'/data/'+self.name_network+'/datos.dat'
         
-        self.pyo_model.instance = self.pyo_model.model_abstract.create_instance(
-            self.pyo_model.data_dat)
+        self.pyo_model.instance = self.pyo_model.model_abstract.create_instance(self.pyo_model.data_dat)
 
         if self.objective== 4:
             self.pyo_model.instance.obj = \

@@ -10,7 +10,7 @@ def menu_select_file(I):
            Vamos a seleccionar el archivo con los datos de la red.
            
            Por defecto, HCNDP proporciona el archivo 
-           datos_i16_j10_k10_base.xlsx ubicado en la carpeta \data\
+           datos_i16_j10_k10_base.xlsx ubicado en la carpeta /data/red original/.
                
            Puedes seguir utilizando ese archivo o definir tu propio archivo 
            de datos.
