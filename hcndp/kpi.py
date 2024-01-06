@@ -40,9 +40,7 @@ def calculate_kpi(current_solution,_post_optima):
     set_continuity_per_node(network)
     set_kpi_network(network)
     set_df_grafo_flujo_jkjk(network)
-    
-    print ("Se calcularon todos los KPI de la solución.")
-    
+        
 
 #%% <codecell> Funciones para cálculo de probabilidades por teoría de colas
 
@@ -528,6 +526,7 @@ def set_df_grafo_flujo_jkjk(network):
     df_flujos_jkjk=pd.merge(df_flujos_jkjk,df_probs_kk,left_on=['servicio_K','servicio_Kp'],right_on=['servicio_K','servicio_Kp'], how='left')
     df_flujos_jkjk['p_kkp_True_False']=df_flujos_jkjk['p_kkp']>0 # Flujos posibles
     df_flujos_jkjk['p_jjkk_True_False']=df_flujos_jkjk['p_jjkk']>0 #Flujos asignados
+    network.file['df_flujos_jkjk']=df_flujos_jkjk
 
 #%% <codecell> Main    
 if __name__ == "__main__":
