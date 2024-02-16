@@ -5,6 +5,72 @@ Created on Fri Dec 29 12:33:35 2023
 @author: edgar
 """
 
+# <codecell> Funciones complementarias
+# Importación de librerías
+
+import numpy as np
+import pandas as pd
+import math
+import random
+import sys
+import re
+import networkx as nx
+import matplotlib.pyplot as plt
+from itertools import product
+
+#Genero los índices para cualquier letra (I,J,K) y su cantidad.
+def indices1(letra,cantidad): # Se generan listas tipo j1,j2,j3
+    matr=[str("%s%d" % (letra.lower(),i+1)) for i in range (cantidad)]
+    return matr
+
+def indices(letra,cantidad): # Se generan listas tipo j01,j02,j03
+    matr=[]
+    for i in range (1,cantidad+1):
+        matr.append(letra+f"{i:02d}")
+    return matr
+
+#Creo un parámetro llamado 'par' (h) con un solo subíndice y valores enteros aleatorios. Ej: h_i
+def param_simple(par,letra,cantidad,lim):
+    matr=[np.random.randint(lim[0],lim[1]+1) for i in range (cantidad)]
+    return matr
+
+#Creo un parámetro llamado 'par' (d) con dos subíndices y valores enteros aleatorios. Ej:c_jk
+def param_doble(par,letra1,letra2,cantidad1,cantidad2,lim):
+    matr=[np.random.randint(lim[0],lim[1]+1) for j in range (cantidad2) for i in range (cantidad1)]
+    return matr
+#param_doble("h","I","K",I,K,lim_h)
+
+#Genero una lista "ubica" con coordenadas x e y.
+def ubicaciones(letra,cantidad):
+    ubica=np.random.uniform(0,1,(cantidad,2)) #Coordenadas aleatorias
+    return ubica
+
+#Genero una matriz de distancias euclideanas entre dos listas de coordenadas
+def distancias(par,matr1,matr2,letra1,letra2):
+    distancias = distance.cdist(matr1, matr2, 'euclidean')
+    return distancias
+
+#Genero una matriz de coberturas para cada par de nodos ij.
+def cobertura(par,matr,maximo,letra1,letra2,cantidad1,cantidad2):
+    matr_cob=matr<=maximo
+    return matr_cob*1
+
+#Calculo decaimiento de distancias por método Gaussiano (Tao 2020 y Delamater 2013)
+def decay_gauss(d_ij,do):
+    if d_ij<do:
+        f=np.exp((-1/2)*(d_ij/do)**2) - np.exp(-1/2)
+        f=(f/(1-np.exp(-1/2)))
+    else:
+        f=0
+    return f
+
+# Construyo una matriz con las combinaciones posibles de dos o más listas
+def matriz_combinaciones(lista_a,lista_b):
+    combinaciones = list(product(lista_a, lista_bb))
+    df = pd.DataFrame(combinaciones, columns=['Columna1', 'Columna2'])
+    return df
+
+
 # <codecell> Clase network
 class Network:
     def __init__(self,I,J,K,archivo,name):
@@ -308,6 +374,7 @@ class Network:
         while True:
             print("\n----------------------------------------------------------")
             print("Selección de la función objetivo")
+            print("get_objective_function@network.py")
             print("----------------------------------------------------------\n")
             print("Definir función objetivo:")
             for i,j in _menu_options.items():
@@ -475,4 +542,653 @@ class Network:
         
         file.close()
 
+class Node:
+    def __init__(self, node_id):
+        self.node_id = node_id
+        self.neighbors = []
+
+    def add_neighbor(self, neighbor):
+        self.neighbors.append(neighbor)
+
+    def __str__(self):
+        return f"Node {self.node_id}"
+
+class Node_Demand(Node):
+    def __init__(self, node_id, demand, service):
+        super().__init__(node_id)
+        self.demand = demand
+        self.service = service
+
+    def __str__(self):
+        return f"Node_Demand {self.node_id}"
+
+class Node_Supply(Node):
+    def __init__(self, node_id, capac_instal_max, rate, place, service, matriz_λ, matriz_δ, capac_instal_sigma=0, capac_sigma_dispon=0):
+        super().__init__(node_id)
+        self.capac_instal_max = capac_instal_max
+        self.capac_instal_disponible = capac_instal_max
+        self.rate = rate
+        self.place = place
+        self.service = service
+        self.matriz_λ = matriz_λ
+        self.matriz_δ = matriz_δ
+        self.capac_instal_sigma = capac_instal_sigma
+        self.capac_sigma_dispon = capac_sigma_dispon
+
+    def __str__(self):
+        return f"Node_Supply {self.node_id}"    
+
+class Edge:
+    def __init__(self, edge_id, source, target):
+        self.edge_id = edge_id
+        self.source = source
+        self.target = target
+
+    def __str__(self):
+        return f"Edge ({self.source} -> {self.target})"
+
+class Edge_Dem_Sup_W (Edge):
+    def __init__(self, edge_id, source, target, distance, service, flow_dem_sup_tau):
+        super().__init__(edge_id, source,target)
+        self.distance = distance
+        self.service = service
+        self.flow_dem_sup_tau= flow_dem_sup_tau
+
+    def __str__(self):
+        return f"Edge W ({self.source} -> {self.target}), service ({self.service}), τ ({self.flow_dem_sup_tau})"
+
+class Edge_Sup_Sup_X (Edge):
+    def __init__(self, edge_id, source, target,node_demand_pop,flow_sup_sup_phi,flow_sup_sup_perc,
+                 service_source,service_target,distance_origin_target):
+        super().__init__(edge_id, source,target)
+        self.node_demand_pop=node_demand_pop
+        self.flow_sup_sup_phi=flow_sup_sup_phi
+        self.flow_sup_sup_perc=flow_sup_sup_perc
+        self.service_source=service_source
+        self.service_target=service_target
+        self.distance_origin_target=distance_origin_target
+
+    def __str__(self):
+        return f"Customer ({self.node_demand_pop}), Edge X ({self.source} -> {self.target}), transfer percentage ({self.flow_sup_sup_perc})"
+
+
+
+class Network_representation(Network):
+    def __init__(self,I,J,K,archivo,file):
+        self.I=I
+        self.J=J
+        self.K=K
+        self.archivo=archivo
+        self.file=file
+        self.nodes_demand = {}
+        self.nodes_supply = {}
+        self.edges_dem_sup_W = {}
+        self.edges_sup_sup_X = {}
         
+        # Matriz de servicios
+        
+        df_niveles = file['df_niveles']
+        items=indices("k",K)
+        df_niveles=df_niveles.query('servicio_K in @items')
+        
+        # Matriz de demandas
+        df_demanda = file['df_demanda']
+        items=indices("i",I)
+        df_demanda=df_demanda.query('nombre_I in @items')
+        
+        #Matriz de oferta
+        df_oferta = file['df_oferta']
+        items=indices("j",J)
+        df_oferta=df_oferta.query('nombre_J in @items')
+        
+        # Matriz de capacidades
+        df_capac = file['df_capac']
+        items=indices("j",J)
+        df_capac=df_capac.query('nombre_J in @items')
+        items=indices("k",K)
+        df_capac=df_capac.query('servicio_K in @items')
+        
+        #Agrego las columna nivel de atención y ubicaciones
+        df_capac=pd.merge(df_capac,df_niveles,on='servicio_K',how='left')
+        df_capac=pd.merge(df_capac,df_oferta,on='nombre_J',how='inner')
+        
+        # Importamos los flujos posibles entre nodos i y nodos j (w_ij)
+        df_w_ij = file['df_w_ij']
+        items=indices("i",I)
+        df_w_ij=df_w_ij.query('nombre_I in @items')
+        items=indices("j",J)
+        df_w_ij=df_w_ij.query('nombre_J in @items')
+        
+        # Importamos las distancias entre nodos i j
+        df_dist_ij = file['df_dist_ij']
+        items=indices("i",I)
+        df_dist_ij=df_dist_ij.query('nombre_I in @items')
+        items=indices("j",J)
+        df_dist_ij=df_dist_ij.query('nombre_J in @items')
+        df_w_ij=pd.merge(df_w_ij,df_dist_ij,left_on=['nombre_I','nombre_J'],right_on=['nombre_I','nombre_J'], how='left')
+        
+        #Importamos los flujos posibles entre nodos j y j' (x_jj)
+        df_x_jj = file['flujos_jj']
+        df_x_jj=df_x_jj.loc[np.arange(J)]
+        df_x_jj=df_x_jj.iloc[:,np.arange(J)+1]
+        df_x_jj=np.nan_to_num(df_x_jj)
+        df_x_jj = pd.DataFrame(data = df_x_jj, index = indices("j",J), columns = indices("j",J))
+        df_x_jj = df_x_jj.melt(ignore_index=False).reset_index().rename(columns={"index": "nombre_J", "variable": "nombre_Jp","value":"x_jjp"})
+
+        #Importamos los porcentajes de transferencia (p_kk')
+        df_probs = file['prob_serv']
+        df_probs=df_probs.drop(['Unnamed: 0'], axis=1)
+        df_probs=df_probs.loc[np.arange(K)]
+        df_probs=df_probs[np.arange(K)+1]
+        df_probs=np.nan_to_num(df_probs)
+        df_probs = pd.DataFrame(data = df_probs, index = indices("k",K), columns = indices("k",K))
+        df_probs = df_probs.melt(ignore_index=False).reset_index().rename(columns={"index": "servicio_K", "variable": "servicio_Kp","value":"p_kkp"})
+        df_probs["bin"]=(df_probs['p_kkp']!=0).astype(int)
+        
+        
+        #Construimos la matriz df_arcos para flujos jkjk
+        lista=[]
+        j=indices("j",J)
+        k=indices("k",K)
+        for _a in j:
+          for _b in j:
+            for _c in k: # range (1,K+1):
+              for _d in k: #range(1,K+1):
+                lista.append([_a,_c,_b,_d])
+        
+        df_arcos=pd.DataFrame(lista,columns=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'])
+        df_arcos.sort_values(by=['nombre_J','servicio_K'], inplace=True)
+
+        # Creación de los nodos de demanda
+        for _,row in df_demanda.iterrows():
+            self.add_node_demand(row['nombre_I'],row['demanda_i'],'k01')
+
+        # Creación de nodos de oferta artificiales
+        for _, row in df_demanda.iterrows():
+            self.add_node_supply(node_id=row['nombre_I'].replace('i', 'j')+'k00', 
+                            capac_instal_max=math.nan,
+                            rate=math.nan,
+                            place=row['nombre_I'].replace('i', 'j'),
+                            service='k00',
+                            matriz_λ=pd.DataFrame(columns=['nombre_I','nombre_J','servicio_K','λ_ijk']),
+                            matriz_δ=pd.DataFrame(columns=['nombre_I','nombre_J','servicio_K','servicio_Kp','δ_ijkkp']),
+                            capac_instal_sigma=math.nan,
+                            capac_sigma_dispon=math.nan)
+            
+        # Los nodos de oferta artificiales tienen un lambda igual a la demanda de su nodo i
+
+        # Creación de los nodos de oferta
+        for _, row in df_capac.iterrows():
+            self.add_node_supply(node_id=row['nombre_J']+row['servicio_K'],
+                            capac_instal_max=row['s_jk'],
+                            #capac_instal_disponible = row['s_jk'],
+                            rate=row['c_jk'],
+                            place=row['nombre_J'],
+                            service=row['servicio_K'],
+                            matriz_λ=pd.DataFrame(columns=['nombre_I','nombre_J','servicio_K','λ_ijk']),
+                            matriz_δ=pd.DataFrame(columns=['nombre_I','nombre_J','servicio_K','servicio_Kp','δ_ijkkp']),
+                            capac_instal_sigma=0,
+                            capac_sigma_dispon=0)
+
+        # Creación de los arcos demanda - oferta
+        for _, row in df_w_ij.iterrows():
+            if row['w_ij']==1:
+                self.add_edge_dem_sup_W(edge_id=row['nombre_I']+row['nombre_J']+'k01',
+                                   source=row['nombre_I'],
+                                   target=row['nombre_J']+'k01',
+                                   distance=row['dist_IJ'],
+                                   service='k01',
+                                   flow_dem_sup_tau=0)
+
+        #Creación de arcos entre nodos de oferta articiciales y reales
+        for _,_i in self.edges_dem_sup_W.items():
+                self.add_edge_sup_sup_X(edge_id= _i.source + _i.source.replace('i', 'j') +'k00' + _i.target,
+                               source= _i.source.replace('i', 'j') +'k00',
+                               target= _i.target,
+                               node_demand_pop=_i.source,
+                               flow_sup_sup_phi=0,
+                               flow_sup_sup_perc=0,
+                               service_source='k00',
+                               service_target='k01',
+                               distance_origin_target=0)    
+
+        # Creación de los arcos oferta - oferta
+        for _, row in df_x_jj.iterrows():
+            for _p, row_p in df_probs.iterrows():
+                if row['x_jjp']!=0 and row_p['p_kkp'] !=0 and \
+                    df_capac[(df_capac['nombre_J'] == row['nombre_Jp']) & (df_capac['servicio_K']==row_p['servicio_Kp'])]['s_jk'].values[0]!=0:
+                    for _i in df_demanda['nombre_I']:
+                        if ((row_p['servicio_K']==row_p['servicio_Kp'] and (row['nombre_J'] != row['nombre_Jp'])) == False):
+                            self.add_edge_sup_sup_X(edge_id=_i+row['nombre_J']+row_p['servicio_K']+row['nombre_Jp']+row_p['servicio_Kp'],
+                                               source=row['nombre_J']+row_p['servicio_K'],
+                                               target=row['nombre_Jp']+row_p['servicio_Kp'],
+                                               node_demand_pop=_i,
+                                               flow_sup_sup_phi=0,
+                                               flow_sup_sup_perc=0,
+                                               service_source=row_p['servicio_K'],
+                                               service_target=row_p['servicio_Kp'],
+                                               distance_origin_target=df_dist_ij[(df_dist_ij['nombre_I'] == _i) & (df_dist_ij['nombre_J'] == row['nombre_Jp'])]['dist_IJ'].values[0])
+            
+        # Creación de los λ_ijk en cada nodo de servicio jk
+        for _i,_j in self.nodes_supply.items():
+            for _,_i in df_demanda.iterrows():
+                _lista=[_i['nombre_I'],_j.place,_j.service,0.0]
+                _j.matriz_λ.loc[len(_j.matriz_λ)] = _lista
+        
+        # Creación de los δ_ijkk' en cada nodo de servicio jk
+        for _i,_j in self.nodes_supply.items():
+            for _,_i in df_demanda.iterrows():
+                for _p,_k in df_niveles.iterrows():
+                    _lista=[_i['nombre_I'],_j.place,_j.service,_k['servicio_K'],0.0]
+                    _j.matriz_δ.loc[len(_j.matriz_δ)] = _lista
+                    
+        # Creación el df_asignación para almacenar flujos entrantes lambda ijk 
+        # Construyo una matriz g con los arribos externos, es decir los ϕi.j.k0jk
+        _lista_i=indices("i",I)
+        _lista_j=indices("j",J)
+        _lista_k=indices("k",K)
+        _lista = list(product(_lista_i, _lista_j,_lista_k))
+        _df_asignacion=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
+        _df_asignacion["lambda_ijk"] = 0.0
+        _df_asignacion=_df_asignacion.sort_values(by=['nombre_I','nombre_J', 'servicio_K'])
+        _df_asignacion.set_index(['nombre_I', 'nombre_J','servicio_K'],inplace=True)
+        self.df_asignacion = _df_asignacion
+
+
+    def add_node_demand(self, node_id,demand,service):
+        if node_id not in self.nodes_demand:
+            self.nodes_demand[node_id] = Node_Demand(node_id,demand,service)
+
+    def add_node_supply(self, node_id,capac_instal_max, rate, place, service,matriz_λ,matriz_δ,capac_instal_sigma,capac_sigma_dispon):
+        if node_id not in self.nodes_supply:
+            self.nodes_supply[node_id] = Node_Supply(node_id,capac_instal_max,rate, place, service,matriz_λ,matriz_δ, capac_instal_sigma,capac_sigma_dispon)
+            self.nodes_supply[node_id].matriz_δ['δ_ijkkp']  = 0.0
+            #self.nodes_supply[node_id].matriz_δ['δ_ijkkp']  = matriz_δ['δ_ijkkp'].astype(float)
+            
+    def add_edge_dem_sup_W(self, edge_id,source, target, distance,service, flow_dem_sup_tau):
+        self.edges_dem_sup_W[edge_id] = Edge_Dem_Sup_W(edge_id,source, target, distance, service , flow_dem_sup_tau)
+        if target not in self.nodes_demand[source].neighbors:
+            self.nodes_demand[source].add_neighbor(target)
+
+    def add_edge_sup_sup_X(self, edge_id, source, target,node_demand_pop,flow_sup_sup_phi,flow_sup_sup_perc,service_source,service_target,distance_origin_target):
+        self.edges_sup_sup_X[edge_id] = Edge_Sup_Sup_X(edge_id,source, target, node_demand_pop,flow_sup_sup_phi,flow_sup_sup_perc,service_source,service_target,distance_origin_target)
+        if target not in self.nodes_supply[source].neighbors:
+            self.nodes_supply[source].add_neighbor(target)
+        if target not in self.nodes_demand[node_demand_pop].neighbors:
+            self.nodes_demand[node_demand_pop].add_neighbor(target)
+    
+    #Cargo las funciones que hacen parte de la heurística
+    # Función de asignación exhaustiva de recursos
+    # Función que llena los datos de df_matriz, y actualiza df_matriz_todos
+    
+    def asignacion_recursos(self,path,_k):
+        # Construyo matriz de distancias filtrada (elimino distancias mayores a d_o)
+        def construir_matriz(_k):
+            df_matriz=pd.DataFrame(columns=['nombre_J','dist_max','nombre_I','demanda_I','s_jk','sigma_jk','reman_despues','reman_antes'])
+            return df_matriz
+        
+        # Preparo df_matriz para que tenga los datos de una iteración
+        suma_asignacion=0
+        _d_o=path.nodes_services[_k].distance_do
+        df_matriz_todos=construir_matriz(_k)
+    
+        # Suma de s_jk
+        _x = sum([_i.capac_instal_max for _i in self.nodes_supply.values() if not math.isnan(_i.capac_instal_max) and  _i.service==_k])    
+        
+        # Calculo distancias dentro de la cobertura
+        for _,_i in self.edges_sup_sup_X.items():
+            if _i.distance_origin_target<=_d_o:
+                _i.distance_origin_target_covered=_i.distance_origin_target
+            else:
+                _i.distance_origin_target_covered=math.nan
+                
+        #Valido que s_max sea menor a la suma de los s_jk
+        if _x < path.nodes_services[_k].service_capacity:
+            #print ("Hay más recursos que capacidad disponible")
+            print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
+            print ("Suma de capacidades: ", _x)
+        else:
+            #print ("Hay más capacidad disponible que recursos")
+            print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
+            print ("Suma de capacidades: ", _x)
+        
+        while suma_asignacion < path.nodes_services[_k].service_capacity:
+            df_matriz=construir_matriz(_k)
+            
+            # Construyo df_matriz
+            for _,_j in self.nodes_supply.items():
+                if _j.service==_k:
+                    selected, max_dist = 0 , 0
+                    
+                    for i in self.edges_sup_sup_X.values():
+                        if i.target == _:
+                            if i.distance_origin_target_covered >= max_dist:
+                                max_dist=i.distance_origin_target_covered
+                                selected=i
+                    
+                    if selected != 0:
+                        nueva_fila = {'nombre_J': selected.target, 
+                                      'dist_max': selected.distance_origin_target_covered, 
+                                      'nombre_I': selected.node_demand_pop, 
+                                      'demanda_I': self.nodes_demand[selected.node_demand_pop].demand, 
+                                      's_jk': self.nodes_supply[selected.target].capac_instal_disponible,
+                                      'sigma_jk':0,
+                                      'reman_despues':math.nan,
+                                      'reman_antes':math.nan}
+                        selected.distance_origin_target_covered=math.nan
+                        df_matriz = pd.concat([df_matriz, pd.DataFrame([nueva_fila])], ignore_index=True)
+            
+            # ordeno matriz por mayor distancia en orden descendente
+            df_matriz=df_matriz.sort_values(by=['dist_max'],ascending=False)
+            
+            # remanente antes (fila0) = smax
+            if df_matriz.empty :
+                print ("No hay más capacidad disponible")
+                break 
+            else: 
+                df_matriz['reman_antes'].iloc[0] = path.nodes_services[_k].service_capacity
+            
+            # Actualizo df_matriz con la asignación y copio sus datos a df_matriz_todos   
+            for _i in range (len(df_matriz)):
+                if df_matriz['reman_antes'].iloc[_i] <=0:
+                    df_matriz['sigma_jk'].iloc[_i]=0
+                    
+                if _i==0 and suma_asignacion==0:
+                    df_matriz['reman_antes'].iloc[_i] = path.nodes_services[_k].service_capacity
+                    df_matriz['sigma_jk'].iloc[_i]=min(df_matriz['demanda_I'].iloc[_i],df_matriz['s_jk'].iloc[_i],df_matriz['reman_antes'].iloc[_i])
+                    df_matriz['reman_despues'].iloc[_i]=df_matriz['reman_antes'].iloc[_i]-df_matriz['sigma_jk'].iloc[_i]
+                elif _i==0 and suma_asignacion!=0:
+                    df_matriz['reman_antes'].iloc[_i] = df_matriz_todos['reman_despues'].iloc[-1]
+                    df_matriz['sigma_jk'].iloc[_i]=min(df_matriz['demanda_I'].iloc[_i],df_matriz['s_jk'].iloc[_i],df_matriz['reman_antes'].iloc[_i])
+                    df_matriz['reman_despues'].iloc[_i]=df_matriz['reman_antes'].iloc[_i]-df_matriz['sigma_jk'].iloc[_i]
+                else:
+                    df_matriz['reman_antes'].iloc[_i] = df_matriz['reman_despues'].iloc[_i-1]
+                    df_matriz['sigma_jk'].iloc[_i]=min(df_matriz['demanda_I'].iloc[_i],df_matriz['s_jk'].iloc[_i],df_matriz['reman_antes'].iloc[_i])
+                    df_matriz['reman_despues'].iloc[_i]=df_matriz['reman_antes'].iloc[_i]-df_matriz['sigma_jk'].iloc[_i]
+                
+                # Actualización de valores en los objetos
+                self.nodes_supply[df_matriz['nombre_J'].iloc[_i]].capac_instal_disponible -= df_matriz['sigma_jk'].iloc[_i]
+                self.nodes_supply[df_matriz['nombre_J'].iloc[_i]].capac_instal_sigma += df_matriz['sigma_jk'].iloc[_i]
+                self.nodes_supply[df_matriz['nombre_J'].iloc[_i]].capac_sigma_dispon += df_matriz['sigma_jk'].iloc[_i]
+                
+            suma_asignacion+=sum(df_matriz['sigma_jk'])
+            df_matriz_todos = df_matriz_todos._append(df_matriz,ignore_index=True)
+        
+        print ("Final")
+    
+    
+    # Función que calcula los δ_ijkk
+    def asignacion_flujos_δ(self,network,path,_k):
+        print ("Inicio asignación flujos δ para ",_k) 
+        for _,_j in network.nodes_supply.items():
+            if _j.service==_k:
+                for _p,_i in _j.matriz_δ.iterrows():
+                    j=_j.place
+                    k=_j.service
+                    i=_i['nombre_I']
+                    kp=_i['servicio_Kp']
+                    
+                    if k+kp in path.edges_ser_ser_R:
+                        _r=path.edges_ser_ser_R[k+kp].transfer_percentage
+                    else:
+                        _r=0
+            
+                    δ_ijkkp=float(_j.matriz_λ.where((_j.matriz_λ['nombre_I']==i) & (_j.matriz_λ['nombre_J']==j) 
+                                      & (_j.matriz_λ['servicio_K']==k))['λ_ijk'].dropna().values[0] * _r)
+                    _j.matriz_δ.loc[_p, 'δ_ijkkp'] = float(δ_ijkkp)
+                
+                #print ("Matriz de deltas actualizada para servicio origen ",_k)
+                #print (_j.matriz_δ[_j.matriz_δ['δ_ijkkp'] > 0])
+        #print ("Finalizo asignación flujos δ para ",_k) 
+    
+    
+    
+    # Función para solucionar el problema de transporte entre k y kp
+    def solucion_entre_k_kp(self,network,_k,_kp,archivo):
+        #print ("Inicio solución del problema de transporte entre ",_k, " y ",_kp)
+    
+        global network_x
+        network_x = nx.DiGraph()
+        df_dist_ij = archivo['df_dist_ij']
+        
+        #Creo nodos oferta
+        for _i,_j in network.nodes_supply.items():
+            if _j.service==_kp:
+                network_x.add_node(_j.node_id,tipo="oferta",demand=_j.capac_sigma_dispon*100)
+        
+        # Creo nodos demanda
+        for _i,_j in network.nodes_supply.items():
+            if _j.service==_k:
+                for _,_l in _j.matriz_δ.iterrows():
+                    if _l.δ_ijkkp != 0:
+                        network_x.add_node(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],
+                                           tipo="demanda",source=_j.node_id,demand=round(-_l['δ_ijkkp'])*100)
+                        for _m in _j.neighbors: # Creo arcos
+                            if _m[-3:]==_kp:
+                                _distancia=df_dist_ij.loc[(df_dist_ij['nombre_I'] == _l["nombre_I"]) & (df_dist_ij['nombre_J'] == _m[:3]), 'dist_IJ'].values[0]
+                                #print (f"Distancia entre {_l['nombre_I']} y {_m[:3]}: {_distancia}")
+                                network_x.add_edge(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],_m,weight=_distancia)
+        
+        #Balanceo nodos de demanda y oferta
+        _suma_demanda, _suma_oferta=0,0
+        for _i in network_x.nodes(data=True):
+            if _i[1]['tipo']=="oferta":
+                _suma_oferta += _i[1]["demand"]
+            else:
+                _suma_demanda += _i[1]["demand"]
+        
+        if _suma_oferta - _suma_demanda >0: #Creo nodo demanda ficticio y enlaces hacia el último jk con costo cero
+            network_x.add_node("ficticio",tipo="demanda",demand=-(_suma_oferta + _suma_demanda) )
+            for _i in network_x.nodes(data=True):
+                if _i[1]["tipo"]=="oferta":
+                    network_x.add_edge("ficticio",_i[0],weight=0)
+        elif _suma_oferta - _suma_demanda <0: #Creo nodo oferta ficticio y enlace hacia 
+            network_x.add_node("ficticio",tipo="oferta",demand=-(_suma_oferta + _suma_demanda) )
+    
+        # Redondear los pesos
+        #for source, target, data in network_x.edges(data=True):
+        #    if 'weight' in data:
+        #        data['weight'] = round(data['weight'])
+        
+        # Resuelvo el problema
+        flowCost, flowDict = nx.network_simplex(network_x)
+    
+        # Como escalé las ofertas y demandas *100, actualizo sus valores
+        # Itera sobre cada diccionario dentro del diccionario principal
+        for subdiccionario in flowDict.values():
+            # Itera sobre cada valor en el subdiccionario
+            for _i, _j in subdiccionario.items():
+                # Divide el valor por 100
+                subdiccionario[_i] = _j / 100
+        
+        # Actualizo las capacidades instaladas disponibles en cada nodo de oferta
+        for _node_from, _flows in flowDict.items():
+            for _node_to, _flow in _flows.items():
+                if _flow > 0  and _node_from!= "ficticio":
+                    #print(f"{_node_from}, {_flows}-> {_node_to}: {_flow}")
+                    #print (network.nodes_supply[_node_to].capac_sigma_dispon)
+                    network.nodes_supply[_node_to].capac_sigma_dispon-=_flow
+                    #print (network.nodes_supply[_node_to].capac_sigma_dispon)
+        
+        # Imprimir resultados
+        _resultado={}
+        #print("Costo Total:", flowCost)
+        #print("\nFlujo Óptimo:")
+        for _node_from, _flows in flowDict.items():
+            for _node_to, _flow in _flows.items():
+                if _flow > 0:
+                    #print(f"{_node_from} -> {_node_to}: {_flow}")
+                    _resultado[(_node_from,_node_to)] = _flow
+        
+        #Construyo el gráfico de la red
+        #pos=nx.circular_layout(network_x)
+        #nx.draw(network_x, pos, node_size=3000, node_color='white',edgecolors= "grey", edge_color='black',linewidths= 2,
+        #width= 2)
+        #labels = {node: str(node) for node in network_x.nodes}
+        #nx.draw_networkx_labels(network_x, pos, labels)
+        ##edge_labels = nx.get_edge_attributes(network_x, "weight")
+        ##print (edge_labels)
+        #nx.draw_networkx_edge_labels(network_x, pos, _resultado)
+        ## Set margins for the axes so that nodes aren't clipped
+        #ax = plt.gca()
+        #ax.margins(0.20)
+        #plt.axis("off")
+        #plt.show()
+    
+        
+        # Almaceno los ϕ_{ijkjk} en los nodo supply
+        for _node_from, _flows in flowDict.items():
+            for _node_to, _flow in _flows.items():
+                if _flow > 0 and _node_from != "ficticio":
+                    _direccion = _node_from[:-3]+_node_to
+                    network.edges_sup_sup_X[_direccion].flow_sup_sup_phi=_flow
+        
+        print ("Termino solución del problema de transporte entre ",_k, " y ",_kp)
+    
+    
+    
+    # Función de obtención de porcentajes π
+    def obtencion_π(self,network,k,kp):
+        print ("Inicio obtención de π para ",k," y ",kp)
+        _lista=[]
+        for _i,_j in network.edges_sup_sup_X.items():
+            if _j.service_source == k and _j.service_target == kp :
+                _lista.append([_j.node_demand_pop,_j.source,_j.target,_j.flow_sup_sup_phi])
+        _df = pd.DataFrame(_lista, columns=['poblacion','origen', 'destino', 'ϕ'])
+        _suma_por_origen = _df.groupby('origen')['ϕ'].sum()
+        #print ("Suma de ϕ por origen")
+        #print (_suma_por_origen)
+        
+        _df['porcentaje'] = _df.apply(lambda row: row['ϕ'] / _suma_por_origen[row['origen']] if _suma_por_origen[row['origen']] > 0 else 0, axis=1)
+        #print ("Obtención pi")
+        #print (_df)
+        
+        for _,_i in _df.iterrows():
+            _enlace=_i['poblacion']+_i['origen']+_i['destino']
+            for _j,_k in network.edges_sup_sup_X.items():
+                if _j == _enlace:
+                    _k.flow_sup_sup_perc=_i['porcentaje']
+                    #print (_i['porcentaje'])
+                    #print (_j[:3],_enlace,_i['porcentaje'],_k.flow_sup_sup_perc)
+        
+        #print ("Finalizo obtención de π para ",k," y ",kp)
+    
+    
+    # Función de asignación de porcentajes π para flujos cíclicos
+    def asignacion_π_ciclos(self,network,k,kp):
+        for _i,_j in network.edges_sup_sup_X.items():
+            if _j.service_source==k and _j.service_target==kp:
+                if _i[1:3]==_i[4:6] == _i[10:12]:
+                    _j.flow_sup_sup_perc=1.0
+
+                
+    # Función de construcción de $λ_{ijk}$
+    def construyo_λ(self,network,kp):
+        for _j in network.nodes_supply.values():
+            if _j.service==kp:
+                for _,_fila in _j.matriz_λ.iterrows():
+                    _i=_fila['nombre_I']
+                    _jp=_fila['nombre_J']
+                    _kp=_fila['servicio_K']
+                    _suma=0.0
+                    for _arco in network.edges_sup_sup_X.values():
+                        if  _arco.node_demand_pop==_i and  _arco.target == _jp+_kp:
+                                _suma += _arco.flow_sup_sup_phi
+                    _j.matriz_λ.loc[_,'λ_ijk'] = _suma
+                    
+                
+    
+    def __str__(self):
+        _df_pivot = self.df_asignacion.reset_index()
+        _df_pivot['nombre_I_nombre_J']=_df_pivot['nombre_I']+_df_pivot['nombre_J']
+        _df_pivot = _df_pivot.pivot(index='nombre_I_nombre_J', columns='servicio_K', values='lambda_ijk')
+            
+        return f"Tasas de arribo para usuarios de \n {_df_pivot}"
+        
+        
+        #nodes_demand_str = ", ".join(str(node) for node in self.nodes_demand.values())
+        #nodes_supply_str = ", ".join(str(node) for node in self.nodes_supply.values())
+        #edges_dem_sup_str = ", ".join(str(edge) for edge in self.edges_dem_sup_W)
+        #edges_sup_sup_str = ", ".join(str(edge) for edge in self.edges_sup_sup_X)
+        #return f"Network with nodes: {nodes_demand_str} \n and {nodes_supply_str} \nEdges: {edges_dem_sup_str} and {edges_sup_sup_str} "
+
+class Path_representation:
+    def __init__(self,K,archivo,file):
+        self.K=K
+        self.archivo=archivo
+        self.file=file
+        self.nodes_services = {}
+        self.edges_ser_ser_R = {}
+
+        # Matriz de servicios
+        df_niveles = file['df_niveles']
+        items=indices("k",K)
+        df_niveles=df_niveles.query('servicio_K in @items')
+        
+        #Importamos los porcentajes de transferencia (p_kk')
+        df_probs = file['prob_serv']
+        df_probs=df_probs.drop(['Unnamed: 0'], axis=1)
+        df_probs=df_probs.loc[np.arange(K)]
+        df_probs=df_probs[np.arange(K)+1]
+        df_probs=np.nan_to_num(df_probs)
+        df_probs = pd.DataFrame(data = df_probs, index = indices("k",K), columns = indices("k",K))
+        df_probs = df_probs.melt(ignore_index=False).reset_index().rename(columns={"index": "servicio_K", "variable": "servicio_Kp","value":"p_kkp"})
+        df_probs["bin"]=(df_probs['p_kkp']!=0).astype(int)
+        
+        # Creación de los nodos de servicios
+        for _,row in df_niveles.iterrows():
+            self.add_node_service(row['servicio_K'],row['Servicio'],row['s_k_max'],row['d_o_k'])
+        
+        #Creación de nodo del servicio artificial k00
+        self.add_node_service('k00','Servicio artificial',math.nan,math.nan)
+        
+        #Creación de arcos oferta oferta artificiales
+        self.add_edge_ser_ser_R(edge_id='k00k01',
+                                source='k00',
+                                target='k01',
+                                transfer_percentage=1)
+        
+        # Creación de los arcos oferta - oferta
+        for _, row in df_probs.iterrows():
+            if row['p_kkp']!=0:
+                self.add_edge_ser_ser_R(edge_id=row['servicio_K']+row['servicio_Kp'],
+                                        source=row['servicio_K'],
+                                        target=row['servicio_Kp'],
+                                        transfer_percentage=row['p_kkp'])
+
+    
+    def add_node_service(self, node_id,service_name,service_capacity,distance_do):
+        if node_id not in self.nodes_services:
+            self.nodes_services[node_id] = Node_Service(node_id,service_name,service_capacity,distance_do)
+
+    def add_edge_ser_ser_R(self, edge_id, source, target,transfer_percentage):
+        self.edges_ser_ser_R[edge_id] = Edge_Ser_Ser_R(edge_id,source,target, transfer_percentage)
+        #self.edges_ser_ser_R.append(Edge_Ser_Ser_R(source, target, transfer_percentage))
+        if target not in self.nodes_services[source].neighbors:
+            self.nodes_services[source].add_neighbor(target)
+        #self.nodes_services[source].add_neighbor(target)
+
+    def __str__(self):
+        nodes_services_str = ", ".join(str(node) for node in self.nodes_services.values())
+        edges_services_str = ", ".join(str(edge) for edge in self.edges_ser_ser_R)
+        return f"Clinical Path with nodes: {nodes_services_str} and \nEdges: {edges_services_str}"
+
+class Node_Service(Node):
+    def __init__(self, node_id, service_name, service_capacity,distance_do):
+        super().__init__(node_id)
+        self.service_name = service_name
+        self.service_capacity = service_capacity
+        self.distance_do = distance_do
+
+    def __str__(self):
+        return f"Node_Service {self.node_id}"
+
+class Edge_Ser_Ser_R (Edge):
+    def __init__(self, edge_id,source, target, transfer_percentage):
+        super().__init__(edge_id,source,target)
+        self.transfer_percentage = transfer_percentage
+
+    def __str__(self):
+        return f"Edge R ({self.source} -> {self.target})"
+
+

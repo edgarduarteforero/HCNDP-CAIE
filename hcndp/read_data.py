@@ -6,8 +6,10 @@ Created on Tue Dec  5 16:04:10 2023
 """
 def menu_select_file(I):
     import textwrap
+    print ("#" * 60)
     print (textwrap.dedent('''\
-           Vamos a seleccionar el archivo con los datos de la red.
+                           
+           \nVamos a seleccionar el archivo con los datos de la red.
            
            Por defecto, HCNDP proporciona el archivo 
            datos_i16_j10_k10_base.xlsx ubicado en la carpeta /data/red original/.
@@ -29,8 +31,8 @@ def menu_select_file(I):
         if opcion == "1":
             print (textwrap.dedent(""" \
             Has seleccionado la Opción 1.
-                  
-            El archivo datos_i16_j10_k10_base.xlsx tiene estos parámetros:
+                
+            \nEl archivo datos_i16_j10_k10_base.xlsx tiene estos parámetros:
             I = 16
             J = 10
             K = 10

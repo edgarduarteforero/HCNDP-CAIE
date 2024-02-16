@@ -49,10 +49,9 @@ def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
                 print ("No puedo relizar el procedimiento.")
 
         if opcion1 == "2":
-            print("Has seleccionado la Opción 2.")
+            print("Has seleccionado la Opción 1.")
             try:     
                 print("Ejecuto procedimiento para construir frontera de Pareto")  
-                
                 # Creo el problema multiobjetivo    
                 name_moo_problem="temporal"
                 create_moo_problem_object(network_original,name_moo_problem, multiobjective_dict) 
@@ -375,10 +374,13 @@ class Multiobjective:
         
     def calculate_pareto_front(self):
         import pandas as pd
+        from deepdiff import DeepDiff #Importo para poder comparar dos arrays
         import numpy as np
+        import winsound
+        import time
 
         # Construyo puntos ancla
-        if self.objectives_sequence==1: #Rho --> Alpha 
+        if self.objectives_sequence==1:
             matrix_problems_lexi=[[1,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1],
                                   [2,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],]
             self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
@@ -389,7 +391,7 @@ class Multiobjective:
         import pyomo.environ as pyo
         
         #problem_lexi es una fila de matrix_problems_lexi
-        # Creo el objeto solution llamado "principal"
+        # Creo el objeto solution
         objective_lexi=1
         problem_lexi=matrix_problems_lexi[objective_lexi]
         solutions.create_solution_object(
@@ -397,12 +399,12 @@ class Multiobjective:
                 problems_dict=self.problems_multi_dict, 
                 name_solution="principal")
         
-        principal_problem = self.problems_multi_dict["principal"]
-        principal_problem.construct_model()
-        model=principal_problem.pyo_model.model_abstract
-        principal_problem.objective = problem_lexi[0]
-        principal_problem.description_objective = problem_lexi
-        principal_problem.name_solution = 'pareto_front'
+        current_solution = self.problems_multi_dict["principal"]
+        current_solution.construct_model()
+        model=current_solution.pyo_model.model_abstract
+        current_solution.objective = problem_lexi[0]
+        current_solution.description_objective = problem_lexi
+        current_solution.name_solution = 'pareto_front'
 
         # Variable para aplicar el e-constraint        
         model.s2=pyo.Var(within=pyo.NonNegativeReals,initialize=0)
@@ -428,15 +430,25 @@ class Multiobjective:
         model.obj = pyo.Objective(expr=model.rho_max * 100 + (10**-6) * (model.s2)/denominador_s2
                             , sense=pyo.minimize) #/ 348 ,sense=minimize)
         
-        # # Construyo la instancia
-        # principal_problem.construct_instance()
+        # Construyo la instancia
+        current_solution.construct_instance()
         
         # Construyo matrices para guardar resultados
         global df_soluciones_rho, df_soluciones_alpha_ik,df_soluciones_tao_ijk
         global df_soluciones_fi_jkjk,df_soluciones_sigma,df_soluciones_fi_ijkjk
+        
+        self.df_soluciones_rho=pd.DataFrame()
+        self.df_soluciones_alpha_ik=pd.DataFrame()
+        self.df_soluciones_tao_ijk=pd.DataFrame()
+        self.df_soluciones_fi_jkjk=pd.DataFrame()
+        self.df_soluciones_sigma=pd.DataFrame()
+        self.df_soluciones_fi_ijkjk=pd.DataFrame()
 
+        
+        
         # Número de puntos a obtener
-        puntos_requeridos= int(input("\nIngresa el número de puntos para la frontera:")) 
+        puntos_requeridos= int(input("\nIngresa el número de puntos para la frontera:"))
+
         
         # Soluciones del lexicográfico
         rho_opt=self.diccionario_anclas['Min_Rho_Max'][1:3]
@@ -446,36 +458,17 @@ class Multiobjective:
         
         # Construir estructura de datos: salida_resultados, points_used, 
         # puntos_revisados, soluciones
-        self.salida_resultados=np.array([rho_opt,acc_opt])
-        self.points_used=np.array([rho_opt+acc_opt+[1,1]])
-        
-        self.puntos_revisados = np.vstack((np.array([rho_opt]), acc_opt))
-        self.soluciones=[] #Lista con las estadísticas de cada solución encontrada
-        
-        self.adaptive_bisection_augmecon(puntos_requeridos)
-        
-    def adaptive_bisection_augmecon(self,puntos_requeridos):
-        import time 
-        import numpy as np
-        import winsound
-        import time
-        import copy
-        from deepdiff import DeepDiff #Importo para poder comparar dos arrays
-
+        salida_resultados=np.array([rho_opt,acc_opt])
+        points_used=np.array([rho_opt+acc_opt+[1,1]])
         fila=0
         factor=0
         # Inicio cronómetro
         start_time = time.time()
         tiempo=[start_time]
+        puntos_revisados = np.vstack((np.array([rho_opt]), acc_opt))
+        self.soluciones=[] #Lista con las estadísticas de cada solución encontrada
         
-        salida_resultados=self.salida_resultados
-        points_used=self.points_used
-        puntos_revisados = self.puntos_revisados
-        
-    
-    
         while len(salida_resultados) <= puntos_requeridos:
-            self.current_solution = copy.deepcopy(self.problems_multi_dict['principal'])
             global precision
             precision = 10
             
@@ -500,14 +493,9 @@ class Multiobjective:
                 a= np.where(puntos_revisados==epsilon)[0][0]
                 b= np.where(puntos_revisados==epsilon)[1][0]
                 punto_obtenido=[puntos_revisados[a,0],puntos_revisados[a,0]*100,puntos_revisados[a,b],"distancia corta"]
-            
             else: #Obtengo un punto obtenido desde optimización
                 print ("Punto no evaluado, procedo a optimización")
-                self.current_solution.epsilon=float(f'{epsilon:.{3}f}')
-                punto_obtenido=self.punto_en_frontera(val2=epsilon,val3=3,problem=self.current_solution)
-                
-                
-                
+                punto_obtenido=self.frontera(val2=epsilon,val3=3,current_solution=current_solution)
                 puntos_revisados=np.vstack((puntos_revisados,[punto_obtenido[0],punto_obtenido[2]])) #Agrego los puntos hallados a una matriz de puntos_Revisados
             print ("El nuevo punto es:", punto_obtenido[0:4])
             #input()
@@ -551,7 +539,7 @@ class Multiobjective:
                     #break
                 else:
                     print ("Ahora Epsilon es ", epsilon)
-                    punto_obtenido=self.punto_en_frontera(val2=epsilon,val3=3,problem=self.current_solution)
+                    punto_obtenido=self.frontera(val2=epsilon,val3=3,current_solution=current_solution)
                     print("Remplazo el punto dominado / repetido por", punto_obtenido[0:4], "y evalúo nuevamente si es dominado o repetido.")
                     dominado=self.dominancia(punto_obtenido[0],punto_obtenido[2],points_used[fila,2],points_used[fila,3],points_used[fila,0],points_used[fila,1])
                     punto_repetido=self.repetido(punto_obtenido,salida_resultados)
@@ -566,12 +554,13 @@ class Multiobjective:
                 print ("tiempo", time.time()-start_time)
                 tiempo.append(time.time() - start_time)
                 
-                # LÍNEA ELIMINADA!!!!!
-                #self.analisis_solucion(epsilon) #Analizo la solución obtenida y la agrego a la lista soluciones[]
                 
-                #Grabo la solución obtenida como un nuevo objeto en problems_multi_dict
-                #numero_soluciones=len(self.problems_multi_dict)
-                self.problems_multi_dict[str(self.current_solution.epsilon)]=self.current_solution
+                # LÍNEA ELIMINADA!!!!!
+                self.analisis_solucion(current_solution,epsilon) #Analizo la solución obtenida y la agrego a la lista soluciones[]
+                
+                # Agrego el detalle de la solución a una matriz
+                #input()
+                
                 
                 #Si se alcanza el número de puntos requeridos se interrumpe el programa
                 if len(salida_resultados) == puntos_requeridos: 
@@ -760,7 +749,87 @@ class Multiobjective:
             
             print ("termino iteración con",len(salida_resultados), " puntos.")
             #input("Press Enter to analyze the obtained solution...")
-            #input()    
+            #input()
+            
+        
+        '''
+        # Obtener solución para cada objetivo
+        if problem_lexi[0]==1:
+            current_solution.construct_model()
+            model=current_solution.pyo_model.model_abstract
+            _var_obj_actual=problem_lexi[4]
+            _sense=problem_lexi[5]
+            model.del_component(model.obj)
+            model.obj = pyo.Objective(expr=getattr(model, _var_obj_actual),sense=_sense)
+        
+        elif problem_lexi[0]==2:
+           current_solution.construct_model()
+           model=current_solution.pyo_model.model_abstract
+           
+           _var_obj_actual=problem_lexi[4]
+           _sense=problem_lexi[5] #Minimize=1, maximize=-1
+           
+           # Maximizar alpha min
+           # Agrego restricción y agrego función objetivo 
+           # Si la restricción usa rho entonces va con <=, de lo contrario, va con >=
+           if matrix_problems_lexi[0][4]=="rho_max":
+               operador="<="
+           else:
+               operador=">="
+           #Example problem_lexi=[1,"Min_Rho_Max","model.rho_max","minimize","rho_max",1]
+           self.lexicograf(model,
+                           _var_obj_anterior=matrix_problems_lexi[0][4],
+                           _func_obj_anterior=matrix_problems_lexi[0][1],
+                           operador=operador)
+           
+           model.del_component(model.obj)
+           model.obj = pyo.Objective(expr=getattr(model, _var_obj_actual),sense=_sense) 
+           del current_solution.pyo_model.instance
+           
+        elif problem_lexi[0]==3:
+           current_solution.construct_model()
+           model=current_solution.pyo_model.model_abstract
+           
+           _var_obj_actual=problem_lexi[4]
+           _sense=problem_lexi[5] #Minimize=1, maximize=-1
+        
+        
+           # Maximizar alpha min
+           # Agrego restricción y agrego función objetivo    
+           # Si la restricción usa rho entonces va con <=, de lo contrario, va con >=
+           if matrix_problems_lexi[0][4]=="rho_max":
+               operador="<="
+           else:
+               operador=">="
+           #Example problem_lexi=[1,"Min_Rho_Max","model.rho_max","minimize","rho_max",1]
+           self.lexicograf(model,
+                           _var_obj_anterior=matrix_problems_lexi[0][4],
+                           _func_obj_anterior=matrix_problems_lexi[0][1],
+                           operador=operador)
+        
+           # Maximizar delta min
+           # Agrego restricción y agrego función objetivo   
+           # Si la restricción usa rho entonces va con <=, de lo contrario, va con >=
+           if matrix_problems_lexi[1][4]=="rho_max":
+               operador="<="
+           else:
+               operador=">="
+           
+           self.lexicograf(model,
+                           _var_obj_anterior=matrix_problems_lexi[1][4],
+                           _func_obj_anterior=matrix_problems_lexi[1][1],
+                           operador=operador)
+           
+           
+           model.del_component(model.obj)
+           model.obj = pyo.Objective(expr=getattr(model, _var_obj_actual),sense=_sense) 
+           del current_solution.pyo_model.instance
+        
+        current_solution.construct_instance()
+        current_solution.execute_solver()
+        self.anclas.append([problem_lexi[1],pyo.value(current_solution.pyo_model.instance.obj)])
+        print (self.anclas)  
+        '''
     
     # Fórmula adaptada para asegurar mejores resultados
     def calculo_i2 (self,fila,factor,points_used):
@@ -769,121 +838,103 @@ class Multiobjective:
         return epsilon   
     
     # Función para obtener la solución a un problema
-
-    
-    def punto_en_frontera(self,val2,val3,problem):
+    def frontera(self,val2,val3,current_solution):
         import pyomo.environ as pyo
         import numpy as np
         import pandas as pd
         import xlsxwriter
         import os
         import openpyxl
-        from hcndp import solutions
         
         #instance = model.create_instance("datos.dat") 
-        
-        
-        problem.construct_instance()
-        
-        instance=problem.pyo_model.instance
+        instance=current_solution.pyo_model.instance
         instance.eps2 = val2
         instance.eps3 = val3
         
-        problem.execute_solver()
-        
-        # opt = pyo.SolverFactory('gurobi',tee=True)
-        # opt.options['NonConvex'] = 2
-        # opt.options['TimeLimit']=50
+        opt = pyo.SolverFactory('gurobi',tee=True)
+        opt.options['NonConvex'] = 2
+        opt.options['TimeLimit']=50
         #opt.options['MIPGap']=0.01
         #opt.options['MIPFocus']= 3 #
         
-        #results=opt.solve(instance)
-        results=problem.pyo_model.instance
+        results=opt.solve(instance)
         results
         #solucion=[value(instance.inic_rho_max),value(instance.inic_alpha_min)]
         # Accessing solver status: http://www.pyomo.org/blog/2015/1/8/accessing-solver
-        # if (results.solver.status == pyo.SolverStatus.ok) and (results.solver.termination_condition == pyo.TerminationCondition.optimal):
-        #     out="optimal and feasible"
-        # elif (results.solver.termination_condition == pyo.TerminationCondition.infeasible):
-        #     out="infeasible"
+        if (results.solver.status == pyo.SolverStatus.ok) and (results.solver.termination_condition == pyo.TerminationCondition.optimal):
+            out="optimal and feasible"
+        elif (results.solver.termination_condition == pyo.TerminationCondition.infeasible):
+            out="infeasible"
         
-        # else:
-        #     out="error"
-        #     print ("Solver Status: ",  results.solver.status)
-        out=problem.out    
-        # ## Obtengo los valores de las variables según el modelo de optimización
-        # tao_ijk = np.array([[i,j,k,pyo.value(instance.tao[i,j,k])] for i in instance.I for j in instance.J for k in instance.K])
-        # h_ik = np.array([[i,k,pyo.value(instance.h[i,k])] for i in instance.I for k in instance.K])
-        # l_ijk = np.array([[i,j,k,pyo.value(instance.l_ijk[i,j,k])] for i in instance.I for j in instance.J for k in instance.K])
-        # c_jk = np.array([[j,k,pyo.value(instance.c[j,k])] for j in instance.J for k in instance.K])
-        # s_jk = np.array([[j,k,pyo.value(instance.s[j,k])] for j in instance.J for k in instance.K])
+        else:
+            out="error"
+            print ("Solver Status: ",  results.solver.status)
     
-        # fi_ijkjk = np.array([[i,j,k,jp,kp,pyo.value(instance.fi[i,j,k,jp,kp])] for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
+        ## Obtengo los valores de las variables según el modelo de optimización
+        tao_ijk = np.array([[i,j,k,pyo.value(instance.tao[i,j,k])] for i in instance.I for j in instance.J for k in instance.K])
+        h_ik = np.array([[i,k,pyo.value(instance.h[i,k])] for i in instance.I for k in instance.K])
+        l_ijk = np.array([[i,j,k,pyo.value(instance.l_ijk[i,j,k])] for i in instance.I for j in instance.J for k in instance.K])
+        c_jk = np.array([[j,k,pyo.value(instance.c[j,k])] for j in instance.J for k in instance.K])
+        s_jk = np.array([[j,k,pyo.value(instance.s[j,k])] for j in instance.J for k in instance.K])
+    
+        fi_ijkjk = np.array([[i,j,k,jp,kp,pyo.value(instance.fi[i,j,k,jp,kp])] for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
         
-        # df_l_ijk=pd.DataFrame(l_ijk,columns=['nombre_I','nombre_J','servicio_K','lambda_ijk'])
-        # fi_jkjk = pd.DataFrame(fi_ijkjk,columns=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_jkjk'])
-        # fi_jkjk=fi_jkjk.merge(df_l_ijk, on=['nombre_I','nombre_J', 'servicio_K'], how='left')
-        # fi_jkjk['fi_jkjk']=pd.to_numeric(fi_jkjk['fi_jkjk'])
-        # fi_jkjk['lambda_ijk']=pd.to_numeric(fi_jkjk['lambda_ijk'])
-        # fi_jkjk=fi_jkjk.groupby(['nombre_J','servicio_K','nombre_Jp','servicio_Kp']).sum(['lambda_ijk'])
+        df_l_ijk=pd.DataFrame(l_ijk,columns=['nombre_I','nombre_J','servicio_K','lambda_ijk'])
+        fi_jkjk = pd.DataFrame(fi_ijkjk,columns=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_jkjk'])
+        fi_jkjk=fi_jkjk.merge(df_l_ijk, on=['nombre_I','nombre_J', 'servicio_K'], how='left')
+        fi_jkjk['fi_jkjk']=pd.to_numeric(fi_jkjk['fi_jkjk'])
+        fi_jkjk['lambda_ijk']=pd.to_numeric(fi_jkjk['lambda_ijk'])
+        fi_jkjk=fi_jkjk.groupby(['nombre_J','servicio_K','nombre_Jp','servicio_Kp']).sum(['lambda_ijk'])
     
     
-        # prob_fi_jkjk=fi_jkjk.groupby(['nombre_J','servicio_K','nombre_Jp','servicio_Kp']).sum(['lambda_ijk'])
-        # prob_fi_jkjk['fi_jkjk']=prob_fi_jkjk['fi_jkjk']/prob_fi_jkjk['lambda_ijk']
-        # prob_fi_jkjk.fillna(0,inplace=True)
-        # prob_fi_jkjk.reset_index(inplace=True)
-        # prob_fi_jkjk=prob_fi_jkjk.to_numpy()
-        # prob_fi_jkjk = prob_fi_jkjk[:, :-1] 
+        prob_fi_jkjk=fi_jkjk.groupby(['nombre_J','servicio_K','nombre_Jp','servicio_Kp']).sum(['lambda_ijk'])
+        prob_fi_jkjk['fi_jkjk']=prob_fi_jkjk['fi_jkjk']/prob_fi_jkjk['lambda_ijk']
+        prob_fi_jkjk.fillna(0,inplace=True)
+        prob_fi_jkjk.reset_index(inplace=True)
+        prob_fi_jkjk=prob_fi_jkjk.to_numpy()
+        prob_fi_jkjk = prob_fi_jkjk[:, :-1] 
     
-        # alpha_ik = np.array([[i,k,pyo.value(instance.alpha_ik[i,k])] for i in instance.I for k in instance.K ])
-        # rho_jk=np.array([[j,k,pyo.value(instance.rho_jk[j,k])] for j in instance.J for k in instance.K])
-        # f_ijk=np.array ([[i,j,k,pyo.value(instance.tao[i,j,k])] for i in instance.I for j in instance.J for k in instance.K])
-        # l_jk=np.array  ([[j,k,sum(pyo.value(instance.l_ijk[i,j,k]) for i in instance.I)] for j in instance.J for k in instance.K])
-        # sigma_jk=np.array ([[j,k,pyo.value(instance.sigma[j,k])] for j in instance.J for k in instance.K])
-        # theta_jk=np.array ([[j,k,pyo.value(instance.theta[j,k])] for j in instance.J for k in instance.K])
+        alpha_ik = np.array([[i,k,pyo.value(instance.alpha_ik[i,k])] for i in instance.I for k in instance.K ])
+        rho_jk=np.array([[j,k,pyo.value(instance.rho_jk[j,k])] for j in instance.J for k in instance.K])
+        f_ijk=np.array ([[i,j,k,pyo.value(instance.tao[i,j,k])] for i in instance.I for j in instance.J for k in instance.K])
+        l_jk=np.array  ([[j,k,sum(pyo.value(instance.l_ijk[i,j,k]) for i in instance.I)] for j in instance.J for k in instance.K])
+        sigma_jk=np.array ([[j,k,pyo.value(instance.sigma[j,k])] for j in instance.J for k in instance.K])
+        theta_jk=np.array ([[j,k,pyo.value(instance.theta[j,k])] for j in instance.J for k in instance.K])
                
-        # ### Escribo en un archivo de Excel
-        # #output = os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
-        # output = os.getcwd()+'/output/'+self.current_solution.name_solution+'/salida_optimizacion.xlsx'
-        # # Verificar si el directorio existe, y si no, crearlo
-        # directorio = os.path.dirname(output)
-        # if not os.path.exists(directorio):
-        #     os.makedirs(directorio)
+        ### Escribo en un archivo de Excel
+        #output = os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
+        output = os.getcwd()+'/output/'+current_solution.name_solution+'/salida_optimizacion.xlsx'
+        # Verificar si el directorio existe, y si no, crearlo
+        directorio = os.path.dirname(output)
+        if not os.path.exists(directorio):
+            os.makedirs(directorio)
         
-        # # workbook = xlsxwriter.Workbook(output)
-        # # workbook.close()
-        # # path = output
+        # workbook = xlsxwriter.Workbook(output)
+        # workbook.close()
+        # path = output
     
-        # # with pd.ExcelWriter(path, engine='openpyxl',mode='a',if_sheet_exists='replace') as writer:
-        # #     writer.book = openpyxl.load_workbook(path)
-        # #     pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
-        # #     pd.DataFrame(l_ijk).to_excel(writer, sheet_name='l_ijk')
-        # #     pd.DataFrame(f_ijk).to_excel(writer, sheet_name='f_ijk') #Corresponde a los tao_ijk
-        # #     pd.DataFrame(prob_fi_jkjk).to_excel(writer, sheet_name='prob_fi_jkjk')
-        # #     pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
-        # #     pd.DataFrame(fi_ijkjk).to_excel(writer,sheet_name='fi_ijkjk')
-
-        # # Crear el libro con xlsxwriter
-        # with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        #     # Crear hojas y agregar datos
+        # with pd.ExcelWriter(path, engine='openpyxl',mode='a',if_sheet_exists='replace') as writer:
+        #     writer.book = openpyxl.load_workbook(path)
         #     pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
         #     pd.DataFrame(l_ijk).to_excel(writer, sheet_name='l_ijk')
-        #     pd.DataFrame(f_ijk).to_excel(writer, sheet_name='f_ijk')
+        #     pd.DataFrame(f_ijk).to_excel(writer, sheet_name='f_ijk') #Corresponde a los tao_ijk
         #     pd.DataFrame(prob_fi_jkjk).to_excel(writer, sheet_name='prob_fi_jkjk')
         #     pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
-        #     pd.DataFrame(fi_ijkjk).to_excel(writer, sheet_name='fi_ijkjk')
+        #     pd.DataFrame(fi_ijkjk).to_excel(writer,sheet_name='fi_ijkjk')
+
+        # Crear el libro con xlsxwriter
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            # Crear hojas y agregar datos
+            pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
+            pd.DataFrame(l_ijk).to_excel(writer, sheet_name='l_ijk')
+            pd.DataFrame(f_ijk).to_excel(writer, sheet_name='f_ijk')
+            pd.DataFrame(prob_fi_jkjk).to_excel(writer, sheet_name='prob_fi_jkjk')
+            pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
+            pd.DataFrame(fi_ijkjk).to_excel(writer, sheet_name='fi_ijkjk')
         
         
         ### Devuelvo rho, rho*100, alpha min, el estado de la solución, y los tao, fi, rho y alphas de cada solución 
-        return [pyo.value(results.obj),
-                pyo.value(results.rho_max*100),
-                pyo.value(results.alpha_min),
-                out,
-                problem.detailed_solution['tao_ijk'],
-                problem.detailed_solution['fi_jkjk'],
-                problem.detailed_solution['rho_jk'],
-                problem.detailed_solution['alpha_ik'],
-                problem.detailed_solution['fi_ijkjk']]
+        return [pyo.value(instance.obj),pyo.value(instance.rho_max*100),pyo.value(instance.alpha_min),out,tao_ijk,fi_jkjk,rho_jk, alpha_ik,fi_ijkjk]
 
     
     def dominancia(self,x1,y1,x2,y2,x3,y3): #x1y1 es el punto obtenido, x2y2 es el punto que está arriba y x3y3 es el que está abajo
@@ -915,14 +966,13 @@ class Multiobjective:
             repetido="No"
         return repetido
     
-    def analisis_solucion(self,epsilon):
+    def analisis_solucion(self,current_solution,epsilon):
         from hcndp import kpi
         import pandas as pd
         
         # Si hay función objetivo (resultado de optimización)
         _post_optima=True
-        kpi.calculate_kpi(self.current_solution,_post_optima)
-        current_solution=self.current_solution
+        kpi.calculate_kpi(current_solution,_post_optima)
         print("Se calcularon los KPI de la solución.")
         #print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
         #figures.show_menu_figures(current_solution)
@@ -966,9 +1016,6 @@ class Multiobjective:
               groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().min(), #Grado mínimo de nodos de servicio (se usa el j, no el jk)
          ])
         print ()
-        
-        
-        
         '''
         # Verifico si df_soluciones_rho existe
         df_soluciones_rho=self.df_soluciones_rho

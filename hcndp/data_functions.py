@@ -56,6 +56,25 @@ def reshape_matrix(matrix,rows,columns):
     import numpy as np
     return np.reshape(matrix,([rows,columns]))
 
+
+def borrar_contenido_carpeta(ruta_carpeta):    
+    import os
+    import shutil
+    try:
+        # Eliminar todos los archivos y carpetas dentro de la carpeta
+        for elemento in os.listdir(ruta_carpeta):
+            elemento_ruta = os.path.join(ruta_carpeta, elemento)
+            if os.path.isfile(elemento_ruta):
+                os.unlink(elemento_ruta)
+            elif os.path.isdir(elemento_ruta):
+                shutil.rmtree(elemento_ruta)
+
+        print(f"Contenido de la carpeta '{ruta_carpeta}' eliminado correctamente.")
+
+    except Exception as e:
+        print(f"Error al borrar contenido de la carpeta '{ruta_carpeta}': {e}")
+
+
 if __name__ == "__main__":
     
     import numpy as np

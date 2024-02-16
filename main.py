@@ -9,7 +9,7 @@ Created on Tue Dec  5 16:30:26 2023
 import textwrap
 print ("#" * 60)
 print (textwrap.dedent(''' \
-       Bienvenido a nuestra aplicación:
+       \nBienvenido a nuestra aplicación:
            HEALTHCARE NETWORK
                DESIGN PROBLEM
         
@@ -20,6 +20,25 @@ print (textwrap.dedent(''' \
 print ("#" * 60)
 
 input ("\nPulsa cualquier tecla para continuar.")
+
+#%% Borrar carpetas antiguas
+def borrar_carpeta(prompt):
+    while True:
+        respuesta = input(prompt + " (y/n): ").lower()
+        if respuesta in ["y", "n"]:
+            return respuesta
+        else:
+            print("Por favor, ingresa 'y' o 'n'.")
+
+_respuesta_usuario = borrar_carpeta("¿Quieres borrar los resultados de las últimas ejecuciones?")
+if _respuesta_usuario == "y":
+    from hcndp import data_functions
+    import os
+    data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
+    print("\nContenidos borrados. \nContinuando...")
+else:
+    print("\nContinuando...")
+
 
 
 #%%  IJK y nombre archivo
@@ -50,6 +69,8 @@ print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 networks_dict[_name].read_file_excel(archivo)
 networks_dict[_name].delete_surplus_data()
+
+print ("#" * 60)
 print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
 
 
@@ -57,6 +78,7 @@ import textwrap
 while True:
     print("\n----------------------------------------------------------")
     print("Indica qué tipo de problema quieres estudiar.")
+    print("main.py")
     print("----------------------------------------------------------\n")
     print("Selecciona una opción:")
     print("1. Problemas mono-objetivo")

@@ -8,9 +8,13 @@ Created on Wed Dec 20 17:58:33 2023
 
 def menu_solutions(network_original, problems_dict):
     import textwrap
+    import pandas as pd
+    import numpy as np
+    
     while True:
         print("\n----------------------------------------------------------")
         print(f"Vamos a agregar soluciones a la red {network_original.name}.")
+        print("menu_solutions@solutions.py")
         print("----------------------------------------------------------\n")
         print("Selecciona una opción:")
         print("1. Cargar tu propia solución")
@@ -57,21 +61,171 @@ def menu_solutions(network_original, problems_dict):
 
             # Pido al usuario el objetivo
             current_solution.optimizar=True
-            current_solution.menu_exact_optimization(new_network=current_solution.network_copy,
+            current_solution.menu_mono_optimization(new_network=current_solution.network_copy,
                                                      problems_dict=problems_dict,)
             
-
-
-            if current_solution.optimizar==True:
+            # Se ha escogido optimización exacta
+            if current_solution.optimizar==True and current_solution.tecnica=='Exacta':
                 # Calculo la solución óptima
-                current_solution.calculate_exact_optima()
-                
+                #current_solution.calculate_exact_optima()                
                 current_solution.construct_model()
                 current_solution.construct_instance()
                 current_solution.execute_solver()
+            
                 
             
+            # Se ha escogido optimización Aproximada
+            if current_solution.optimizar==True and current_solution.tecnica=="Aproximación":
+                #Creo la representación de la red
+                from hcndp import network
+                network_repr=network.Network_representation(network_original.I,
+                                                            network_original.J,
+                                                            network_original.K,
+                                                            network_original.archivo,
+                                                            network_original.file)
+                path_repr=network.Path_representation(network_original.K, 
+                                                      network_original.archivo,
+                                                      network_original.file)
+                
+                # Asignación de recurso σ_k para cada nodo de oferta j 
+                for _k in path_repr.nodes_services.keys():
+                    if _k !=  'k00':
+                        #print ("Asignación de recursos para: ", _k)
+                        network_repr.asignacion_recursos(path_repr,_k)
+                        #for _i,_j in network.nodes_supply.items():
+                         #   if _j.capac_instal_sigma != 0:
+                                #print (_i,_j.capac_instal_sigma)
+            
+                
+                # Para k=0 creo valores de λ_ijk0 
+                # El valor de λ_ijk0 es igual a la demanda que hay en cada nodo ik0.
+                for _,_j in network_repr.nodes_supply.items():
+                    for _p,_i in _j.matriz_λ.iterrows():
+                        if _i['nombre_I'].replace('i','j')==_i['nombre_J'] and _i['servicio_K']=='k00':
+                            _j.matriz_λ.loc[_p, 'λ_ijk'] = network_repr.nodes_demand[_i['nombre_I']].demand
+            
+                # Construyo primera solución
+                path_repr.edges_ser_ser_R=dict(sorted(path_repr.edges_ser_ser_R.items()))
+                
+                for _i in path_repr.edges_ser_ser_R.values():
+                    k=_i.source
+                    kp=_i.target
+                
+                    if k < kp:
+                        network_repr.asignacion_flujos_δ(network_repr,path_repr,k)
+                    
+                        # Solución entre k y kp*
+                        network_repr.solucion_entre_k_kp(network=network_repr,_k=k,
+                                                         _kp=kp,
+                                                         archivo=network_original.file)
+                        network_repr.obtencion_π(network_repr,k,kp)
+                        network_repr.construyo_λ(network_repr,kp)
+                
+                    elif k == kp:
+                        network_repr.asignacion_π_ciclos(network_repr,k,kp)
+                
+                    elif k > kp:
+                        network_repr.asignacion_π_ciclos(network_repr,kp,k)
+                    
+                
+                
+                # Construyo una matriz g con los arribos externos, es decir los ϕi.j.k0jk
+                from hcndp.data_functions import indices
+
+                _lista_i=indices("i",network_original.I)
+                _lista_j=indices("j",network_original.J)
+                _lista_k=indices("k",network_original.K)
+                
+                #_lista_k_00=_lista_k
+                #_lista_k_00.append('k00')
+                from itertools import product
+                _lista = list(product(_lista_i, _lista_j,_lista_k))
+                _g=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
+                _g['tao_ijk'] = 0.0
+                _g=_g.sort_values(by=['nombre_I', 'nombre_J','servicio_K'])
+                
+                def arribos_externos(poblacion_origen,servicio_origen,nodo_destino):
+                    suma_acumulativa=0
+                    for clave,valor in network_repr.edges_sup_sup_X.items():
+                        if valor.node_demand_pop == poblacion_origen and valor.service_source==servicio_origen and valor.target==nodo_destino :
+                            suma_acumulativa += valor.flow_sup_sup_phi
+                    return suma_acumulativa
+                    
+                _g['tao_ijk']=_g.apply (lambda row: arribos_externos(row['nombre_I'],'k00',row['nombre_J']+row['servicio_K']),axis=1)
+                _g=np.array(_g['tao_ijk']) # Lista de arribos externos ijk
+                _g=np.reshape(_g,([network_original.I,network_original.J*(network_original.K)])) # Matriz de arribos externos de i por (jk)
+                
+                
+                # Construyo las matrices con las probabilidades π  
+                _lista = list(product(_lista_i, _lista_j,_lista_k,_lista_j,_lista_k))
+                _π=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K', 'nombre_Jp','servicio_Kp'])
+                _π['π_ijkjk'] = 0.0   
+                _π=_π.sort_values(by=['nombre_I','nombre_J', 'servicio_K','nombre_Jp','servicio_Kp'])
+                _π['p*π'] = 0.0
+                
+                for _,_fila in _π.iterrows():
+                    _i=_fila['nombre_I']
+                    _j=_fila['nombre_J']
+                    _k=_fila['servicio_K']
+                    _jp=_fila['nombre_Jp']
+                    _kp=_fila['servicio_Kp']
+                    for _nombre,_arco in network_repr.edges_sup_sup_X.items():
+                        if  _nombre == _i+_j+_k+_jp+_kp:
+                            _π.loc[_,'π_ijkjk'] = _arco.flow_sup_sup_perc
+                    
+                    for _nombre,_arco in path_repr.edges_ser_ser_R.items():
+                        if  _nombre == _k+_kp:
+                            _π.loc[_,'p*π'] = _arco.transfer_percentage  * _π.loc[_,'π_ijkjk']
+               
+                    
+               
+                # Calculo los flujos entrantes lambda ijk basado en redes de Jackson
+                _lista = list(product(_lista_i, _lista_j,_lista_k))
+                _df_asignacion=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
+                _df_asignacion["lambda_ijk"] = 0.0
+                _df_asignacion=_df_asignacion.sort_values(by=['nombre_I','nombre_J', 'servicio_K'])
+                _df_asignacion.set_index(['nombre_I', 'nombre_J','servicio_K'],inplace=True)
+                #Para cada i cálculo el lambda ijk
+                _fila=0
+                for i in _lista_i:
+                    probs=_π.loc[(_π['nombre_I']==_lista_i[_fila])]
+                    probs=probs.sort_values(by=['nombre_J', 'servicio_K','nombre_Jp','servicio_Kp'])
+                    #probs=np.array(probs['π_ijkjk'])
+                    probs=np.array(probs['p*π'])
+                    probs=np.reshape(probs,([network_original.J*(network_original.K),network_original.J*(network_original.K)]))
+                    _df_asignacion.loc[i,'lambda_ijk']=np.matmul(_g[_fila],np.linalg.inv(np.identity(len(probs))-(probs)))
+                    _fila+=1
+                
+                for _,_j in network_repr.nodes_supply.items():
+                    if _j.service!='k00':
+                        _j.matriz_λ=_df_asignacion.loc[(slice(None),_j.place,_j.service),:]
+                        _j.matriz_λ.reset_index(inplace=True)
+                        _j.matriz_λ = _j.matriz_λ.rename(columns={'lambda_ijk': 'λ_ijk'})
+                
+                # Actualizo el df_asignacion en network
+                network_repr.df_asignacion=_df_asignacion
+                
+                # Llevar solución a un df_solucion
+                _lista=[] 
+                for _i,_j in network_repr.edges_sup_sup_X.items():
+                    _lista.append([_j.node_demand_pop,_j.source,_j.target,_j.flow_sup_sup_perc,_j.flow_sup_sup_phi])
+                df_solucion = pd.DataFrame(_lista, columns=['nombre_I', 'origen', 'destino','π','ϕ'])
+                
+                current_solution.solution=df_solucion
+                print (df_solucion)
+                # %% Exportar resultados 
+                # TODO Generar solución en el mismo formato que la solución exacta
+                #current_solution.network_copy.create_folders()
+                #current_solution.set_solution_excel()
+                #current_solution.set_solution_txt()
+                
+                
             input("Pulsa una tecla para continuar.")
+
+
+
+
+
 
         # elif opcion == "3":
         #     print("Has seleccionado la Opción 3.")
@@ -79,7 +233,9 @@ def menu_solutions(network_original, problems_dict):
 
         elif opcion == "4":
             print("\nHas seleccionado la Opción 4.")
+            print("\n----------------------------------------------------------")
             print ("KPI de soluciones y gráficos.")
+            print("\n----------------------------------------------------------")
             print ("Estas son las soluciones construidas:/n")
             
             # Listar las soluciones existentes
@@ -122,45 +278,6 @@ def menu_solutions(network_original, problems_dict):
                 print (e)
                 print("Error: Ingresa un número válido de la lista.")
 
-            
-        elif opcion == "5":
-            print("\nHas seleccionado la Opción 4.")
-            print ("Generación de gráficos.")
-            print ("Estas son las soluciones construidas:/n")
-            
-            # Listar las soluciones existentes
-            mostrar_soluciones(problems_dict)
-            
-            # Obtener la elección del usuario
-            try:
-                from hcndp import figures
-                numero_elegido = int(input("Ingresa el número de la solución elegida: "))
-                solucion_elegida = list(problems_dict.keys())[numero_elegido - 1]
-                
-                # Realizar el procedimiento con la opción seleccionada
-                print(f"\nRealizando el procedimiento para la opción: {solucion_elegida}")
-                current_solution=problems_dict[solucion_elegida]
-                
-                if current_solution.objective=="Nulo":
-                    # Si no hay función objetivo (Solución ingresada por usuario)
-                    _post_optima=False
-                    figures.show_menu_figures(current_solution)
-                else:
-                    # Si hay función objetivo (resultado de optimización)
-                    _post_optima=True
-                    figures.show_menu_figures(current_solution)
-            
-            except (ValueError, IndexError) as e:
-                print (e)
-                print("Error: Ingresa un número válido de la lista.")
-
-        # elif opcion == "6":
-        #     print("Has seleccionado la Opción 6.")
-        #     export_data_dat(network)
-
-        # elif opcion == "7":
-        #     print("Has seleccionado la Opción 7.")
-        #     exact_optimization(network,networks)
 
         elif opcion == "9":
             print("Saliendo del programa.")
@@ -214,18 +331,23 @@ class Problem:
         import copy
         self.network_copy = copy.deepcopy(network_original)
 
-    def menu_exact_optimization(self, new_network, problems_dict):
+    def menu_mono_optimization(self, new_network, problems_dict):
         while True:
             print("\n----------------------------------------------------------")
             print("Menú de Optimización y Mejora")
+            print("menu_mono_optimization@solutions.py")
             print("----------------------------------------------------------\n")
-            print("1. Optimización mono-objetivo")
-            print("2. Obtener soluciones por algoritmos de búsqueda")
+            print("1. Solución exacta (Optimización)")
+            print("2. Solución aproximada (Algoritmos de búsqueda)")
             print("3. Regresar al menú anterior")
 
             opcion1 = input("Selecciona una opción: \n")
             if opcion1 == "1":
                 print("Has seleccionado la opción 1.")
+                print("Búsqueda por métodos exactos (Optimización).")
+                self.optimizar=True
+                self.tecnica="Exacta"
+                # Presento menú de funciones objetivo disponibles
                 objective_and_description = new_network.get_objective_function()
                 
                 if self.network_copy.optimizar==True:
@@ -247,10 +369,33 @@ class Problem:
                     self.optimizar=False
                     break
                 objective_and_description = new_network.get_objective_function()
-
+                
             elif opcion1 == "2":
                 print("Has seleccionado la Opción 2.")
-                print ("Algoritmos de búsqueda")
+                print ("Búsqueda por algoritmos de aproximación.")
+                self.optimizar=True
+                self.tecnica="Aproximación"
+                # Presento menú de funciones objetivo disponibles
+                objective_and_description = new_network.get_objective_function()
+                
+                if self.optimizar==True and self.tecnica=="Aproximación":
+                    self.objective = objective_and_description[0]
+                    self.description_objective = objective_and_description[1]
+                    self.name_solution = objective_and_description[1]
+                    # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
+                    clave_temporal = 'temporal'
+                    solucion_temporal = problems_dict[clave_temporal]
+                    problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
+                        clave_temporal)
+                    problems_dict[solucion_temporal.description_objective].network_copy.name_solution = \
+                        problems_dict[solucion_temporal.description_objective].name_solution 
+                
+                    break 
+                
+                elif self.network_copy.optimizar==False:
+                    self.optimizar=False
+                    break
+                objective_and_description = new_network.get_objective_function()
                 
             elif opcion1 == "3":
                 print("Has seleccionado la Opción 3.")
@@ -261,6 +406,7 @@ class Problem:
                 print("Opción no válida. Inténtalo de nuevo.")
 
     def solve_gurobi(self):
+        
         network = self.network_copy
         model = self.pyo_model
         instance = self.pyo_model.instance
@@ -279,9 +425,17 @@ class Problem:
         global out
         out = 0
         _output = os.getcwd()+'/output/'+network.name+'/'
-
+        
+        if self.name_solution == "pareto_front":
+            # Crear directorio
+            _output = os.getcwd()+'/output/'+'pareto_front_'+str(self.epsilon)+'/'
+            if not os.path.exists(_output):
+                # Crea el directorio
+                os.makedirs(_output)
+                
         results = opt.solve(instance, tee=True, warmstart=False,
                             logfile=_output+'logfile_name.log')
+        
         # Accessing solver status: http://www.pyomo.org/blog/2015/1/8/accessing-solver
         if (results.solver.status == pyo.SolverStatus.ok) and (results.solver.termination_condition == pyo.TerminationCondition.optimal):
             out = "optimal and feasible"
@@ -298,6 +452,10 @@ class Problem:
             model.solution['rho_max'] = pyo.value(instance.rho_max)
             model.solution['alpha_min'] = pyo.value(instance.alpha_min)
             model.solution['delta_min'] = pyo.value(instance.delta_min)
+            
+            # Export to LP
+            instance.write(_output+"model.lp", format='lp')
+                
         elif (results.solver.termination_condition == pyo.TerminationCondition.infeasible):
             out = "infeasible"
         elif (results.solver.termination_condition == pyo.TerminationCondition.maxTimeLimit):
@@ -306,7 +464,8 @@ class Problem:
         else:
             out = "error"
             print("Solver Status: ",  results.solver.status)
-
+        self.out=out
+        
     def solve_ipopt(self):
         network = self.network_copy
         model = self.pyo_model
@@ -337,7 +496,7 @@ class Problem:
         model.solution['rho_max'] = pyo.value(instance.rho_max)
         model.solution['alpha_min'] = pyo.value(instance.alpha_min)
         model.solution['delta_min'] = pyo.value(instance.delta_min)
-
+        
     def get_degrees_freedom(self):
         instance = self.pyo_model.instance
         # Todo: import the degrees_of_freedom function from the idaes.core.util.model_statistics package
@@ -358,6 +517,7 @@ class Problem:
         instance = self.pyo_model.instance
 
         # Obtengo los valores de las variables según el modelo de optimización
+        # Estas líneas se hacen si el método es exacto.
         tao_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
                            for i in instance.I for j in instance.J for k in instance.K])
         h_ik = np.array([[i, k, pyo.value(instance.h[i, k])]
@@ -411,15 +571,29 @@ class Problem:
                             for j in instance.J for k in instance.K])
         # Escritura de archivo en Excel
         #output = os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
-        output = os.getcwd()+'/output/'+self.name_solution+'/salida_optimizacion.xlsx'
-        # Verificar si el directorio existe, y si no, crearlo
-        directorio = os.path.dirname(output)
-        if not os.path.exists(directorio):
-            os.makedirs(directorio)
-
-        workbook = xlsxwriter.Workbook(output)
-        workbook.close()
-        path = output
+        if self.name_solution != "pareto_front":
+            output = os.getcwd()+'/output/'+self.name_solution+'/salida_optimizacion.xlsx'
+            
+            # Verificar si el directorio existe, y si no, crearlo
+            directorio = os.path.dirname(output)
+            if not os.path.exists(directorio):
+                os.makedirs(directorio)
+    
+            workbook = xlsxwriter.Workbook(output)
+            workbook.close()
+            path = output
+        elif self.name_solution == "pareto_front":            
+            output = os.getcwd()+'/output/'+'pareto_front_'+str(self.epsilon)+'/salida_optimizacion.xlsx'
+            
+            # Verificar si el directorio existe, y si no, crearlo
+            directorio = os.path.dirname(output)
+            if not os.path.exists(directorio):
+                os.makedirs(directorio)
+    
+            workbook = xlsxwriter.Workbook(output)
+            workbook.close()
+            path = output
+        
         with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
             writer.workbook = openpyxl.load_workbook(path)
             pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
@@ -435,7 +609,22 @@ class Problem:
                          'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
 
         print(f"Se exportó exitosamente el archivo de Excel en {path}")
-
+        self.detailed_solution={'tao_ijk':tao_ijk,
+                                'h_ik':h_ik,
+                                'l_ijk':l_ijk,
+                                'c_jk':c_jk,
+                                's_jk':s_jk,
+                                'fi_ijkjk':fi_ijkjk,
+                                'df_l_ijk':df_l_ijk,
+                                'fi_jkjk':fi_jkjk,
+                                'prob_fi_jkjk':prob_fi_jkjk,
+                                'alpha_ik':alpha_ik,
+                                'rho_jk':rho_jk,
+                                'f_ijk':f_ijk,
+                                'l_jk':l_jk,
+                                'sigma_jk':sigma_jk,
+                                'theta_jk':theta_jk
+                                }
     def set_solution_txt(self):
 
         ##########################################
@@ -448,6 +637,7 @@ class Problem:
 
         #output = os.getcwd()+'/output/'+network.name+'/modeloysolucion.txt'
         output = os.getcwd()+'/output/'+self.name_solution+'/modeloysolucion.txt'
+        
         # Verificar si el directorio existe, y si no, crearlo
         directorio = os.path.dirname(output)
         if not os.path.exists(directorio):
@@ -458,6 +648,9 @@ class Problem:
             instance.pprint(output_file)
 
         output = os.getcwd()+'/output/'+self.name_solution+'/solucion.txt'
+        if self.name_solution == "pareto_front":
+            output = os.getcwd()+'/output/'+'pareto_front_'+str(self.epsilon)+'/solucion.txt'
+  
         # Verificar si el directorio existe, y si no, crearlo
         directorio = os.path.dirname(output)
         if not os.path.exists(directorio):
@@ -484,7 +677,7 @@ class Problem:
         _menu_options = {
             '1': 'Minimizar congestión máxima (rho)',
             '2': 'Maximizar accesibilidad mínima (alpha)',
-            '3': 'Maximizar continuidad mínimia (delta)',
+            '3': 'Maximizar continuidad mínima (delta)',
             '4': 'Maximizar accesibilidad total (alpha)',
             '5': 'Minimizar usuarios en espera total (Lq_total)',
             '6': 'Maximizar continuidad total (delta total)',
