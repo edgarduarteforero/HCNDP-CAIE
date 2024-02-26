@@ -4,11 +4,14 @@ Created on Tue Dec 19 18:29:12 2023
 
 @author: edgar
 """
+
+
            
 def export_data(network):
     import pandas as pd
-    import os
-    output_file=os.getcwd()+'/output/'+network.name_solution+'/salida_medicion.xlsx'
+    import os  
+
+    output_file=os.getcwd()+'/output/'+network.name_problem+'/salida_medicion.xlsx'
         
     with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
         # Iterar a través del diccionario y escribir cada DataFrame en una hoja
@@ -34,7 +37,7 @@ def create_index_sheet(network):
 
     
     # Nombre del archivo Excel
-    excel_file = os.getcwd()+'/output/'+network.name_solution+'/salida_medicion.xlsx'
+    excel_file = os.getcwd()+'/output/'+network.name_problem+'/salida_medicion.xlsx'
     
     # Cargar el archivo existente
     workbook = openpyxl.load_workbook(excel_file)

@@ -18,59 +18,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import product
 
-#Genero los índices para cualquier letra (I,J,K) y su cantidad.
-def indices1(letra,cantidad): # Se generan listas tipo j1,j2,j3
-    matr=[str("%s%d" % (letra.lower(),i+1)) for i in range (cantidad)]
-    return matr
-
-def indices(letra,cantidad): # Se generan listas tipo j01,j02,j03
-    matr=[]
-    for i in range (1,cantidad+1):
-        matr.append(letra+f"{i:02d}")
-    return matr
-
-#Creo un parámetro llamado 'par' (h) con un solo subíndice y valores enteros aleatorios. Ej: h_i
-def param_simple(par,letra,cantidad,lim):
-    matr=[np.random.randint(lim[0],lim[1]+1) for i in range (cantidad)]
-    return matr
-
-#Creo un parámetro llamado 'par' (d) con dos subíndices y valores enteros aleatorios. Ej:c_jk
-def param_doble(par,letra1,letra2,cantidad1,cantidad2,lim):
-    matr=[np.random.randint(lim[0],lim[1]+1) for j in range (cantidad2) for i in range (cantidad1)]
-    return matr
-#param_doble("h","I","K",I,K,lim_h)
-
-#Genero una lista "ubica" con coordenadas x e y.
-def ubicaciones(letra,cantidad):
-    ubica=np.random.uniform(0,1,(cantidad,2)) #Coordenadas aleatorias
-    return ubica
-
-#Genero una matriz de distancias euclideanas entre dos listas de coordenadas
-def distancias(par,matr1,matr2,letra1,letra2):
-    distancias = distance.cdist(matr1, matr2, 'euclidean')
-    return distancias
-
-#Genero una matriz de coberturas para cada par de nodos ij.
-def cobertura(par,matr,maximo,letra1,letra2,cantidad1,cantidad2):
-    matr_cob=matr<=maximo
-    return matr_cob*1
-
-#Calculo decaimiento de distancias por método Gaussiano (Tao 2020 y Delamater 2013)
-def decay_gauss(d_ij,do):
-    if d_ij<do:
-        f=np.exp((-1/2)*(d_ij/do)**2) - np.exp(-1/2)
-        f=(f/(1-np.exp(-1/2)))
-    else:
-        f=0
-    return f
-
-# Construyo una matriz con las combinaciones posibles de dos o más listas
-def matriz_combinaciones(lista_a,lista_b):
-    combinaciones = list(product(lista_a, lista_bb))
-    df = pd.DataFrame(combinaciones, columns=['Columna1', 'Columna2'])
-    return df
-
-
 # <codecell> Clase network
 class Network:
     def __init__(self,I,J,K,archivo,name):
@@ -199,6 +146,7 @@ class Network:
             self.file['df_fi_ijkjk'] = archivo_salida_optim['fi_ijkjk']
             
             # Elimino los flujos que no quiero contemplar en el ejercicio
+            from self import delete_surplus_data
             delete_surplus_data(self)
             
             # Creo la variable z_ijk que tiene valores 1 o 0
@@ -220,7 +168,7 @@ class Network:
             df_asignacion=pd.merge(df_asignacion, df_flujos_ijk,left_index=True, right_index=True)
             self.file['df_asignacion']=df_asignacion
             self.file['df_flujos']=df_flujos_ijk
-    
+
     
     def create_df_probs_kk(self):
         import numpy as np
@@ -362,6 +310,7 @@ class Network:
       
         
     def get_objective_function(self):
+        # Solicito al usuario la función objetivo que desea utilizar
         _menu_options = {
         '1': 'Minimizar congestión máxima (rho)',
         '2': 'Maximizar accesibilidad mínima (alpha)',
@@ -624,6 +573,7 @@ class Network_representation(Network):
         self.nodes_supply = {}
         self.edges_dem_sup_W = {}
         self.edges_sup_sup_X = {}
+        from hcndp.data_functions import indices
         
         # Matriz de servicios
         
@@ -1119,6 +1069,7 @@ class Path_representation:
         self.file=file
         self.nodes_services = {}
         self.edges_ser_ser_R = {}
+        from hcndp.data_functions import indices
 
         # Matriz de servicios
         df_niveles = file['df_niveles']

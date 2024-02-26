@@ -18,7 +18,7 @@ def calculate_kpi(current_solution,_post_optima):
     set_prop_tao(current_solution,network)
     set_prob_k(current_solution,network)
     
-    
+    # Calculo las probabilidades de tener cantidades de clientes y tiempo en cola
     if 'customers' not in network.file:
         print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
         customers = int(input("Ingresa un valor para clientes: \n"))
@@ -40,6 +40,8 @@ def calculate_kpi(current_solution,_post_optima):
     set_continuity_per_node(network)
     set_kpi_network(network)
     set_df_grafo_flujo_jkjk(network)
+    
+    print (f"\nSe han calculado los KPI y se guardaron en {network.name_problem}.")
         
 
 #%% <codecell> Funciones para cálculo de probabilidades por teoría de colas
@@ -141,11 +143,19 @@ def set_lambda_jk (current_solution, network,_post_optima):
     import pandas as pd
 
 
-    path=os.getcwd()+'/output/'+current_solution.name_solution+'/salida_optimizacion.xlsx'
+    path=os.getcwd()+'/output/'+current_solution.name_problem+'/salida_optimizacion.xlsx'
         
     
     # Matriz de arribos externos g
-    g=np.array(network.file['df_asignacion']['tao_ijk']) # Lista de arribos externos ijk
+    df_asignacion=network.file['df_asignacion']
+    # Verificar si las columnas I, J y K están presentes en el índice
+    if not all(col in df_asignacion.index.names for col in ['nombre_I', 
+                                                            'nombre_J', 
+                                                            'servicio_K']):
+        # Si no están presentes, establecer las columnas I, J y K como índice
+        df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
+    df_asignacion = df_asignacion.sort_index(level=[0, 1, 2])
+    g=np.array(df_asignacion['tao_ijk']) # Lista de arribos externos ijk
     g=reshape_matrix(g, network.I, network.J*network.K)
     g=np.sum(g,axis=0) #Lista de suma por cada jk. Son los gamma jk
     # Nótese que se hace la suma de los g en el eje 0 para obtener los g_jk a partir de la suma en i de los g_ijk
@@ -154,7 +164,10 @@ def set_lambda_jk (current_solution, network,_post_optima):
     # Cálculo de lambdas y rho para cada par j k
     if _post_optima==False:
         df_capac=network.file['df_capac']
-        probs=network.file['df_arcos']['p_jjkk']
+        df_arcos=network.file['df_arcos']
+        df_arcos = df_arcos.set_index(['servicio_K','nombre_Jp','servicio_Kp'], append=True)
+        df_arcos=df_arcos.sort_index(level=[0,1,2,3])
+        probs=df_arcos['p_jjkk']
         probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
         df_capac['lambdas']=np.matmul(g,np.linalg.inv(np.identity(len(probs))-(probs)))
         df_capac.replace([np.inf,-np.inf], 0, inplace=True)
@@ -162,7 +175,8 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
         df_capac.replace([np.inf,-np.inf], 0, inplace=True)
         df_capac.fillna(0,inplace=True)
-    
+        print ("\n Se actualizaron exitosamente los lambda_jk")
+
     if _post_optima==True:
         #TERCER BLOQUE
         ## También puedo importar los datos de lambda_jk desde el archivo datos.xlxs
@@ -189,13 +203,25 @@ def set_lambda_ijk (solution, network,_post_optima):
 
     # Calculo los lambdas para cada ijk
     # Se calculan a través de un loop asumiendo que solo hay arribos en cada i
-    g=np.array(network.file['df_asignacion']['tao_ijk']) # Lista de arribos externos ijk
+    #g=np.array(network.file['df_asignacion']['tao_ijk']) # Lista de arribos externos ijk
+    #g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
+    df_asignacion=network.file['df_asignacion']
+    if not all(col in df_asignacion.index.names for col in ['nombre_I', 
+                                                            'nombre_J', 
+                                                            'servicio_K']):
+        # Si no están presentes, establecer las columnas I, J y K como índice
+        df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
+    df_asignacion = df_asignacion.sort_index(level=[0, 1, 2])
+    g=np.array(df_asignacion['tao_ijk']) # Lista de arribos externos ijk
     g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
 
 
     # Puedo calcular los lambda ijk basado en redes de Jackson
     network.file['df_asignacion']["lambda_ijk"] = 0.0
-    probs=network.file['df_arcos']['p_jjkk']
+    df_arcos=network.file['df_arcos']
+    df_arcos = df_arcos.set_index(['servicio_K','nombre_Jp','servicio_Kp'], append=True)
+    df_arcos=df_arcos.sort_index(level=[0,1,2,3])
+    probs=df_arcos['p_jjkk']
     probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
     
     #Para cada i calculo el lambda ijk
@@ -204,6 +230,12 @@ def set_lambda_ijk (solution, network,_post_optima):
     if _post_optima==False:
         network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
         network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
+        
+        network.file['df_asignacion'].sort_index(inplace=True)
+        for i in network.file['df_asignacion'].index.levels[0]: 
+            #df_asignacion.loc[i,'lambda_ijk']=1
+            network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+            _i+=1    
         print ("\n Se actualizaron exitosamente los lambda_ijk")
     if _post_optima==True:
         network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
@@ -299,6 +331,7 @@ def set_prob_k (solution,network):
     #De lo contrario asumo que la demanda_i es la misma h_ik. siempre debo usar axis=1 cuando recorro un dataframe por filas
     df_demanda['h_ik']=df_demanda.apply (lambda row: row['demanda_i'] if row['servicio_K']=='k01' else "0",axis=1) 
     network.file['df_demanda']=df_demanda
+    print ("\n Se actualizaron exitosamente las demandas en estado estable df_pi.")
 
 
 def set_prob_custom_queue (network,customers):

@@ -74,6 +74,8 @@ print ("#" * 60)
 print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
 
 
+#%%  Menú tipo de problema (mono o multi)
+
 import textwrap
 while True:
     print("\n----------------------------------------------------------")
