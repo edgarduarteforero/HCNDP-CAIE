@@ -19,7 +19,6 @@ def menu_solutions(network_original, problems_dict):
         print("Selecciona una opción:")
         print("1. Cargar tu propia solución")
         print("2. Obtener soluciones mono-objetivo")
-        
         print("4. Indicadores (KPI) y gráficos de soluciones")
         print("9. Salir")
 
@@ -115,8 +114,14 @@ def menu_solutions(network_original, problems_dict):
 
                 else:
                     # Si hay función objetivo (resultado de optimización)
-                    _post_optima=True
-                    kpi.calculate_kpi(current_solution,_post_optima)
+                    
+                    # Actualizo las matrices de solution.network_copy
+                    current_solution.network_copy.merge_niveles_capac(_post_optima=True)
+                    current_solution.network_copy.create_df_asignacion(_post_optima=True)
+                    current_solution.network_copy.create_df_probs_kk()
+                    current_solution.network_copy.create_df_arcos(_post_optima=True)
+                    
+                    kpi.calculate_kpi(current_solution,_post_optima=False)
                     print (f"Se calcularon los KPI para la solución {solucion_elegida}.")
                     print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
                     figures.show_menu_figures(current_solution)
@@ -175,6 +180,7 @@ class Problem:
         self.name_problem = name_problem
         self.objective = objective
         self.name_network = name_network
+        self.state=""
 
 # %% Funciones complementarias
     def insert_network_object(self, network_original):
@@ -669,6 +675,7 @@ class Problem:
         df_solucion = pd.DataFrame(_lista, columns=['nombre_I', 'origen', 'destino','π','ϕ'])
         
         self.solution=df_solucion
+        self.state="Solucionado_aproximación"
 
         # %% Exportar resultados 
         # TODO Generar solución en el mismo formato que la solución exacta
@@ -758,6 +765,7 @@ class Problem:
         self.network_copy.create_folders()
         self.set_solution_excel()
         self.set_solution_txt()
+        self.state="Optimizado"
 
     
     # %% Exportar solución

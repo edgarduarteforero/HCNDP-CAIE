@@ -175,6 +175,7 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
         df_capac.replace([np.inf,-np.inf], 0, inplace=True)
         df_capac.fillna(0,inplace=True)
+        network.file['df_capac']=df_capac
         print ("\n Se actualizaron exitosamente los lambda_jk")
 
     if _post_optima==True:
@@ -192,9 +193,21 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac['lambdas'] = df_capac['lambda_jk']
         df_capac = df_capac.drop(columns=['lambda_jk'])
         df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
+        
+        #Actualizo los sigma
+        data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+                             index_col=0)
+        df_capac = df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')        
+        
+        df_capac.drop(['sigma_jk_x'],axis=1,inplace=True)
+        df_capac.insert(4,'sigma_jk',df_capac.pop('sigma_jk_y'))
+        df_capac['sigma_jk'] = df_capac['sigma_jk'].round(0).astype('int')
+        
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
         df_capac.fillna(0,inplace=True)
         df_capac.replace([np.inf, -np.inf], 0, inplace=True)
+        network.file['df_capac']=df_capac
+        
         print ("\n Se actualizaron exitosamente los lambda_jk")
         
 def set_lambda_ijk (solution, network,_post_optima):
@@ -217,7 +230,8 @@ def set_lambda_ijk (solution, network,_post_optima):
 
 
     # Puedo calcular los lambda ijk basado en redes de Jackson
-    network.file['df_asignacion']["lambda_ijk"] = 0.0
+    #network.file['df_asignacion']["lambda_ijk"] = 0.0
+    df_asignacion["lambda_ijk"] = 0.0
     df_arcos=network.file['df_arcos']
     df_arcos = df_arcos.set_index(['servicio_K','nombre_Jp','servicio_Kp'], append=True)
     df_arcos=df_arcos.sort_index(level=[0,1,2,3])
@@ -276,10 +290,20 @@ def set_phi_ijkjk (solution,network):
 def set_prop_tao (solution,network):
     # Calculo los valores de prop_tao_ijk. Proporción de clientes que son dirigidos desde ik a jk
     import pandas as pd
-    df_demanda=network.file['df_demanda'].drop(['servicio_K'],axis=1)
-    network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index(),df_demanda)
+    df_demanda=network.file['df_demanda']
+    
+    if solution.state=="Solucionado_aproximación" or solution.state=="Optimizado":
+        #network.file['df_asignacion'] = pd.merge(network.file['df_asignacion'], df_demanda[['nombre_I', 'servicio_K', 'pi_k']], on=['nombre_I', 'servicio_K'], how='left')
+        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
+        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].set_index(['nombre_I','servicio_K']), 
+                                               df_demanda.set_index(['nombre_I', 'servicio_K'])['pi_k'], 
+                                               left_index=True, right_index=True, how='left')
+    else:
+        df_demanda=network.file['df_demanda'].drop(['servicio_K'],axis=1)
+        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index(),df_demanda)
+    
     network.file['df_asignacion']['prop_tao_ijk']=network.file['df_asignacion']['tao_ijk']/network.file['df_asignacion']['demanda_i']
-    network.file['df_asignacion'].drop(['demanda_i'],axis=1,inplace=True)
+    #network.file['df_asignacion'].drop(['demanda_i'],axis=1,inplace=True)
     network.file['df_asignacion']['prop_tao_ijk'] = network.file['df_asignacion']['prop_tao_ijk'].fillna(0)
     print ("\n Se actualizaron exitosamente los tao_ijk (prop)")
 
@@ -330,7 +354,11 @@ def set_prob_k (solution,network):
     
     #De lo contrario asumo que la demanda_i es la misma h_ik. siempre debo usar axis=1 cuando recorro un dataframe por filas
     df_demanda['h_ik']=df_demanda.apply (lambda row: row['demanda_i'] if row['servicio_K']=='k01' else "0",axis=1) 
-    network.file['df_demanda']=df_demanda
+    if solution.state=="Solucionado_aproximación" or solution.state=="Optimizado":
+        print ("Ya está preparada la matriz df_demanda.")
+    else:
+        print ("Actualizo df_demanda.")
+        network.file['df_demanda']=df_demanda
     print ("\n Se actualizaron exitosamente las demandas en estado estable df_pi.")
 
 

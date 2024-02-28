@@ -81,12 +81,9 @@ class Network:
         import pandas as pd
         import os
         
-        self.file['df_capac']=pd.merge(self.file['df_capac'],self.file['df_niveles'],on='servicio_K',how='left')
-        self.file['df_capac']=pd.merge(self.file['df_capac'],self.file['df_oferta'],on='nombre_J',how='inner')
-        self.file['df_capac']=self.file['df_capac'].set_index(['nombre_J','servicio_K'],drop=True)
-        
         if _post_optima==True:
-            output_file=os.getcwd()+'/output/'+self.name+'/salida_optimizacion.xlsx'
+            
+            output_file=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
     
             data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
@@ -96,8 +93,12 @@ class Network:
             self.file['df_capac'].insert(4,'sigma_jk',self.file['df_capac'].pop('sigma_jk_y'))
             
             self.file['df_capac']['sigma_jk'] = self.file['df_capac']['sigma_jk'].round(0).astype('int')
-        
+
         if _post_optima==False:   
+            self.file['df_capac']=pd.merge(self.file['df_capac'],self.file['df_niveles'],on='servicio_K',how='left')
+            self.file['df_capac']=pd.merge(self.file['df_capac'],self.file['df_oferta'],on='nombre_J',how='inner')
+            self.file['df_capac']=self.file['df_capac'].set_index(['nombre_J','servicio_K'],drop=True)
+            
             if self.file['df_capac']['s_jk'].sum() < self.file['df_capac']['sigma_jk'].sum():
                 print ("""Hay un error en la capacidad.
                        La suma de los s_jk es menor a la suma de los sigma_jk asignados.
@@ -111,43 +112,43 @@ class Network:
         from hcndp.data_functions import indices
         import numpy as np
     
+        if _post_optima == False:
+            # Creo la matriz df_asignación para construir los arcos de la red
+            # En la matriz df_asignacion creamos las columnas para incorporar la función de decaimiento de la distancia
+            self.file['df_asignacion']=pd.DataFrame()
+            self.file['df_asignacion']=self.file['df_capac'].reset_index().set_index('nombre_J')
         
-        # Creo la matriz df_asignación para construir los arcos de la red
-        # En la matriz df_asignacion creamos las columnas para incorporar la función de decaimiento de la distancia
-        self.file['df_asignacion']=pd.DataFrame()
-        self.file['df_asignacion']=self.file['df_capac'].reset_index().set_index('nombre_J')
-    
-        #Fusiono matrices de oferta y distancia creando arcos
-        self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], 
-                                               self.file['df_dist_ij'].set_index(['nombre_J']),
-                                               left_index=True,right_index=True,how='outer').sort_values('dist_IJ').reset_index()
+            #Fusiono matrices de oferta y distancia creando arcos
+            self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], 
+                                                   self.file['df_dist_ij'].set_index(['nombre_J']),
+                                                   left_index=True,right_index=True,how='outer').sort_values('dist_IJ').reset_index()
+            
+            #Creo una matriz con las distancias de cobertura que se digitaron como parámetros
+            self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], 
+                                                   self.file['df_demanda'].reset_index()[['nombre_I','ubicacionesI_x','ubicacionesI_y']],
+                                                   on='nombre_I',how='inner').drop_duplicates()
+             
+            # Calculo las distancias ajustadas por la función de decaimiento con el título f_dij
+            self.file['df_asignacion']['f_dij']=self.file['df_asignacion'].apply(lambda row: decay_gauss(row["dist_IJ"],row["d_o_k"]),axis='columns')
+            self.file['df_asignacion']=self.file['df_asignacion'].set_index(['nombre_J','servicio_K'])
         
-        #Creo una matriz con las distancias de cobertura que se digitaron como parámetros
-        self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], 
-                                               self.file['df_demanda'].reset_index()[['nombre_I','ubicacionesI_x','ubicacionesI_y']],
-                                               on='nombre_I',how='inner').drop_duplicates()
-         
-        # Calculo las distancias ajustadas por la función de decaimiento con el título f_dij
-        self.file['df_asignacion']['f_dij']=self.file['df_asignacion'].apply(lambda row: decay_gauss(row["dist_IJ"],row["d_o_k"]),axis='columns')
-        self.file['df_asignacion']=self.file['df_asignacion'].set_index(['nombre_J','servicio_K'])
-    
-        self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].set_index(['nombre_I','nombre_J','servicio_K']).sort_index()
-        self.file['df_asignacion']=self.file['df_asignacion'].drop(['tao_ijk','z_ijk'], axis=1, errors='ignore')
-        self.file['df_asignacion']=self.file['df_asignacion'].reset_index()
-        self.file['df_asignacion']=self.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], self.file['df_flujos_ijk'],left_index=True, right_index=True)
-    
+            self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].set_index(['nombre_I','nombre_J','servicio_K']).sort_index()
+            self.file['df_asignacion']=self.file['df_asignacion'].drop(['tao_ijk','z_ijk'], axis=1, errors='ignore')
+            self.file['df_asignacion']=self.file['df_asignacion'].reset_index()
+            self.file['df_asignacion']=self.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
+            self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], self.file['df_flujos_ijk'],left_index=True, right_index=True)
+        
         if _post_optima == True:
             # Cargo los resultados obtenidos de la optimización
-            path=os.getcwd()+'/output/'+self.name+'/salida_optimizacion.xlsx'
+            path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
             archivo_salida_optim = pd.read_excel(path, sheet_name=None)
     
             self.file['df_flujos_ijk']=archivo_salida_optim['f_ijk']
             self.file['df_fi_ijkjk'] = archivo_salida_optim['fi_ijkjk']
             
             # Elimino los flujos que no quiero contemplar en el ejercicio
-            from self import delete_surplus_data
-            delete_surplus_data(self)
+            #import delete_surplus_data
+            self.delete_surplus_data()
             
             # Creo la variable z_ijk que tiene valores 1 o 0
             df_flujos_ijk=self.file['df_flujos_ijk'].copy()
@@ -159,13 +160,30 @@ class Network:
             df_w_ij=self.file['df_w_ij'].copy()
             
             # Actualizo df_asignacion
-            df_asignacion=df_asignacion.reset_index(level=['servicio_K']).\
-                        merge(df_w_ij.set_index(['nombre_I','nombre_J']),
-                              left_index=True,right_index=True).rename(columns={"w_ij": "Flujo_w_ij"})
+            #df_asignacion=df_asignacion.reset_index(level=['servicio_K']).\
+            #            merge(df_w_ij.set_index(['nombre_I','nombre_J']),
+            #                  left_index=True,right_index=True).rename(columns={"w_ij": "Flujo_w_ij"})
+            df_asignacion=df_asignacion.set_index(['nombre_I','nombre_J']).merge(df_w_ij.set_index(['nombre_I','nombre_J']),
+                                                                                 left_index=True,
+                                                                                 right_index=True).rename(columns={"w_ij": "Flujo_w_ij"})
             df_asignacion=df_asignacion.reset_index()
             df_asignacion=df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'])
             df_asignacion=df_asignacion.drop(['tao_ijk','z_ijk'], axis=1, errors='ignore')
             df_asignacion=pd.merge(df_asignacion, df_flujos_ijk,left_index=True, right_index=True)
+            
+            # Actualizo los valores de sigma nuevos
+            data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+                                     index_col=0)
+            df_asignacion = pd.merge(df_asignacion,data.set_index(['nombre_J','servicio_K']),left_index=True,right_index=True)
+        
+            df_asignacion.drop(['sigma_jk_x'],axis=1,inplace=True)
+            df_asignacion.insert(4,'sigma_jk',df_asignacion.pop('sigma_jk_y'))
+            
+            df_asignacion['sigma_jk'] = df_asignacion['sigma_jk'].round(0).astype('int')
+
+            
+            
+            
             self.file['df_asignacion']=df_asignacion
             self.file['df_flujos']=df_flujos_ijk
 
@@ -228,7 +246,7 @@ class Network:
     
         
         if _post_optima==True:
-            path=os.getcwd()+'/output/'+self.name+'/salida_optimizacion.xlsx'
+            path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
             archivo_salida_optim = pd.read_excel(path, sheet_name=None)
             data = archivo_salida_optim['prob_fi_jkjk']
             #data = pd.read_excel (archivo, sheet_name='df_probs')
@@ -422,6 +440,9 @@ class Network:
         
         #Escribo los h
         file.write("param %s := \n"%"h")
+        #if 'h_ik' not in df_demanda.index.names:
+            # Si 'h_ik' no está en el índice, establecerlo como índice
+        #    df_demanda.set_index('h_ik', inplace=True)
         file.write(df_demanda.reset_index()[['nombre_I','servicio_K','h_ik']].to_string(header=False,index=False))
         file.write(";\n\n")
         
