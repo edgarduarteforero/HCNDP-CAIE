@@ -60,8 +60,9 @@ class Model_pyomo:
             model.J, model.K, domain=pyo.NonNegativeIntegers, initialize=1)
         # Cantidad de servidores asignados al nodo de servicio JK
     
-        model.rho_max = pyo.Var(within=pyo.NonNegativeReals,
-                                initialize=0, bounds=(0.00, 0.99))
+        model.rho_max = pyo.Var(domain=pyo.NonNegativeReals,initialize=0) #within=pyo.NonNegativeReals,                                initialize=0,within=pyo.NonNegativeReals
+       # model.rho_max=Var(within=NonNegativeReals,initialize=0,within=NonNegativeReals)#bounds=(0.00,0.99)  
+
         # Máxima utilización en los nodos de servicio
     
         model.l_ijk = pyo.Var(model.I, model.J, model.K,
@@ -88,7 +89,7 @@ class Model_pyomo:
     
         model.rho_jk = pyo.Var(
             model.J, model.K, domain=pyo.NonNegativeReals, initialize=0, bounds=(0.00, 0.99))
-    
+        
         model.psi = pyo.Var(model.I, model.J, model.K,
                             domain=pyo.Binary, initialize=0)
         # Factor binario para asegurar que si tao_ijk>0 entonces tao_jik=0 y viceversa
@@ -153,7 +154,7 @@ class Model_pyomo:
     
         def restr_seis_rule(model, i, j, k):
             # Existe flujo tao_ijk si hay enlace, hay servidores en jk
-            return model.tao[i, j, k] <= model.w[i, j]*model.sigma[j, k]*model.c[j, k]
+            return model.tao[i, j, k] <= model.w[i,j]*model.sigma[j, k]*model.c[j, k]
         model.restr_seis = pyo.Constraint(
             model.I, model.J, model.K, rule=restr_seis_rule)
     
@@ -321,10 +322,10 @@ class Model_pyomo:
     
         # %%  Objetivo
         # Función objetivo
-        match objetivo:
+        match int(objetivo):
             case 1:
                 model.obj = pyo.Objective(expr=model.rho_max, sense=pyo.minimize)
-    
+
             case 2:
                 model.obj = pyo.Objective(expr=model.alpha_min, sense=pyo.maximize)
     
@@ -354,5 +355,4 @@ class Model_pyomo:
         
         # %%  Modelo abstracto en model_abstract
         self.model_abstract=model
-    
     

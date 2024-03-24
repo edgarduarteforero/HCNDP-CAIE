@@ -1,14 +1,14 @@
-<!-- Tufts VUE 3.3.0 concept-map (Diagramas de flujo.vue) 2024-02-21 -->
+<!-- Tufts VUE 3.3.0 concept-map (Diagramas de flujo.vue) 2024-03-12 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/C:/Program%20Files%20(x86)/VUE/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Wed Feb 21 07:13:01 COT 2024 by edgar on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
+<!-- Do Not Remove: Saved date Tue Mar 12 16:22:38 COT 2024 by edgar on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built October 8 2015 at 1658 by tomadm on Linux 2.6.32-504.23.4.el6.x86_64 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0"
     label="Diagramas de flujo.vue" created="1704812190924" x="0.0"
     y="0.0" width="2053.783" height="3006.7222" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1708517581869" size="309020"
+    <resource referenceCreated="1710278558239" size="492963"
         spec="C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\C&#xf3;digos Python\HcNDP\Health-Care-Network-Design-Problem\docs\Diagramas de flujo.vue"
         type="1" xsi:type="URLResource">
         <title>Diagramas de flujo.vue</title>
@@ -336,10 +336,10 @@
   &lt;head style="color: #404040" color="#404040"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #404040; margin-top: 0px; margin-right: 0px; font-size: 11; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 11; font-family: Arial }
-        p { margin-bottom: 0; color: #404040; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 11; margin-left: 30 }
+        body { color: #404040; font-size: 11; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 11; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #404040; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 11; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -367,7 +367,7 @@
             label="2. Obtener soluciones por algoritmos de b&#xfa;squeda"
             created="1704813214054" x="34.0" y="63.25" width="291.0"
             height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
-            <fillColor>#FEFB03</fillColor>
+            <fillColor>#F2AE45</fillColor>
             <strokeColor>#000000</strokeColor>
             <textColor>#000000</textColor>
             <font>Arial-plain-12</font>
@@ -1303,10 +1303,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1331,10 +1331,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1359,10 +1359,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1397,10 +1397,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1425,10 +1425,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1483,7 +1483,7 @@
             <shape xsi:type="ellipse"/>
         </child>
         <child ID="782" label="---------------" created="1708449805636"
-            x="34.0" y="244.55" width="62.0" height="17.0"
+            x="34.0" y="244.55" width="63.0" height="17.0"
             strokeWidth="0.0" autoSized="false" xsi:type="text">
             <strokeColor>#404040</strokeColor>
             <textColor>#000000</textColor>
@@ -1493,10 +1493,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1521,10 +1521,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1582,7 +1582,7 @@
             <shape xsi:type="ellipse"/>
         </child>
         <child ID="793" label="---------------" created="1708458097835"
-            x="34.0" y="398.25" width="61.0" height="17.0"
+            x="34.0" y="398.25" width="63.0" height="17.0"
             strokeWidth="0.0" autoSized="false" xsi:type="text">
             <strokeColor>#404040</strokeColor>
             <textColor>#000000</textColor>
@@ -1592,10 +1592,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1620,10 +1620,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1660,7 +1660,7 @@
             <shape xsi:type="ellipse"/>
         </child>
         <child ID="811" label="---------------" created="1708459153483"
-            x="34.0" y="502.375" width="60.0" height="17.0"
+            x="34.0" y="502.375" width="63.0" height="17.0"
             strokeWidth="0.0" autoSized="false" xsi:type="text">
             <strokeColor>#404040</strokeColor>
             <textColor>#000000</textColor>
@@ -1670,10 +1670,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -1698,10 +1698,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2246,7 +2246,7 @@
     </child>
     <child ID="820" label="solutions.py" layerID="1"
         created="1708459506884" x="692.78265" y="1667.7678"
-        width="280.5" height="565.03125" strokeWidth="1.0"
+        width="280.5" height="632.1094" strokeWidth="1.0"
         autoSized="true" xsi:type="node">
         <fillColor>#F1A83E</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -2254,7 +2254,7 @@
         <font>Arial-plain-12</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8207f60c0a801660095d728fd547fd1</URIString>
         <child ID="831" label="menu_solutions" created="1708459549512"
-            x="34.0" y="23.0" width="308.25" height="530.375"
+            x="34.0" y="23.0" width="308.25" height="619.8125"
             strokeWidth="1.0" autoSized="true" xsi:type="node">
             <fillColor>#F1A83E</fillColor>
             <strokeColor>#000000</strokeColor>
@@ -2284,10 +2284,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2302,7 +2302,7 @@
                 <label>Muestro men&#xfa; de agregar soluciones</label>
             </child>
             <child ID="935" label="---------------"
-                created="1708463508450" x="34.0" y="83.75" width="62.0"
+                created="1708463508450" x="34.0" y="83.75" width="63.0"
                 height="19.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
                 <strokeColor>#404040</strokeColor>
                 <textColor>#000000</textColor>
@@ -2312,10 +2312,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2361,10 +2361,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2470,10 +2470,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2513,19 +2513,87 @@
             <child ID="1160"
                 label="calculate_kpi(current_solution,_post_optima) @ kpi.py"
                 created="1708488840945" x="34.0" y="436.625"
-                width="336.0" height="27.0" strokeWidth="1.0"
+                width="346.0" height="146.25" strokeWidth="1.0"
                 autoSized="true" xsi:type="node">
-                <notes>Calculo todos los kpi para una soluci&#xf3;n que est&#xe1; en current_solution y teniendo en cuenta si es una soluci&#xf3;n resultado de una optimizaci&#xf3;n.</notes>
-                <fillColor>#F1A83E</fillColor>
+                <notes>Calculo todos los kpi para una soluci&#xf3;n que est&#xe1; en current_solution y teniendo en cuenta si es una soluci&#xf3;n resultado de una optimizaci&#xf3;n o se ingres&#xf3; por el usuario.%nl;Los resultados se guardan en self.network_copy.file</notes>
+                <fillColor>#F2AE45</fillColor>
                 <strokeColor>#000000</strokeColor>
                 <textColor>#000000</textColor>
                 <font>Arial-plain-12</font>
                 <URIString>http://vue.tufts.edu/rdf/resource/cb956445c0a801660095d7287536a0bd</URIString>
+                <child ID="1216"
+                    label="Si la soluci&#xf3;n fue ingresada por usuario calculo_kpi con &#xa;      _post_optima=False"
+                    created="1709118543071" x="34.0" y="23.0"
+                    width="307.0" height="35.0" strokeWidth="0.0"
+                    autoSized="false" xsi:type="text">
+                    <strokeColor>#404040</strokeColor>
+                    <textColor>#000000</textColor>
+                    <font>SansSerif-plain-14</font>
+                    <URIString>http://vue.tufts.edu/rdf/resource/ef959c9ec0a8016600dd45aa87dc1cd6</URIString>
+                    <richText>&lt;html&gt;
+  &lt;head style="color: #000000" color="#000000"&gt;
+    &lt;style type="text/css"&gt;
+      &lt;!--
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+      --&gt;
+    &lt;/style&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Si la soluci&amp;#243;n fue ingresada por usuario calculo_kpi con 
+      _post_optima=False
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</richText>
+                    <label>Si la soluci&#xf3;n fue ingresada por usuario calculo_kpi con 
+      _post_optima=False</label>
+                </child>
+                <child ID="1217"
+                    label="Si la soluci&#xf3;n fue optimizada capturo soluci&#xf3;n obtenida con &#xa;      merge_niveles, create_df_asignacion, create_df_probs y create_df_arcoscon _post_optima=False Luego hago calculate_kpi con _post_optima=False"
+                    created="1709118635449" x="34.0" y="60.25"
+                    width="299.0" height="80.0" strokeWidth="0.0"
+                    autoSized="false" xsi:type="text">
+                    <strokeColor>#404040</strokeColor>
+                    <textColor>#000000</textColor>
+                    <font>SansSerif-plain-14</font>
+                    <URIString>http://vue.tufts.edu/rdf/resource/ef959c9fc0a8016600dd45aa50e40f22</URIString>
+                    <richText>&lt;html&gt;
+  &lt;head style="color: #000000" color="#000000"&gt;
+    &lt;style type="text/css"&gt;
+      &lt;!--
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+      --&gt;
+    &lt;/style&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Si la soluci&amp;#243;n fue optimizada capturo soluci&amp;#243;n obtenida con 
+      merge_niveles, create_df_asignacion, create_df_probs y 
+      create_df_arcoscon _post_optima=False
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Luego hago calculate_kpi con _post_optima=False
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</richText>
+                    <label>Si la soluci&#xf3;n fue optimizada capturo soluci&#xf3;n obtenida con 
+      merge_niveles, create_df_asignacion, create_df_probs y create_df_arcoscon _post_optima=False Luego hago calculate_kpi con _post_optima=False</label>
+                </child>
                 <shape xsi:type="rectangle"/>
             </child>
             <child ID="1203"
                 label="figures.show_menu_figures(current_solution)"
-                created="1708489779348" x="34.0" y="459.125"
+                created="1708489779348" x="34.0" y="548.5625"
                 width="291.0" height="27.0" strokeWidth="1.0"
                 autoSized="true" xsi:type="node">
                 <notes>Genera gr&#xe1;ficos</notes>
@@ -2538,7 +2606,7 @@
             </child>
             <child ID="1205"
                 label="export.export_data(current_solution.network_copy)"
-                created="1708489828545" x="34.0" y="481.625"
+                created="1708489828545" x="34.0" y="571.0625"
                 width="314.0" height="27.0" strokeWidth="1.0"
                 autoSized="true" xsi:type="node">
                 <notes>Genera gr&#xe1;ficos</notes>
@@ -2551,7 +2619,7 @@
             </child>
             <child ID="1206"
                 label="export.create_index_sheet(current_solution.network_copy)"
-                created="1708489847369" x="34.0" y="504.125"
+                created="1708489847369" x="34.0" y="593.5625"
                 width="358.0" height="27.0" strokeWidth="1.0"
                 autoSized="true" xsi:type="node">
                 <notes>Genera gr&#xe1;ficos</notes>
@@ -2565,7 +2633,7 @@
             <shape xsi:type="rectangle"/>
         </child>
         <child ID="979" label="---------------" created="1708466016961"
-            x="34.0" y="423.78125" width="61.0" height="19.0"
+            x="34.0" y="490.85938" width="63.0" height="19.0"
             strokeWidth="0.0" autoSized="false" xsi:type="text">
             <strokeColor>#404040</strokeColor>
             <textColor>#000000</textColor>
@@ -2575,10 +2643,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2593,7 +2661,7 @@
             <label>---------------</label>
         </child>
         <child ID="955" label="create_problem_object"
-            created="1708465697352" x="34.0" y="445.78125" width="138.0"
+            created="1708465697352" x="34.0" y="512.8594" width="138.0"
             height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
             <fillColor>#F1A83E</fillColor>
             <strokeColor>#000000</strokeColor>
@@ -2603,7 +2671,7 @@
             <shape xsi:type="rectangle"/>
         </child>
         <child ID="980" label="---------------" created="1708466023068"
-            x="34.0" y="466.03125" width="60.0" height="18.0"
+            x="34.0" y="533.1094" width="63.0" height="18.0"
             strokeWidth="0.0" autoSized="false" xsi:type="text">
             <strokeColor>#404040</strokeColor>
             <textColor>#000000</textColor>
@@ -2613,10 +2681,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2631,7 +2699,7 @@
             <label>---------------</label>
         </child>
         <child ID="978" label="Problem" created="1708466000689" x="34.0"
-            y="487.03125" width="105.047745" height="37.0"
+            y="554.1094" width="105.047745" height="37.0"
             strokeWidth="1.0" autoSized="false" xsi:type="node">
             <fillColor>#F1A83E</fillColor>
             <strokeColor>#000000</strokeColor>
@@ -2641,7 +2709,7 @@
             <shape xsi:type="rhombus"/>
         </child>
         <child ID="981" label="---------------" created="1708466027911"
-            x="34.0" y="517.78125" width="68.0" height="18.0"
+            x="34.0" y="584.8594" width="68.0" height="18.0"
             strokeWidth="0.0" autoSized="false" xsi:type="text">
             <strokeColor>#404040</strokeColor>
             <textColor>#000000</textColor>
@@ -2651,10 +2719,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2670,9 +2738,9 @@
         </child>
         <child ID="1119"
             label="update_solution_post_optima (network1, network2)"
-            created="1708478674442" x="34.0" y="538.78125" width="321.0"
+            created="1708478674442" x="34.0" y="605.8594" width="321.0"
             height="27.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
-            <notes>Toma dos redes, original y nueva.%nl;Deber&#xed;a leer los par&#xe1;metros de la nueva red y actualizarlos en la red original. %nl;Revisar si est&#xe1; bien hecho esto. L&#xed;neas 780 a 817 de solutions.py</notes>
+            <notes>ESTA FUNCI&#xd3;N NO SE EST&#xc1; USANDO%nl;Toma dos redes, original y nueva.%nl;Deber&#xed;a leer los par&#xe1;metros de la nueva red y actualizarlos en la red original. %nl;Revisar si est&#xe1; bien hecho esto. L&#xed;neas 780 a 817 de solutions.py</notes>
             <fillColor>#EA2218</fillColor>
             <strokeColor>#000000</strokeColor>
             <textColor>#000000</textColor>
@@ -2719,16 +2787,16 @@
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62401c0a801660095d728b0bc2224</URIString>
         <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
     </child>
-    <child ID="849" layerID="1" created="1708459808273" x="907.81024"
-        y="1644.8271" width="16.064087" height="46.440674"
+    <child ID="849" layerID="1" created="1708459808273" x="910.05945"
+        y="1644.8271" width="14.330017" height="46.440674"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62401c0a801660095d72849a051f6</URIString>
-        <point1 x="908.31024" y="1690.7678"/>
-        <point2 x="923.3743" y="1645.3271"/>
+        <point1 x="910.55945" y="1690.7678"/>
+        <point2 x="923.88947" y="1645.3271"/>
         <ID1 xsi:type="node">831</ID1>
         <ID2 xsi:type="node">844</ID2>
     </child>
@@ -2744,10 +2812,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2762,15 +2830,15 @@
         <label>solutions.menu_solutions(network_original , problems_dict)</label>
     </child>
     <child ID="858" layerID="1" created="1708460083400" x="521.55347"
-        y="1883.6489" width="205.72919" height="4.5213623"
+        y="1892.9543" width="205.72919" height="20.009888"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62401c0a801660095d728939deac8</URIString>
-        <point1 x="522.05347" y="1884.1489"/>
-        <point2 x="726.78265" y="1887.6703"/>
+        <point1 x="522.05347" y="1893.4543"/>
+        <point2 x="726.78265" y="1912.4642"/>
         <ID1 xsi:type="text">857</ID1>
         <ID2 xsi:type="node">831</ID2>
     </child>
@@ -2804,7 +2872,7 @@
     </child>
     <child ID="943" label="Problem @ solutions.py" layerID="1"
         created="1708464194843" x="232.91296" y="2016.5087"
-        width="356.0" height="926.375" strokeWidth="1.0"
+        width="295.85623" height="892.0625" strokeWidth="1.0"
         autoSized="true" xsi:type="node">
         <fillColor>#F1A83E</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -2851,10 +2919,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -2946,10 +3014,10 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -3162,7 +3230,7 @@
             <shape xsi:type="rectangle"/>
         </child>
         <child ID="1075" label="construct_model" created="1708476904296"
-            x="34.0" y="650.3375" width="203.0" height="145.29999"
+            x="34.0" y="650.3375" width="192.75" height="139.54999"
             strokeWidth="1.0" autoSized="true" xsi:type="node">
             <fillColor>#F1A83E</fillColor>
             <strokeColor>#000000</strokeColor>
@@ -3306,7 +3374,7 @@
             <shape xsi:type="rectangle"/>
         </child>
         <child ID="1079" created="1708477113582" x="-5.8211613"
-            y="599.7241" width="40.321163" height="109.599976"
+            y="599.7241" width="40.321163" height="108.51129"
             strokeWidth="1.0" autoSized="false" controlCount="2"
             arrowState="2" xsi:type="link">
             <strokeColor>#404040</strokeColor>
@@ -3314,7 +3382,7 @@
             <font>Arial-plain-11</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c9b40cd7c0a801660095d7283fcdc95a</URIString>
             <point1 x="34.0" y="600.2241"/>
-            <point2 x="34.0" y="708.8241"/>
+            <point2 x="34.0" y="707.7354"/>
             <ID1 xsi:type="node">1073</ID1>
             <ID2 xsi:type="node">1075</ID2>
             <ctrlPoint0 x="-8.8658905" y="609.4018" xsi:type="point"/>
@@ -3351,7 +3419,7 @@
             <ctrlPoint1 x="-107.02683" y="785.1659" xsi:type="point"/>
         </child>
         <child ID="1105" label="utiliza" created="1708477783468"
-            x="150.6875" y="577.125" width="96.90399" height="138.61017"
+            x="150.6875" y="577.125" width="96.40399" height="138.61017"
             strokeWidth="1.0" autoSized="false" controlCount="2"
             arrowState="1" xsi:type="link">
             <strokeColor>#404040</strokeColor>
@@ -3365,23 +3433,11 @@
             <ctrlPoint0 x="307.75732" y="632.28217" xsi:type="point"/>
             <ctrlPoint1 x="205.83568" y="718.4582" xsi:type="point"/>
         </child>
-        <child ID="1159"
-            label="calculate_kpi_before_optim (_post_optima=False)"
-            created="1708488840940" x="34.0" y="889.0625" width="316.0"
-            height="27.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
-            <notes>Usando kpi.py Calculo lambda_jk%nl;lambda_ijk%nl;phi_ijkjk%nl;prop_tao%nl;prob_k</notes>
-            <fillColor>#F1A83E</fillColor>
-            <strokeColor>#000000</strokeColor>
-            <textColor>#000000</textColor>
-            <font>Arial-plain-12</font>
-            <URIString>http://vue.tufts.edu/rdf/resource/cb956452c0a801660095d7283d4be817</URIString>
-            <shape xsi:type="rectangle"/>
-        </child>
         <shape xsi:type="rectangle"/>
     </child>
     <child ID="929" label="es llamado por" layerID="1"
         created="1708463145851" x="560.5871" y="1692.935"
-        width="112.9765" height="491.28003" strokeWidth="1.0"
+        width="112.4765" height="491.28003" strokeWidth="1.0"
         autoSized="false" controlCount="1" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
@@ -3451,7 +3507,7 @@
     </child>
     <child ID="982" label="create_problem_object @ solutions.py"
         layerID="1" created="1708466040906" x="1080.9601" y="1949.6987"
-        width="309.03375" height="257.73688" strokeWidth="1.0"
+        width="309.03375" height="255.48686" strokeWidth="1.0"
         autoSized="true" xsi:type="node">
         <fillColor>#F1A83E</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -3459,7 +3515,7 @@
         <font>Arial-plain-12</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d728ab798ca4</URIString>
         <child ID="961" label="problems_dict{})" created="1708465828516"
-            x="34.0" y="23.0" width="359.04498" height="304.98248"
+            x="34.0" y="23.0" width="359.04498" height="301.98248"
             strokeWidth="1.0" autoSized="true" xsi:type="node">
             <fillColor>#F1A83E</fillColor>
             <strokeColor>#000000</strokeColor>
@@ -3488,10 +3544,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -3517,10 +3573,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -3589,16 +3645,16 @@
         <shape xsi:type="rectangle"/>
     </child>
     <child ID="977" label="hace esto" layerID="1"
-        created="1708465969340" x="796.8928" y="2000.905"
-        width="333.65283" height="113.14404" strokeWidth="1.0"
+        created="1708465969340" x="790.4428" y="2005.1896"
+        width="340.09003" height="175.93762" strokeWidth="1.0"
         strokeStyle="2" autoSized="false" controlCount="2"
         arrowState="2" xsi:type="link">
         <strokeColor>#A6A6A6</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d728e303c6ed</URIString>
-        <point1 x="797.3928" y="2113.549"/>
-        <point2 x="1130.0457" y="2034.6064"/>
+        <point1 x="790.9428" y="2180.6272"/>
+        <point2 x="1130.0328" y="2034.02"/>
         <ID1 xsi:type="node">955</ID1>
         <ID2 xsi:type="node">961</ID2>
         <ctrlPoint0 x="1060.7513" y="1993.1113" xsi:type="point"/>
@@ -3625,10 +3681,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -3654,10 +3710,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -3683,10 +3739,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -3763,16 +3819,16 @@
         <ID1 xsi:type="node">930</ID1>
         <ID2 xsi:type="node">880</ID2>
     </child>
-    <child ID="995" layerID="1" created="1708470189911" x="536.1918"
-        y="2010.2649" width="214.15564" height="145.03418"
+    <child ID="995" layerID="1" created="1708470189911" x="528.26917"
+        y="2023.0089" width="226.38928" height="199.36829"
         strokeWidth="1.0" strokeStyle="2" autoSized="false"
         controlCount="1" arrowState="2" xsi:type="link">
         <strokeColor>#A6A6A6</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62404c0a801660095d7286b85738f</URIString>
-        <point1 x="749.8474" y="2154.799"/>
-        <point2 x="536.6918" y="2016.5087"/>
+        <point1 x="754.15845" y="2221.8772"/>
+        <point2 x="528.76917" y="2032.241"/>
         <ID1 xsi:type="node">978</ID1>
         <ID2 xsi:type="node">943</ID2>
         <ctrlPoint0 x="546.1439" y="1981.7007" xsi:type="point"/>
@@ -3845,7 +3901,7 @@
         <ctrlPoint0 x="-16.41864" y="2309.2517" xsi:type="point"/>
     </child>
     <child ID="1020" label="kpi.py " layerID="1" created="1708474022190"
-        x="670.2718" y="2465.275" width="255.0" height="494.75"
+        x="698.9385" y="2737.275" width="255.0" height="494.75"
         strokeWidth="1.0" autoSized="true" xsi:type="node">
         <notes>CAlcular los KPI de una soluci&#xf3;n</notes>
         <fillColor>#F1A83E</fillColor>
@@ -4087,10 +4143,9 @@
         </child>
         <shape xsi:type="rectangle"/>
     </child>
-    <child ID="1049"
-        label="Usan solution y &#xa;    &#xa;    &#xa;      network"
-        layerID="1" created="1708474954852" x="902.1873" y="2682.1667"
-        width="149.0" height="32.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
+    <child ID="1049" label="Usan solution y network" layerID="1"
+        created="1708474954852" x="930.854" y="2954.1667" width="149.0"
+        height="32.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
         <strokeColor>#404040</strokeColor>
         <textColor>#000000</textColor>
         <font>SansSerif-plain-14</font>
@@ -4099,17 +4154,17 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
     &lt;p style="color: #000000" color="#000000"&gt;
-      Usan solution y 
+      Usan solution y
     &lt;/p&gt;
     &lt;p style="color: #000000" color="#000000"&gt;
       network
@@ -4117,78 +4172,75 @@
   &lt;/body&gt;
 &lt;/html&gt;
 </richText>
-        <label>Usan solution y 
-    
-    
-      network</label>
+        <label>Usan solution y network</label>
     </child>
-    <child ID="1050" label="label" layerID="1" created="1708474984935"
-        x="773.5218" y="2666.724" width="129.16553" height="20.568115"
+    <child ID="1050" layerID="1" created="1708474984935" x="802.1885"
+        y="2938.7244" width="129.16553" height="20.567871"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdac0a801660095d72880c2bfe0</URIString>
-        <point1 x="774.0218" y="2667.2244"/>
-        <point2 x="902.1873" y="2686.7925"/>
+        <point1 x="802.6885" y="2939.2244"/>
+        <point2 x="930.854" y="2958.7922"/>
         <ID1 xsi:type="node">1032</ID1>
         <ID2 xsi:type="text">1049</ID2>
     </child>
-    <child ID="1051" layerID="1" created="1708474992065" x="775.7718"
-        y="2684.0889" width="126.91553" height="9.530762"
+    <child ID="1051" layerID="1" created="1708474992065" x="804.4385"
+        y="2956.0889" width="126.91553" height="9.530762"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdac0a801660095d728ffe6b79b</URIString>
-        <point1 x="776.2718" y="2684.5889"/>
-        <point2 x="902.1873" y="2693.1196"/>
+        <point1 x="804.9385" y="2956.5889"/>
+        <point2 x="930.854" y="2965.1196"/>
         <ID1 xsi:type="node">1033</ID1>
         <ID2 xsi:type="text">1049</ID2>
     </child>
-    <child ID="1052" label="label" layerID="1" created="1708475001459"
-        x="763.7718" y="2693.6719" width="138.91553" height="14.0"
+    <child ID="1052" layerID="1" created="1708475001459" x="792.4385"
+        y="2970.9678" width="138.91553" height="3.4082031"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d7288221d89f</URIString>
-        <point1 x="764.2718" y="2701.876"/>
-        <point2 x="902.1873" y="2699.4675"/>
+        <point1 x="792.9385" y="2973.876"/>
+        <point2 x="930.854" y="2971.4678"/>
         <ID1 xsi:type="node">1034</ID1>
         <ID2 xsi:type="text">1049</ID2>
     </child>
-    <child ID="1053" label="label" layerID="1" created="1708475009494"
-        x="766.7718" y="2705.2378" width="135.91553" height="14.7109375"
+    <child ID="1053" layerID="1" created="1708475009494" x="795.4385"
+        y="2977.2378" width="135.91553" height="14.7109375"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72818448c7d</URIString>
-        <point1 x="767.2718" y="2719.4487"/>
-        <point2 x="902.1873" y="2705.7378"/>
+        <point1 x="795.9385" y="2991.4487"/>
+        <point2 x="930.854" y="2977.7378"/>
         <ID1 xsi:type="node">1035</ID1>
         <ID2 xsi:type="text">1049</ID2>
     </child>
-    <child ID="1054" layerID="1" created="1708475014640" x="758.5218"
-        y="2711.267" width="144.16553" height="27.135498"
+    <child ID="1054" layerID="1" created="1708475014640" x="787.1885"
+        y="2983.2666" width="144.16553" height="27.135498"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72897fd05cb</URIString>
-        <point1 x="759.0218" y="2737.9026"/>
-        <point2 x="902.1873" y="2711.767"/>
+        <point1 x="787.6885" y="3009.9023"/>
+        <point2 x="930.854" y="2983.7668"/>
         <ID1 xsi:type="node">1036</ID1>
         <ID2 xsi:type="text">1049</ID2>
     </child>
     <child ID="1056" label="Usan network" layerID="1"
-        created="1708475035519" x="924.8593" y="2844.7795" width="149.0"
+        created="1708475035519" x="953.526" y="3116.7795" width="149.0"
         height="17.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
         <strokeColor>#404040</strokeColor>
         <textColor>#000000</textColor>
@@ -4198,10 +4250,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -4215,201 +4267,200 @@
 </richText>
         <label>Usan network</label>
     </child>
-    <child ID="1057" label="label" layerID="1" created="1708475046313"
-        x="782.87744" y="2771.275" width="194.45752" height="74.00464"
+    <child ID="1057" layerID="1" created="1708475046313" x="811.54407"
+        y="3043.275" width="194.45782" height="74.00464"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728edcb50a1</URIString>
-        <point1 x="783.37744" y="2771.775"/>
-        <point2 x="976.83496" y="2844.7795"/>
+        <point1 x="812.04407" y="3043.775"/>
+        <point2 x="1005.5019" y="3116.7795"/>
         <ID1 xsi:type="node">1037</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1058" label="label" layerID="1" created="1708475055067"
-        x="779.63916" y="2791.525" width="189.80035" height="53.75464"
+    <child ID="1058" layerID="1" created="1708475055067" x="808.30566"
+        y="3063.525" width="189.8003" height="53.75464"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72853ae3200</URIString>
-        <point1 x="780.13916" y="2792.025"/>
-        <point2 x="968.9395" y="2844.7795"/>
+        <point1 x="808.80566" y="3064.025"/>
+        <point2 x="997.60596" y="3116.7795"/>
         <ID1 xsi:type="node">1038</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1059" label="label" layerID="1" created="1708475059807"
-        x="787.0217" y="2811.3003" width="169.42719" height="33.979248"
+    <child ID="1059" layerID="1" created="1708475059807" x="815.6885"
+        y="3083.3005" width="169.42749" height="33.979004"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d7288cf5a03d</URIString>
-        <point1 x="787.5218" y="2811.8003"/>
-        <point2 x="955.949" y="2844.7795"/>
+        <point1 x="816.1885" y="3083.8005"/>
+        <point2 x="984.61597" y="3116.7795"/>
         <ID1 xsi:type="node">1039</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1060" layerID="1" created="1708475064619" x="825.2718"
-        y="2846.0168" width="100.087524" height="4.8603516"
+    <child ID="1060" layerID="1" created="1708475064619" x="853.9385"
+        y="3118.0166" width="100.087524" height="4.8603516"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d7289422dfe2</URIString>
-        <point1 x="825.7718" y="2846.5168"/>
-        <point2 x="924.8593" y="2850.3772"/>
+        <point1 x="854.4385" y="3118.5166"/>
+        <point2 x="953.526" y="3122.377"/>
         <ID1 xsi:type="node">1042</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1061" label="label" layerID="1" created="1708475067152"
-        x="757.7718" y="2826.359" width="167.58752" height="19.256104"
+    <child ID="1061" layerID="1" created="1708475067152" x="786.4385"
+        y="3098.359" width="167.58752" height="19.256104"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728e8d7b443</URIString>
-        <point1 x="758.2718" y="2826.859"/>
-        <point2 x="924.8593" y="2845.115"/>
+        <point1 x="786.9385" y="3098.859"/>
+        <point2 x="953.526" y="3117.115"/>
         <ID1 xsi:type="node">1040</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1062" label="label" layerID="1" created="1708475073160"
-        x="833.5218" y="2852.0723" width="91.837524" height="14.0"
+    <child ID="1062" layerID="1" created="1708475073160" x="862.1885"
+        y="3128.3784" width="91.837524" height="5.3879395"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728ec4b9272</URIString>
-        <point1 x="834.0218" y="2861.2664"/>
-        <point2 x="924.8593" y="2856.8784"/>
+        <point1 x="862.6885" y="3133.266"/>
+        <point2 x="953.526" y="3128.8782"/>
         <ID1 xsi:type="node">1043</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1063" label="label" layerID="1" created="1708475079657"
-        x="817.7718" y="2861.2795" width="117.57568" height="16.359863"
+    <child ID="1063" layerID="1" created="1708475079657" x="846.4385"
+        y="3133.2795" width="117.575745" height="16.359863"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728ce1c11aa</URIString>
-        <point1 x="818.2718" y="2877.1394"/>
-        <point2 x="934.8475" y="2861.7795"/>
+        <point1 x="846.9385" y="3149.1394"/>
+        <point2 x="963.5142" y="3133.7795"/>
         <ID1 xsi:type="node">1044</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1064" label="label" layerID="1" created="1708475084718"
-        x="798.6791" y="2861.2798" width="161.60596" height="35.49536"
+    <child ID="1064" layerID="1" created="1708475084718" x="827.3452"
+        y="3133.2798" width="161.60553" height="35.49536"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72857a5b29e</URIString>
-        <point1 x="799.1791" y="2896.275"/>
-        <point2 x="959.78503" y="2861.7795"/>
+        <point1 x="827.84515" y="3168.275"/>
+        <point2 x="988.4507" y="3133.7795"/>
         <ID1 xsi:type="node">1045</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1065" label="label" layerID="1" created="1708475091398"
-        x="772.5146" y="2861.2798" width="196.92444" height="55.74536"
+    <child ID="1065" layerID="1" created="1708475091398" x="801.18115"
+        y="3133.2798" width="196.92493" height="55.74536"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728c94fcdd8</URIString>
-        <point1 x="773.0146" y="2916.525"/>
-        <point2 x="968.939" y="2861.7795"/>
+        <point1 x="801.68115" y="3188.525"/>
+        <point2 x="997.6061" y="3133.7795"/>
         <ID1 xsi:type="node">1046</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
-    <child ID="1066" label="label" layerID="1" created="1708475096810"
-        x="777.28503" y="2861.2798" width="200.01752" height="75.99536"
+    <child ID="1066" layerID="1" created="1708475096810" x="805.9519"
+        y="3133.2798" width="200.0174" height="75.99536"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72837e52cc0</URIString>
-        <point1 x="777.78503" y="2936.775"/>
-        <point2 x="976.80255" y="2861.7795"/>
+        <point1 x="806.4519" y="3208.775"/>
+        <point2 x="1005.4693" y="3133.7795"/>
         <ID1 xsi:type="node">1047</ID1>
         <ID2 xsi:type="text">1056</ID2>
     </child>
     <child ID="1068" layerID="1" created="1708476466938" x="503.41296"
-        y="2575.897" width="221.63647" height="77.87793"
+        y="2575.897" width="260.56714" height="349.87793"
         strokeWidth="1.0" autoSized="false" controlCount="1"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728f7ec8949</URIString>
-        <point1 x="724.54944" y="2653.275"/>
+        <point1 x="763.4801" y="2925.275"/>
         <point2 x="503.91296" y="2576.397"/>
         <ID1 xsi:type="node">1032</ID1>
         <ID2 xsi:type="node">1019</ID2>
         <ctrlPoint0 x="585.5614" y="2571.152" xsi:type="point"/>
     </child>
     <child ID="1069" layerID="1" created="1708476474752" x="503.41296"
-        y="2581.889" width="223.85779" height="92.13599"
-        strokeWidth="1.0" autoSized="false" controlCount="1"
-        arrowState="2" xsi:type="link">
+        y="2581.889" width="261.711" height="364.136" strokeWidth="1.0"
+        autoSized="false" controlCount="1" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d7289e148cd7</URIString>
-        <point1 x="726.77075" y="2673.525"/>
+        <point1 x="764.62396" y="2945.525"/>
         <point2 x="503.91296" y="2582.389"/>
         <ID1 xsi:type="node">1033</ID1>
         <ID2 xsi:type="node">1019</ID2>
         <ctrlPoint0 x="582.43427" y="2581.3154" xsi:type="point"/>
     </child>
     <child ID="1070" layerID="1" created="1708476482042" x="503.41296"
-        y="2593.2576" width="219.12555" height="101.017334"
+        y="2593.2576" width="256.0382" height="373.01733"
         strokeWidth="1.0" autoSized="false" controlCount="1"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728bb2c1537</URIString>
-        <point1 x="722.0385" y="2693.775"/>
+        <point1 x="758.9512" y="2965.775"/>
         <point2 x="503.91296" y="2593.7576"/>
         <ID1 xsi:type="node">1034</ID1>
         <ID2 xsi:type="node">1019</ID2>
         <ctrlPoint0 x="590.2522" y="2600.8604" xsi:type="point"/>
     </child>
     <child ID="1071" layerID="1" created="1708476487809" x="503.41296"
-        y="2591.2932" width="222.33734" height="123.23169"
+        y="2591.2932" width="257.57837" height="395.2317"
         strokeWidth="1.0" autoSized="false" controlCount="1"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d7280f6c2e42</URIString>
-        <point1 x="725.2503" y="2714.025"/>
+        <point1 x="760.49133" y="2986.025"/>
         <point2 x="503.91296" y="2591.7932"/>
         <ID1 xsi:type="node">1035</ID1>
         <ID2 xsi:type="node">1019</ID2>
         <ctrlPoint0 x="582.43427" y="2596.9514" xsi:type="point"/>
     </child>
     <child ID="1072" layerID="1" created="1708476498287" x="487.92984"
-        y="2593.6338" width="235.34085" height="141.14111"
+        y="2593.6338" width="269.28122" height="413.1411"
         strokeWidth="1.0" autoSized="false" controlCount="1"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72866c20536</URIString>
-        <point1 x="722.7707" y="2734.275"/>
+        <point1 x="756.71106" y="3006.275"/>
         <point2 x="488.42984" y="2594.1338"/>
         <ID1 xsi:type="node">1036</ID1>
         <ID2 xsi:type="node">1019</ID2>
@@ -4428,28 +4479,28 @@
     </child>
     <child ID="1100" label="utiliza la clase" layerID="1"
         created="1708477630570" x="90.58403" y="2577.953"
-        width="176.82892" height="121.04297" strokeWidth="1.0"
+        width="176.82892" height="120.35327" strokeWidth="1.0"
         autoSized="false" controlCount="1" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d7289ca71e33</URIString>
-        <point1 x="266.91296" y="2698.4958"/>
+        <point1 x="266.91296" y="2697.8062"/>
         <point2 x="91.08403" y="2578.453"/>
         <ID1 xsi:type="node">1075</ID1>
         <ID2 xsi:type="node">948</ID2>
         <ctrlPoint0 x="107.82089" y="2650.7673" xsi:type="point"/>
     </child>
-    <child ID="1101" layerID="1" created="1708477674674" x="418.66296"
-        y="2718.5732" width="32.81122" height="1.6662598"
+    <child ID="1101" layerID="1" created="1708477674674" x="410.97546"
+        y="2717.4946" width="40.36023" height="1.4169922"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d728319e9eb7</URIString>
-        <point1 x="450.97418" y="2719.0732"/>
-        <point2 x="419.16296" y="2719.7395"/>
+        <point1 x="450.8357" y="2717.9946"/>
+        <point2 x="411.47546" y="2718.4116"/>
         <ID1 xsi:type="node">1086</ID1>
         <ID2 xsi:type="node">1075</ID2>
     </child>
@@ -4493,10 +4544,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -4522,10 +4573,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -4551,10 +4602,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -4661,10 +4712,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -4690,10 +4741,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-size: 12; font-family: Arial; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -4792,19 +4843,19 @@
         <ctrlPoint1 x="460.35757" y="1936.2098" xsi:type="point"/>
     </child>
     <child ID="1154" label="es llamada por" layerID="1"
-        created="1708488008635" x="354.91296" y="1931.1234"
-        width="398.58008" height="686.0272" strokeWidth="1.0"
+        created="1708488008635" x="345.26984" y="1937.7684"
+        width="431.9447" height="692.5519" strokeWidth="1.0"
         autoSized="false" controlCount="2" arrowState="2" xsi:type="link">
         <strokeColor>#000000</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9de8cddc0a801660095d728bce41583</URIString>
-        <point1 x="355.41296" y="2613.2598"/>
-        <point2 x="752.99304" y="1931.6234"/>
+        <point1 x="345.76984" y="2617.3838"/>
+        <point2 x="776.71454" y="1938.2684"/>
         <ID1 xsi:type="node">1073</ID1>
         <ID2 xsi:type="node">1152</ID2>
-        <ctrlPoint0 x="802.5978" y="2673.9055" xsi:type="point"/>
-        <ctrlPoint1 x="567.0927" y="1935.3219" xsi:type="point"/>
+        <ctrlPoint0 x="748.5978" y="2735.2388" xsi:type="point"/>
+        <ctrlPoint1 x="513.0927" y="1996.6552" xsi:type="point"/>
     </child>
     <child ID="1156" label="es llamada por" layerID="1"
         created="1708488123563" x="408.5005" y="1953.3982"
@@ -4821,24 +4872,24 @@
         <ctrlPoint0 x="823.4011" y="2621.697" xsi:type="point"/>
         <ctrlPoint1 x="611.37366" y="1956.7802" xsi:type="point"/>
     </child>
-    <child ID="1163" layerID="1" created="1708488971066" x="919.0218"
-        y="2021.8823" width="142.09967" height="478.93042"
+    <child ID="1163" layerID="1" created="1708488971066" x="848.68933"
+        y="2042.589" width="207.89148" height="718.1859"
         strokeWidth="1.0" autoSized="false" controlCount="2"
         arrowState="2" xsi:type="link">
         <strokeColor>#000000</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/cb956462c0a801660095d728f8d3954a</URIString>
-        <point1 x="919.5218" y="2500.3127"/>
-        <point2 x="941.28265" y="2022.3823"/>
+        <point1 x="849.18933" y="2760.275"/>
+        <point2 x="946.90765" y="2044.3143"/>
         <ID1 xsi:type="node">1022</ID1>
         <ID2 xsi:type="node">1160</ID2>
         <ctrlPoint0 x="1068.4047" y="2502.9585" xsi:type="point"/>
         <ctrlPoint1 x="1134.1652" y="2015.3442" xsi:type="point"/>
     </child>
     <child ID="1164" label="figures.py" layerID="1"
-        created="1708489004787" x="1121.133" y="2316.381" width="171.75"
-        height="471.5" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        created="1708489004787" x="1138.4663" y="2232.381"
+        width="171.75" height="471.5" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#F1A83E</fillColor>
         <strokeColor>#000000</strokeColor>
         <textColor>#000000</textColor>
@@ -5067,8 +5118,8 @@
         <shape xsi:type="rectangle"/>
     </child>
     <child ID="1168" label="Representaciones de red" layerID="1"
-        created="1708489096261" x="1221.327" y="2308.1587" width="179.0"
-        height="27.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        created="1708489096261" x="1238.6603" y="2224.1587"
+        width="179.0" height="27.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <notes>Presenta representaciones de plano cartesiano, chord, probabilidades, mapas de calor, etc.</notes>
         <fillColor>#B5B995</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -5078,22 +5129,22 @@
         <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
     </child>
     <child ID="1204" layerID="1" created="1708489790190" x="915.47015"
-        y="2041.381" width="240.1629" height="304.7433"
+        y="2108.3413" width="269.8288" height="175.44946"
         strokeWidth="1.0" autoSized="false" controlCount="2"
         arrowState="2" xsi:type="link">
         <strokeColor>#000000</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/cb956463c0a801660095d72878b38abc</URIString>
-        <point1 x="915.97015" y="2041.881"/>
-        <point2 x="1155.133" y="2345.6243"/>
+        <point1 x="915.97015" y="2108.8413"/>
+        <point2 x="1184.799" y="2272.631"/>
         <ID1 xsi:type="node">1203</ID1>
         <ID2 xsi:type="node">1165</ID2>
-        <ctrlPoint0 x="1089.9553" y="2040.1282" xsi:type="point"/>
+        <ctrlPoint0 x="1075.4426" y="2107.0056" xsi:type="point"/>
         <ctrlPoint1 x="936.8817" y="2334.5337" xsi:type="point"/>
     </child>
     <child ID="1207" label="export.py" layerID="1"
-        created="1708489876121" x="771.3369" y="2301.298" width="150.0"
+        created="1708489876121" x="780.6702" y="2345.9648" width="150.0"
         height="72.5" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#F1A83E</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -5124,20 +5175,517 @@
         </child>
         <shape xsi:type="rectangle"/>
     </child>
-    <child ID="1213" layerID="1" created="1708490028222" x="920.8369"
-        y="2055.7747" width="72.927246" height="280.55713"
+    <child ID="1213" layerID="1" created="1708490028222" x="928.40765"
+        y="2119.4814" width="68.3421" height="240.27466"
         strokeWidth="1.0" autoSized="false" controlCount="2"
         arrowState="2" xsi:type="link">
         <strokeColor>#000000</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/cb956464c0a801660095d728ab297ce2</URIString>
-        <point1 x="928.90765" y="2056.2747"/>
-        <point2 x="921.3369" y="2335.8318"/>
+        <point1 x="928.90765" y="2119.9814"/>
+        <point2 x="930.6702" y="2359.256"/>
         <ID1 xsi:type="node">1205</ID1>
         <ID2 xsi:type="node">1207</ID2>
-        <ctrlPoint0 x="1017.82715" y="2052.9463" xsi:type="point"/>
+        <ctrlPoint0 x="1022.67755" y="2112.892" xsi:type="point"/>
         <ctrlPoint1 x="1014.12915" y="2333.7083" xsi:type="point"/>
+    </child>
+    <child ID="1218" label="approximate_solution" layerID="1"
+        created="1709119809334" x="-102.704895" y="2753.703"
+        width="261.0" height="490.7" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/ef959cc4c0a8016600dd45aa9479345b</URIString>
+        <child ID="1221" label="network_repr=Network_representation"
+            created="1709119843947" x="34.0" y="23.0" width="272.8"
+            height="41.800003" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <notes>Objeto red con nodos de demanda, oferta, y arcos</notes>
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/ef959cc4c0a8016600dd45aa540311ce</URIString>
+            <shape xsi:type="ellipse"/>
+        </child>
+        <child ID="1222" label="path_repr=Path_representation"
+            created="1709119947490" x="34.0" y="57.350002"
+            width="231.79999" height="39.800003" strokeWidth="1.0"
+            autoSized="true" xsi:type="node">
+            <notes>Objeto red con nodos de servicios y arcos entre servicios</notes>
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/ef959cc5c0a8016600dd45aa8afd0353</URIString>
+            <shape xsi:type="ellipse"/>
+        </child>
+        <child ID="1227"
+            label="Asumo que K00 es el servicio de los nodos de demanda Para cada k != k00 aplico:"
+            created="1709120038589" x="34.0" y="90.200005" width="222.0"
+            height="48.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
+            <strokeColor>#404040</strokeColor>
+            <textColor>#000000</textColor>
+            <font>SansSerif-plain-14</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/ef959cc5c0a8016600dd45aa1a41d8be</URIString>
+            <richText>&lt;html&gt;
+  &lt;head style="color: #000000" color="#000000"&gt;
+    &lt;style type="text/css"&gt;
+      &lt;!--
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+      --&gt;
+    &lt;/style&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Asumo que K00 es el servicio de los nodos de demanda
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Para cada k != k00 aplico:
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</richText>
+            <label>Asumo que K00 es el servicio de los nodos de demanda Para cada k != k00 aplico:</label>
+        </child>
+        <child ID="1228"
+            label="network_repr.asignacion_recursos(path_repr,_k)"
+            created="1709120460421" x="34.0" y="141.20001" width="280.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/ef959cc5c0a8016600dd45aaa0253c5a</URIString>
+            <shape xsi:type="rectangle"/>
+        </child>
+        <child ID="1238" label="Para k=0 asumo lambda = demanda."
+            created="1709225703842" x="34.0" y="161.45001" width="216.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/f932e281c0a8016600dd45aa8e84b3a8</URIString>
+            <shape xsi:type="rectangle"/>
+        </child>
+        <child ID="1241"
+            label="Construyo primera soluci&#xf3;n: Para k &lt; k' construyo delta ijkkp Flujo de usuarios i que salen de jk y van a kp solucion_entre_k_kp: Problema de transporte entre k ykp. Las soluciones son los flow_sup_sup_phi que est&#xe1;n en edges_sup_sup_X obtencion_&#x3c0;: convierte los flow_sup_sup_phi (flujos) en porcentajes que &#xa;      est&#xe1;n en edges_sup_sup_X como sup_sup_perc construyo_&#x3bb;: construye los lambda como la suma de los flow_sup_sup_phi. &#xa;      Se almacenanen nodes_supply"
+            created="1709225985326" x="34.0" y="181.70001" width="215.0"
+            height="303.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
+            <strokeColor>#404040</strokeColor>
+            <textColor>#000000</textColor>
+            <font>SansSerif-plain-14</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/f932e282c0a8016600dd45aa152cf44e</URIString>
+            <richText>&lt;html&gt;
+  &lt;head style="color: #000000" color="#000000"&gt;
+    &lt;style type="text/css"&gt;
+      &lt;!--
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+      --&gt;
+    &lt;/style&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Construyo primera soluci&amp;#243;n:
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Para k &amp;lt; k' construyo delta ijkkp
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Flujo de usuarios i que salen de jk y van a kp
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      solucion_entre_k_kp: Problema de transporte entre k ykp. Las soluciones 
+      son los flow_sup_sup_phi que est&amp;#225;n en edges_sup_sup_X
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      obtencion_&amp;#960;: convierte los flow_sup_sup_phi (flujos) en porcentajes que 
+      est&amp;#225;n en edges_sup_sup_X como sup_sup_perc
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      construyo_&amp;#955;: construye los lambda como la suma de los flow_sup_sup_phi. 
+      Se almacenanen nodes_supply
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</richText>
+            <label>Construyo primera soluci&#xf3;n: Para k &lt; k' construyo delta ijkkp Flujo de usuarios i que salen de jk y van a kp solucion_entre_k_kp: Problema de transporte entre k ykp. Las soluciones son los flow_sup_sup_phi que est&#xe1;n en edges_sup_sup_X obtencion_&#x3c0;: convierte los flow_sup_sup_phi (flujos) en porcentajes que 
+      est&#xe1;n en edges_sup_sup_X como sup_sup_perc construyo_&#x3bb;: construye los lambda como la suma de los flow_sup_sup_phi. 
+      Se almacenanen nodes_supply</label>
+        </child>
+        <shape xsi:type="rectangle"/>
+    </child>
+    <child ID="1229" label="utiliza" layerID="1" created="1709120525393"
+        x="21.450117" y="2658.8855" width="245.96284" height="95.31738"
+        strokeWidth="1.0" autoSized="false" controlCount="1"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/ef959cc6c0a8016600dd45aa300dbb70</URIString>
+        <point1 x="266.91296" y="2659.3855"/>
+        <point2 x="21.950117" y="2753.703"/>
+        <ID1 xsi:type="node">1082</ID1>
+        <ID2 xsi:type="node">1218</ID2>
+        <ctrlPoint0 x="21.126627" y="2719.136" xsi:type="point"/>
+    </child>
+    <child ID="1237" label="Algoritmo asignaci&#xf3;n recursos"
+        layerID="1" created="1709211625439" x="276.5799" y="2961.7874"
+        width="415.40002" height="1355.4" strokeWidth="1.0"
+        autoSized="true" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-bold-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/f932e282c0a8016600dd45aa7ec14a5b</URIString>
+        <child ID="1235"
+            label="suma_asignacion=0 Construyo df_matriz_todos vac&#xed;a _x = suma de los s_jk (Puestos disponibles para k en la red) Para c/arco sup sup X (ijkjk) Calculo &quot;distance_origin_target_covered&quot; si distancia est&#xe1; cubierta Comparo _x vs service_capacity(k) Servidores disponibles para asignar Imprimo si _x != service_capacity(k) Mientras que suma_asignacion &lt; service_capacity(k) df_matriz=construir_matriz(_k) Matriz que tendr&#xe1; para cada jk el &#xa;      nodo i m&#xe1;s lejano Para cada nodo jk de oferta Si j.servicio=k selected=0 max_dist=0 Hallo los nodos i y j que est&#xe1;n m&#xe1;s separados para cada arco ijkj'k' si j'k' == jk si distance_origin_covered > max dist max_dist = distance_origin_covered selected = i si selected !=0 agrego nueva fila a df_matriz con el par encontrado Ordeno df_matriz por distancia m&#xe1;xima Si df_matriz == vac&#xed;o break De lo contrario Para fila 0 declaro reman_antes=service_capacity Asigno sigma a cada jk Para cada fila _i en df_matriz Si reman_antes &lt;= 0, sigma_jk = 0 Si  suma_asignacion=0 y _i=0 reman_antes=service_capacity sigma_jk = min (demanda,s_jk,reman_antes) reman_despues=reman_antes-sigma_jk else: reman_antes=reman_despues(del anterior) sigma_jk = min (demanda,s_jk,reman_antes) reman_despues=reman_antes-sigma_jk Los valores de sigma_jk en df_matriz se llevan a los objetos &#xa;      network.supply node como capac_instal_disponible capac_instal_sigma capac_sigma_dispon Actualizo suma_asignacion+=sigma_jk Agrego df_matriz a df_matriz_todos"
+            created="1709121153080" x="79.20001" y="93.20001"
+            width="262.0" height="1188.0" strokeWidth="0.0"
+            autoSized="false" xsi:type="text">
+            <notes>suma_asignacion=0%nl;Construyo df_matriz_todos vac&#xed;a%nl;_x = suma de los s_jk (Puestos disponibles para k en la red)%nl;%nl;Para c/arco sup sup X (ijkjk) %nl; %sp; Calculo "distance_origin_target_covered" si distancia est&#xe1; cubierta%nl;%nl;Comparo _x vs service_capacity(k) Servidores disponibles para asignar%nl;Imprimo si _x != service_capacity(k)%nl;%nl;Mientras que suma_asignacion &lt; service_capacity(k)%nl; %sp; %sp;df_matriz=construir_matriz(_k) Matriz que tendr&#xe1; para cada jk el nodo i m&#xe1;s lejano%nl; %sp; %sp;Para cada nodo jk de oferta%nl; %sp; %sp; %sp; Si j.servicio=k%nl; %sp; %sp; %sp; %sp; %sp;selected=0%nl; %sp; %sp; %sp; %sp; %sp;max_dist=0%nl;%nl; %sp; %sp; %sp; %sp; %sp;Hallo los nodos i y j que est&#xe1;n m&#xe1;s separados%nl; %sp; %sp; %sp; %sp; %sp;para cada arco ijkj'k'%nl; %sp; %sp; %sp; %sp; %sp; %sp; %sp; si j'k' == jk %sp;%nl; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; si distance_origin_covered &gt; max dist%nl; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp;max_dist = distance_origin_covered%nl; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp; %sp;selected = i %nl; %sp; %sp; %sp; %sp; %sp;si selected !=0%nl; %sp; %sp; %sp; %sp; %sp; %sp;agrego nueva fila a df_matriz con el par encontrado%nl;%nl; %sp; %sp;Ordeno df_matriz por distancia m&#xe1;xima%nl; %sp; %sp;Si df_matriz == vac&#xed;o%nl; %sp; %sp; %sp; %sp; %sp; break%nl; %sp; %sp;De lo contrario %nl; %sp; %sp; %sp; %sp; %sp;Para fila 0 declaro reman_antes=service_capacity%nl;%nl; %sp; %sp;Asigno sigma a cada jk%nl; %sp; %sp;Para cada fila _i en df_matriz%nl; %sp; %sp; %sp; Si reman_antes &lt;= 0, sigma_jk = 0%nl; %sp; %sp; %sp; Si %sp;suma_asignacion=0 y _i=0%nl;%tab;reman_antes=service_capacity%nl;%tab;sigma_jk = min (demanda,s_jk,reman_antes)%nl;%tab;reman_despues=reman_antes-sigma_jk%nl; %sp; %sp; %sp; else:%nl;%tab;reman_antes=reman_despues(del anterior)%nl;%tab;sigma_jk = min (demanda,s_jk,reman_antes)%nl;%tab;reman_despues=reman_antes-sigma_jk%nl;%nl; %sp; %sp; %sp; %sp;Los valores de sigma_jk en df_matriz se llevan a los objetos network.supply node como%nl; %sp; %sp; %sp; capac_instal_disponible%nl; %sp; %sp; %sp; capac_instal_sigma%nl; %sp; %sp; %sp; capac_sigma_dispon%nl;%nl; %sp; %sp;Actualizo suma_asignacion+=sigma_jk%nl; %sp; %sp;Agrego df_matriz a df_matriz_todos%nl; %sp; %sp; %sp; %sp; %nl;%nl; %sp; %sp; %sp; %sp;%nl;%tab;%nl;%nl;%nl;%nl; %sp; %sp; %sp; %sp; %sp; %nl;%nl;%nl; %sp;%nl;</notes>
+            <strokeColor>#404040</strokeColor>
+            <textColor>#000000</textColor>
+            <font>SansSerif-plain-14</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/ef959cc6c0a8016600dd45aa77d0d424</URIString>
+            <richText>&lt;html&gt;
+  &lt;head&gt;
+    &lt;style type="text/css"&gt;
+      &lt;!--
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+      --&gt;
+    &lt;/style&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      suma_asignacion=0
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Construyo df_matriz_todos vac&amp;#237;a
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      _x = suma de los s_jk (Puestos disponibles para k en la red)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Para c/arco sup sup X (ijkjk)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Calculo &amp;quot;distance_origin_target_covered&amp;quot; si distancia est&amp;#225; cubierta
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Comparo _x vs service_capacity(k) Servidores disponibles para asignar
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Imprimo si _x != service_capacity(k)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Mientras que suma_asignacion &amp;lt; service_capacity(k)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      df_matriz=construir_matriz(_k) Matriz que tendr&amp;#225; para cada jk el nodo i 
+      m&amp;#225;s lejano
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Para cada nodo jk de oferta
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Si j.servicio=k
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      selected=0
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      max_dist=0
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Hallo los nodos i y j que est&amp;#225;n m&amp;#225;s separados
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      para cada arco ijkj'k'
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      si j'k' == jk
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      si distance_origin_covered &amp;gt; max dist
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      max_dist = distance_origin_covered
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      selected = i
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      si selected !=0
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      agrego nueva fila a df_matriz con el par encontrado
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Ordeno df_matriz por distancia m&amp;#225;xima
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Si df_matriz == vac&amp;#237;o
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      break
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      De lo contrario
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Para fila 0 declaro reman_antes=service_capacity
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Asigno sigma a cada jk
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Para cada fila _i en df_matriz
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Si reman_antes &amp;lt;= 0, sigma_jk = 0
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Si suma_asignacion=0 y _i=0
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      reman_antes=service_capacity
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      sigma_jk = min (demanda,s_jk,reman_antes)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      reman_despues=reman_antes-sigma_jk
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      else:
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      reman_antes=reman_despues(del anterior)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      sigma_jk = min (demanda,s_jk,reman_antes)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      reman_despues=reman_antes-sigma_jk
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Los valores de sigma_jk en df_matriz se llevan a los objetos 
+      network.supply node como
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      capac_instal_disponible
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      capac_instal_sigma
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      capac_sigma_dispon
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Actualizo suma_asignacion+=sigma_jk
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Agrego df_matriz a df_matriz_todos
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</richText>
+            <label>suma_asignacion=0 Construyo df_matriz_todos vac&#xed;a _x = suma de los s_jk (Puestos disponibles para k en la red) Para c/arco sup sup X (ijkjk) Calculo "distance_origin_target_covered" si distancia est&#xe1; cubierta Comparo _x vs service_capacity(k) Servidores disponibles para asignar Imprimo si _x != service_capacity(k) Mientras que suma_asignacion &lt; service_capacity(k) df_matriz=construir_matriz(_k) Matriz que tendr&#xe1; para cada jk el 
+      nodo i m&#xe1;s lejano Para cada nodo jk de oferta Si j.servicio=k selected=0 max_dist=0 Hallo los nodos i y j que est&#xe1;n m&#xe1;s separados para cada arco ijkj'k' si j'k' == jk si distance_origin_covered &gt; max dist max_dist = distance_origin_covered selected = i si selected !=0 agrego nueva fila a df_matriz con el par encontrado Ordeno df_matriz por distancia m&#xe1;xima Si df_matriz == vac&#xed;o break De lo contrario Para fila 0 declaro reman_antes=service_capacity Asigno sigma a cada jk Para cada fila _i en df_matriz Si reman_antes &lt;= 0, sigma_jk = 0 Si  suma_asignacion=0 y _i=0 reman_antes=service_capacity sigma_jk = min (demanda,s_jk,reman_antes) reman_despues=reman_antes-sigma_jk else: reman_antes=reman_despues(del anterior) sigma_jk = min (demanda,s_jk,reman_antes) reman_despues=reman_antes-sigma_jk Los valores de sigma_jk en df_matriz se llevan a los objetos 
+      network.supply node como capac_instal_disponible capac_instal_sigma capac_sigma_dispon Actualizo suma_asignacion+=sigma_jk Agrego df_matriz a df_matriz_todos</label>
+        </child>
+        <shape xsi:type="chevron"/>
+    </child>
+    <child ID="1236" label="algoritmo" layerID="1"
+        created="1709124132099" x="80.88781" y="2890.8435"
+        width="275.3921" height="758.91455" strokeWidth="1.0"
+        autoSized="false" controlCount="2" arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/f932e283c0a8016600dd45aa519107b7</URIString>
+        <point1 x="81.38781" y="2894.9028"/>
+        <point2 x="355.7799" y="3649.258"/>
+        <ID1 xsi:type="node">1228</ID1>
+        <ID2 xsi:type="text">1235</ID2>
+        <ctrlPoint0 x="421.61847" y="2829.8254" xsi:type="point"/>
+        <ctrlPoint1 x="-28.592094" y="3650.0527" xsi:type="point"/>
+    </child>
+    <child ID="1243"
+        label="Resultados de salida_optimizacion. fi_jkjk es la suma de los flujos fi_ijkjk que hay entre cada par jkjk. prob_fi_jkjk es el cociente de suma_i(fi_ijkjk) (Flujo que va de jk a jk) / suma_i(lambda_ijk) (Flujo que sale de jk)"
+        layerID="1" created="1709812724979" x="-295.08032" y="2339.6143"
+        width="242.0" height="122.0" strokeWidth="0.0" autoSized="false" xsi:type="text">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#000000</textColor>
+        <font>SansSerif-plain-14</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2e84643ec0a801640130660a15cd1ae2</URIString>
+        <richText>&lt;html&gt;
+  &lt;head&gt;
+    &lt;style type="text/css"&gt;
+      &lt;!--
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+      --&gt;
+    &lt;/style&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      Resultados de salida_optimizacion.
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      fi_jkjk es la suma de los flujos fi_ijkjk que hay entre cada par jkjk.
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      prob_fi_jkjk es el cociente de
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      suma_i(fi_ijkjk) (Flujo que va de jk a jk)
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      /
+    &lt;/p&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      suma_i(lambda_ijk) (Flujo que sale de jk)
+    &lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</richText>
+        <label>Resultados de salida_optimizacion. fi_jkjk es la suma de los flujos fi_ijkjk que hay entre cada par jkjk. prob_fi_jkjk es el cociente de suma_i(fi_ijkjk) (Flujo que va de jk a jk) / suma_i(lambda_ijk) (Flujo que sale de jk)</label>
+    </child>
+    <child ID="1244" label="contiene" layerID="1"
+        created="1709820948315" x="-53.580322" y="2433.6284"
+        width="337.68848" height="94.25537" strokeWidth="1.0"
+        autoSized="false" controlCount="0" arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2e84643ec0a801640130660a8996f7b8</URIString>
+        <point1 x="283.60815" y="2527.3838"/>
+        <point2 x="-53.080322" y="2434.1284"/>
+        <ID1 xsi:type="node">1014</ID1>
+        <ID2 xsi:type="text">1243</ID2>
+    </child>
+    <child ID="1245" layerID="1" created="1709899977650" x="1334.1893"
+        y="460.8104" width="162.05359" height="32.66342"
+        strokeWidth="1.0" autoSized="false" controlCount="2"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2e84643ec0a801640130660a15b35ee9</URIString>
+        <point1 x="1495.7429" y="461.3104"/>
+        <point2 x="1334.6893" y="490.2529"/>
+        <ID1 xsi:type="node">48</ID1>
+        <ID2 xsi:type="node">55</ID2>
+        <ctrlPoint0 x="1341.4268" y="459.78802" xsi:type="point"/>
+        <ctrlPoint1 x="1385.6616" y="504.2788" xsi:type="point"/>
+    </child>
+    <child ID="1246" label="set_lambda_jk" layerID="1"
+        created="1710278483971" x="1204.0446" y="2931.8445" width="93.0"
+        height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/348bc282c0a8016401d24da58e8acd95</URIString>
+        <shape xsi:type="rectangle"/>
+    </child>
+    <child ID="1249" label="set_lambda_jk" layerID="1"
+        created="1710278535305" x="1332.0446" y="2931.1775" width="93.0"
+        height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/348bc282c0a8016401d24da5a15f59e9</URIString>
+        <shape xsi:type="rectangle"/>
     </child>
     <child ID="157" label="Objeto" layerID="115" created="1704816653036"
         x="63.407166" y="582.67773" width="101.0" height="29.6"
@@ -5789,10 +6337,10 @@
   &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-bottom: 0px; color: #000000; margin-top: 0px; margin-right: 0px; font-family: Arial; font-size: 12; margin-left: 0px }
-        ol { vertical-align: middle; list-style-position: outside; margin-top: 6; margin-left: 30; font-size: 12; font-family: Arial }
-        p { margin-bottom: 0; color: #000000; margin-top: 0; margin-right: 0; margin-left: 0 }
-        ul { vertical-align: middle; list-style-position: outside; margin-top: 6; font-family: Arial; font-size: 12; margin-left: 30 }
+        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
+        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
+        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
       --&gt;
     &lt;/style&gt;
     
@@ -8668,6 +9216,16 @@
         <URIString>http://vue.tufts.edu/rdf/resource/f13b791cc0a801640028f87565bb146a</URIString>
         <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
     </child>
+    <child ID="1242" label="New Node" layerID="115"
+        created="1709576872093" x="911.45996" y="2180.8027" width="69.0"
+        height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/18be6aadc0a801640130660ad370bb73</URIString>
+        <shape xsi:type="rectangle"/>
+    </child>
     <layer ID="1" label="Menus" created="1704812190930" x="0.0" y="0.0"
         width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/eebaac69c0a80164006507776fa2a06d</URIString>
@@ -8677,8 +9235,8 @@
         strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/eef1ee10c0a801640065077774438027</URIString>
     </layer>
-    <userZoom>1.2352247327734367</userZoom>
-    <userOrigin x="-246.59496" y="-72.004944"/>
+    <userZoom>1.5</userZoom>
+    <userOrigin x="-458.62048" y="-85.295944"/>
     <presentationBackground>#202020</presentationBackground>
     <PathwayList currentPathway="0" revealerIndex="-1">
         <pathway ID="0" label="Camino sin t&#xed;tulo"

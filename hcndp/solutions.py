@@ -72,7 +72,7 @@ def menu_solutions(network_original, problems_dict):
             # Se ha escogido optimización Aproximada
             if current_solution.optimizar==True and current_solution.tecnica=="Aproximación":
                 current_solution.approximate_solution(network_original)
-                
+            print ("Los resultados de la optimización se guardaron en salida_optimizacion.xlsx.")    
             input("Pulsa una tecla para continuar.")
 
         elif opcion == "4":
@@ -121,7 +121,7 @@ def menu_solutions(network_original, problems_dict):
                     current_solution.network_copy.create_df_probs_kk()
                     current_solution.network_copy.create_df_arcos(_post_optima=True)
                     
-                    kpi.calculate_kpi(current_solution,_post_optima=False)
+                    kpi.calculate_kpi(current_solution,_post_optima=True)
                     print (f"Se calcularon los KPI para la solución {solucion_elegida}.")
                     print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
                     figures.show_menu_figures(current_solution)
@@ -210,16 +210,21 @@ class Problem:
                 if self.network_copy.optimizar==True:
                     self.objective = objective_and_description[0]
                     self.description_objective = objective_and_description[1]
-                    self.name_problem = objective_and_description[1]
+                    self.name_problem = objective_and_description[1]+" "+self.tecnica
     
                     # Actualizo nombre del problema en problems_dict (Ya no es "temporal")
                     clave_temporal = 'temporal'
                     solucion_temporal = problems_dict[clave_temporal]
-                    problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
+                    #problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
+                    #    clave_temporal)
+                    #problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
+                    #    problems_dict[solucion_temporal.description_objective].name_problem
+                    problems_dict[solucion_temporal.name_problem] = problems_dict.pop(
                         clave_temporal)
-                    problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
-                        problems_dict[solucion_temporal.description_objective].name_problem
-                    print (f"Se ha actualizado el objeto {problems_dict[solucion_temporal.description_objective].name_problem}")
+                    problems_dict[solucion_temporal.name_problem].network_copy.name_problem = \
+                        problems_dict[solucion_temporal.name_problem].name_problem
+                    
+                    print (f"Se ha actualizado el objeto {problems_dict[solucion_temporal.name_problem].name_problem}")
                     break 
                 
                 elif self.network_copy.optimizar==False:
@@ -238,15 +243,22 @@ class Problem:
                 if self.network_copy.optimizar==True and self.tecnica=="Aproximación":
                     self.objective = objective_and_description[0]
                     self.description_objective = objective_and_description[1]
-                    self.name_problem = objective_and_description[1]
+                    self.name_problem = objective_and_description[1]+" "+self.tecnica
+                    
                     # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
                     clave_temporal = 'temporal'
                     solucion_temporal = problems_dict[clave_temporal]
-                    problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
+                    # problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
+                    #     clave_temporal)
+                    # problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
+                    #     problems_dict[solucion_temporal.description_objective].name_problem
+                    
+                    problems_dict[solucion_temporal.name_problem] = problems_dict.pop(
                         clave_temporal)
-                    problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
-                        problems_dict[solucion_temporal.description_objective].name_problem
-                
+                    problems_dict[solucion_temporal.name_problem].network_copy.name_problem = \
+                        problems_dict[solucion_temporal.name_problem].name_problem
+                    print (f"Se ha actualizado el objeto {problems_dict[solucion_temporal.name_problem].name_problem}")
+    
                     break 
                 
                 elif self.network_copy.optimizar==False:
@@ -267,17 +279,28 @@ class Problem:
         network = self.network_copy
         model = self.pyo_model
         instance = self.pyo_model.instance
+        print ("Instancia del modelo de optimización")
+        instance.pprint()
+        # Construir el modelo
+        #modelo_construido = modelo.create_instance()
+        
+        # Fijar el valor de la variable para una combinación específica de subíndices
+        #valor_fijo = 20
+        #instance.sigma.fix(valor_fijo)
+
 
         # Solución por Gurobi
         import pyomo.environ as pyo
         import os
 
-        opt = pyo.SolverFactory('gurobi', tee=True)
+        opt = pyo.SolverFactory('gurobi')
+        
         opt.options['NonConvex'] = 2
         opt.options['MIPFocus'] = 3
         #opt.options['Heuristics'] = 0
         #opt.options['Presolve']  =2
         opt.options['TimeLimit'] = 500
+        
 
         global out
         out = 0
@@ -371,61 +394,91 @@ class Problem:
         import openpyxl
 
         network = self.network_copy
-        instance = self.pyo_model.instance
 
         # Obtengo los valores de las variables según el modelo de optimización
         # Estas líneas se hacen si el método es exacto.
-        tao_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
-                           for i in instance.I for j in instance.J for k in instance.K])
-        h_ik = np.array([[i, k, pyo.value(instance.h[i, k])]
-                        for i in instance.I for k in instance.K])
-        l_ijk = np.array([[i, j, k, pyo.value(instance.l_ijk[i, j, k])]
-                         for i in instance.I for j in instance.J for k in instance.K])
-        c_jk = np.array([[j, k, pyo.value(instance.c[j, k])]
-                        for j in instance.J for k in instance.K])
-        s_jk = np.array([[j, k, pyo.value(instance.s[j, k])]
-                        for j in instance.J for k in instance.K])
+        if self.tecnica=='Exacta':
+            instance = self.pyo_model.instance
 
-        fi_ijkjk = np.array([[i, j, k, jp, kp, pyo.value(instance.fi[i, j, k, jp, kp])]
-                            for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
-        df_l_ijk = pd.DataFrame(
-            l_ijk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'lambda_ijk'])
-        fi_jkjk = pd.DataFrame(fi_ijkjk, columns=[
-                               'nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp', 'fi_jkjk'])
-        fi_jkjk = fi_jkjk.merge(
-            df_l_ijk, on=['nombre_I', 'nombre_J', 'servicio_K'], how='left')
-        fi_jkjk['fi_jkjk'] = pd.to_numeric(fi_jkjk['fi_jkjk'])
-        fi_jkjk['lambda_ijk'] = pd.to_numeric(fi_jkjk['lambda_ijk'])
-        fi_jkjk = fi_jkjk.groupby(
-            ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
-
-        prob_fi_jkjk = fi_jkjk.groupby(
-            ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
-        prob_fi_jkjk['fi_jkjk'] = prob_fi_jkjk['fi_jkjk'] / \
-            prob_fi_jkjk['lambda_ijk']
-        prob_fi_jkjk.fillna(0, inplace=True)
-        prob_fi_jkjk.reset_index(inplace=True)
-
-        #fi_jkjk = pd.DataFrame(fi_ijkjk,columns=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_jkjk'])
-        # fi_jkjk['fi_jkjk']=pd.to_numeric(fi_jkjk['fi_jkjk'])
-        # fi_jkjk=fi_jkjk.groupby(['nombre_J','servicio_K','nombre_Jp','servicio_Kp']).sum().reset_index()
-        #fi_jkjk['fi_jkjk']=fi_jkjk.groupby(['nombre_J','servicio_K']).apply(lambda x: x['fi_jkjk']/x['fi_jkjk'].sum()).reset_index()['fi_jkjk']
-        # fi_jkjk=fi_jkjk.fillna(0)
-        prob_fi_jkjk = prob_fi_jkjk.to_numpy()
-        prob_fi_jkjk = prob_fi_jkjk[:, :-1]
-
-        alpha_ik = np.array([[i, k, pyo.value(instance.alpha_ik[i, k])]
+            tao_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
+                               for i in instance.I for j in instance.J for k in instance.K])
+            h_ik = np.array([[i, k, pyo.value(instance.h[i, k])]
                             for i in instance.I for k in instance.K])
-        rho_jk = np.array([[j, k, pyo.value(instance.rho_jk[j, k])]
-                          for j in instance.J for k in instance.K])
-        f_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
-                         for i in instance.I for j in instance.J for k in instance.K])
-        l_jk = np.array([[j, k, sum(pyo.value(instance.l_ijk[i, j, k])
-                        for i in instance.I)] for j in instance.J for k in instance.K])
-        sigma_jk = np.array([[j, k, pyo.value(instance.sigma[j, k])]
+            l_ijk = np.array([[i, j, k, pyo.value(instance.l_ijk[i, j, k])]
+                             for i in instance.I for j in instance.J for k in instance.K])
+            c_jk = np.array([[j, k, pyo.value(instance.c[j, k])]
                             for j in instance.J for k in instance.K])
-        theta_jk = np.array([[j, k, pyo.value(instance.theta[j, k])]
+            s_jk = np.array([[j, k, pyo.value(instance.s[j, k])]
                             for j in instance.J for k in instance.K])
+    
+            fi_ijkjk = np.array([[i, j, k, jp, kp, pyo.value(instance.fi[i, j, k, jp, kp])]
+                                for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
+            df_l_ijk = pd.DataFrame(
+                l_ijk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'lambda_ijk'])
+            fi_jkjk = pd.DataFrame(fi_ijkjk, columns=[
+                                   'nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp', 'fi_jkjk'])
+            fi_jkjk = fi_jkjk.merge(
+                df_l_ijk, on=['nombre_I', 'nombre_J', 'servicio_K'], how='left')
+            fi_jkjk['fi_jkjk'] = pd.to_numeric(fi_jkjk['fi_jkjk'])
+            fi_jkjk['lambda_ijk'] = pd.to_numeric(fi_jkjk['lambda_ijk'])
+            fi_jkjk = fi_jkjk.groupby(
+                ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
+    
+            prob_fi_jkjk = fi_jkjk.groupby(
+                ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
+            prob_fi_jkjk['fi_jkjk'] = prob_fi_jkjk['fi_jkjk'] / \
+                prob_fi_jkjk['lambda_ijk']
+            prob_fi_jkjk.fillna(0, inplace=True)
+            prob_fi_jkjk.reset_index(inplace=True)
+    
+            #fi_jkjk = pd.DataFrame(fi_ijkjk,columns=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_jkjk'])
+            # fi_jkjk['fi_jkjk']=pd.to_numeric(fi_jkjk['fi_jkjk'])
+            # fi_jkjk=fi_jkjk.groupby(['nombre_J','servicio_K','nombre_Jp','servicio_Kp']).sum().reset_index()
+            #fi_jkjk['fi_jkjk']=fi_jkjk.groupby(['nombre_J','servicio_K']).apply(lambda x: x['fi_jkjk']/x['fi_jkjk'].sum()).reset_index()['fi_jkjk']
+            # fi_jkjk=fi_jkjk.fillna(0)
+            prob_fi_jkjk = prob_fi_jkjk.to_numpy()
+            prob_fi_jkjk = prob_fi_jkjk[:, :-1]
+    
+            alpha_ik = np.array([[i, k, pyo.value(instance.alpha_ik[i, k])]
+                                for i in instance.I for k in instance.K])
+            rho_jk = np.array([[j, k, pyo.value(instance.rho_jk[j, k])]
+                              for j in instance.J for k in instance.K])
+            f_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
+                             for i in instance.I for j in instance.J for k in instance.K])
+            l_jk = np.array([[j, k, sum(pyo.value(instance.l_ijk[i, j, k])
+                            for i in instance.I)] for j in instance.J for k in instance.K])
+            sigma_jk = np.array([[j, k, pyo.value(instance.sigma[j, k])]
+                                for j in instance.J for k in instance.K])
+            theta_jk = np.array([[j, k, pyo.value(instance.theta[j, k])]
+                                for j in instance.J for k in instance.K])
+        
+        # Obtengo los datos si la solución fue por aproximación
+        if self.tecnica=='Aproximación':
+            l_ijk=self.df_asignacion.reset_index()
+            l_ijk.columns = ['0', '1', '2','3']
+            
+            l_jk = l_ijk.set_index(['1','2']).groupby(level=['1', '2']).sum()
+            l_jk=l_jk.drop(columns=['0']).reset_index()
+            #l_jk = self.df_l_jk.reset_index()
+            l_jk.columns = ['0', '1', '2']
+            
+            
+            f_ijk=self.df_f_ijk
+            f_ijk.columns = ['nombre_I','nombre_J','servicio_K','tao_ijk']
+            
+            prob_fi_jkjk=self.df_prob_fi_jkjk.reset_index()
+            prob_fi_jkjk = prob_fi_jkjk[['nombre_J','servicio_K','nombre_Jp','servicio_Kp','π_jkjk']]
+            prob_fi_jkjk.columns = ['nombre_J','servicio_K','nombre_Jp','servicio_Kp','Probs']
+            prob_fi_jkjk = prob_fi_jkjk[prob_fi_jkjk['servicio_K'] != 'k00']
+            
+            sigma_jk=self.df_sigma
+            sigma_jk.columns = ['0','1','2']
+            
+            fi_ijkjk=self.df_fi_ijkjk
+            fi_ijkjk = fi_ijkjk[['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','ϕ']]
+            fi_ijkjk.columns = ['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_ijkjk']
+            fi_ijkjk=fi_ijkjk[fi_ijkjk['servicio_K'] != 'k00']
+            
         # Escritura de archivo en Excel
         #output = os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
         if self.name_problem != "pareto_front":
@@ -451,37 +504,55 @@ class Problem:
             workbook.close()
             path = output
         
-        with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-            writer.workbook = openpyxl.load_workbook(path)
-            pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
-            pd.DataFrame(l_ijk).to_excel(writer, sheet_name='l_ijk')
-            pd.DataFrame(f_ijk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'tao_ijk']).to_excel(
-                writer, sheet_name='f_ijk')  # Corresponde a los tao_ijk
-
-            pd.DataFrame(prob_fi_jkjk, columns=['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp', 'Probs']).to_excel(
-                writer, sheet_name='prob_fi_jkjk')
-
-            pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
-            pd.DataFrame(fi_ijkjk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
-                         'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
-
+        if self.tecnica=='Exacta':
+            with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                writer.workbook = openpyxl.load_workbook(path)
+                pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
+                pd.DataFrame(l_ijk).to_excel(writer, sheet_name='l_ijk')
+                pd.DataFrame(f_ijk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'tao_ijk']).to_excel(
+                    writer, sheet_name='f_ijk')  # Corresponde a los tao_ijk
+    
+                pd.DataFrame(prob_fi_jkjk, columns=['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp', 'Probs']).to_excel(
+                    writer, sheet_name='prob_fi_jkjk')
+    
+                pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
+                pd.DataFrame(fi_ijkjk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
+                             'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
+        
+       
+        if self.tecnica=="Aproximación":
+            with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                writer.workbook = openpyxl.load_workbook(path)
+                l_jk.to_excel(writer, sheet_name='l_jk')
+                l_ijk.to_excel(writer, sheet_name='l_ijk')
+                f_ijk.to_excel(
+                    writer, sheet_name='f_ijk')  # Corresponde a los tao_ijk
+    
+                prob_fi_jkjk.to_excel(
+                    writer, sheet_name='prob_fi_jkjk')
+    
+                sigma_jk.to_excel(writer, sheet_name='sigma')
+                fi_ijkjk.to_excel(writer, sheet_name='fi_ijkjk')
+        
         print(f"Se exportó exitosamente el archivo de Excel en {path}.\n")
-        print(f"Explora el objeto {self.name_problem} para mayor detalle de la solución.\n")
-        self.detailed_solution={'tao_ijk':tao_ijk,
-                                'h_ik':h_ik,
-                                'l_ijk':l_ijk,
-                                'c_jk':c_jk,
-                                's_jk':s_jk,
-                                'fi_ijkjk':fi_ijkjk,
-                                'df_l_ijk':df_l_ijk,
-                                'fi_jkjk':fi_jkjk,
-                                'prob_fi_jkjk':prob_fi_jkjk,
-                                'alpha_ik':alpha_ik,
-                                'rho_jk':rho_jk,
-                                'f_ijk':f_ijk,
-                                'l_jk':l_jk,
-                                'sigma_jk':sigma_jk,
-                                'theta_jk':theta_jk
+        
+        if self.tecnica=='Exacta':
+            print(f"Explora el objeto {self.name_problem} para mayor detalle de la solución.\n")
+            self.detailed_solution={'tao_ijk':tao_ijk,
+                                    'h_ik':h_ik,
+                                    'l_ijk':l_ijk,
+                                    'c_jk':c_jk,
+                                    's_jk':s_jk,
+                                    'fi_ijkjk':fi_ijkjk,
+                                    'df_l_ijk':df_l_ijk,
+                                    'fi_jkjk':fi_jkjk,
+                                    'prob_fi_jkjk':prob_fi_jkjk,
+                                    'alpha_ik':alpha_ik,
+                                    'rho_jk':rho_jk,
+                                    'f_ijk':f_ijk,
+                                    'l_jk':l_jk,
+                                    'sigma_jk':sigma_jk,
+                                    'theta_jk':theta_jk
                                 }
     def set_solution_txt(self):
 
@@ -541,6 +612,7 @@ class Problem:
         import pandas as pd
         import numpy as np
         from hcndp import network
+        import copy
         network_repr=network.Network_representation(network_original.I,
                                                     network_original.J,
                                                     network_original.K,
@@ -559,36 +631,74 @@ class Problem:
                  #   if _j.capac_instal_sigma != 0:
                         #print (_i,_j.capac_instal_sigma)
     
-        
+    
+        # Construyo el df_sigma con los resultados de la asignacion
+        # Crear listas vacías para almacenar los datos
+        places = []
+        services = []
+        capac_instal_sigma = []
+
+        # Iterar a través del diccionario nodes_supply y extraer los datos
+        for node in network_repr.nodes_supply.values():
+            places.append(node.place)
+            services.append(node.service)
+            capac_instal_sigma.append(node.capac_instal_sigma)
+
+        # Crear el DataFrame
+        network_repr.df_sigma = pd.DataFrame({
+            'place': places,
+            'service': services,
+            'capac_instal_sigma': capac_instal_sigma
+             })            
+        network_repr.df_sigma = network_repr.df_sigma.dropna(subset=['capac_instal_sigma'])
+        self.df_sigma=network_repr.df_sigma
         # Para k=0 creo valores de λ_ijk0 
         # El valor de λ_ijk0 es igual a la demanda que hay en cada nodo ik0.
         for _,_j in network_repr.nodes_supply.items():
             for _p,_i in _j.matriz_λ.iterrows():
                 if _i['nombre_I'].replace('i','j')==_i['nombre_J'] and _i['servicio_K']=='k00':
                     _j.matriz_λ.loc[_p, 'λ_ijk'] = network_repr.nodes_demand[_i['nombre_I']].demand
-    
-        # Construyo primera solución
+        # Construyo primera solución 
+        # Ordeno el diccionario de ser_ser_R
         path_repr.edges_ser_ser_R=dict(sorted(path_repr.edges_ser_ser_R.items()))
         
         for _i in path_repr.edges_ser_ser_R.values():
             k=_i.source
             kp=_i.target
         
-            if k < kp:
-                network_repr.asignacion_flujos_δ(network_repr,path_repr,k)
+            #if k < kp:
+                # Obtengo los delta ijkk
+            network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
             
-                # Solución entre k y kp*
-                network_repr.solucion_entre_k_kp(network=network_repr,_k=k,
+                # Solución entre k y kp* obtengo los phi ijkjk
+            network_repr.solucion_entre_k_kp(network=network_repr,_k=k,
                                                  _kp=kp,
                                                  archivo=network_original.file)
-                network_repr.obtencion_π(network_repr,k,kp)
-                network_repr.construyo_λ(network_repr,kp)
+                
+                # Obtengo las aproximaciones de lambda
+            network_repr.construyo_λ(network_repr,kp)
+            
+            
+            #if k == kp:
+                # Obtengo los delta ijkk
+            #    network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
+            
+            
+        # Porcentajes de flujo. Obtengo los pi jk jk
+        network_repr.obtencion_π(network_repr)
+            
         
-            elif k == kp:
-                network_repr.asignacion_π_ciclos(network_repr,k,kp)
         
-            elif k > kp:
-                network_repr.asignacion_π_ciclos(network_repr,kp,k)
+        # for _i in path_repr.edges_ser_ser_R.values():
+        #     k=_i.source
+        #     kp=_i.target
+        #     network_repr.construyo_λ(network_repr,kp)
+        
+            #elif k == kp:
+            #    network_repr.asignacion_π_ciclos(network_repr,k,kp)
+        
+            #elif k > kp:
+            #    network_repr.asignacion_π_ciclos(network_repr,kp,k)
             
         
         
@@ -606,6 +716,7 @@ class Problem:
         _g=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
         _g['tao_ijk'] = 0.0
         _g=_g.sort_values(by=['nombre_I', 'nombre_J','servicio_K'])
+        self.df_f_ijk=_g
         
         def arribos_externos(poblacion_origen,servicio_origen,nodo_destino):
             suma_acumulativa=0
@@ -648,40 +759,125 @@ class Problem:
         _df_asignacion["lambda_ijk"] = 0.0
         _df_asignacion=_df_asignacion.sort_values(by=['nombre_I','nombre_J', 'servicio_K'])
         _df_asignacion.set_index(['nombre_I', 'nombre_J','servicio_K'],inplace=True)
-        #Para cada i cálculo el lambda ijk
+        
+        
+        
+        #Para cada i calculo el lambda ijk usando Jackson
         _fila=0
         for i in _lista_i:
             probs=_π.loc[(_π['nombre_I']==_lista_i[_fila])]
             probs=probs.sort_values(by=['nombre_J', 'servicio_K','nombre_Jp','servicio_Kp'])
-            #probs=np.array(probs['π_ijkjk'])
-            probs=np.array(probs['p*π'])
+            probs=np.array(probs['π_ijkjk'])
+            #probs=np.array(probs['p*π'])
             probs=np.reshape(probs,([network_original.J*(network_original.K),network_original.J*(network_original.K)]))
             _df_asignacion.loc[i,'lambda_ijk']=np.matmul(_g[_fila],np.linalg.inv(np.identity(len(probs))-(probs)))
             _fila+=1
-        
+        # Actualizo los valoes de lambda en las matrices en cada nodo oferta
         for _,_j in network_repr.nodes_supply.items():
             if _j.service!='k00':
                 _j.matriz_λ=_df_asignacion.loc[(slice(None),_j.place,_j.service),:]
                 _j.matriz_λ.reset_index(inplace=True)
                 _j.matriz_λ = _j.matriz_λ.rename(columns={'lambda_ijk': 'λ_ijk'})
         
+        # Actualizo los delta con base en los nuevos lambda
+        for _i in path_repr.edges_ser_ser_R.values():
+            k=_i.source
+            kp=_i.target
+        
+            # Obtengo los delta ijkk
+            network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
+            
+        # Actualizo los phi con base en los nuevos lambda
+        network_repr.solucion_flujos_phi_post_Jackson(network_repr)
+                
+               
         # Actualizo el df_asignacion en network
+        
+        self.df_asignacion=_df_asignacion
         network_repr.df_asignacion=_df_asignacion
+        self.df_l_jk = network_repr.df_asignacion.groupby(level=['nombre_J', 'servicio_K']).sum()
         
         # Llevar solución a un df_solucion
         _lista=[] 
         for _i,_j in network_repr.edges_sup_sup_X.items():
-            _lista.append([_j.node_demand_pop,_j.source,_j.target,_j.flow_sup_sup_perc,_j.flow_sup_sup_phi])
-        df_solucion = pd.DataFrame(_lista, columns=['nombre_I', 'origen', 'destino','π','ϕ'])
+            _lista.append([_j.node_demand_pop,
+                           _j.source,_j.target,
+                           _j.flow_sup_sup_perc_ijkjk,
+                           _j.flow_sup_sup_phi,
+                           _j.flow_sup_sup_perc_jkjk])
+        df_solucion = pd.DataFrame(_lista, columns=['nombre_I', 'origen', 'destino','π_ijkjk','ϕ','π_jkjk'])
         
         self.solution=df_solucion
+        
+        # Preparo los df_prob_fi_jkjk y df_fi_ijkjk
+        df_solucion['nombre_J'] = df_solucion['origen'].str[:3]
+        df_solucion['servicio_K'] = df_solucion['origen'].str[3:]
+        df_solucion['nombre_Jp'] = df_solucion['destino'].str[:3]
+        df_solucion['servicio_Kp'] = df_solucion['destino'].str[3:]
+
+        # Eliminar la columna 'origen'
+        df_solucion.drop(columns=['origen','destino'], inplace=True)
+        
+        #Como df_solucion no tiene todas las combinaciones de ijkj'k', tengo que completar la matriz
+        _lista_I=indices("i",network_repr.I)
+        _lista_J=indices("j",network_repr.J)
+        _lista_K=indices("k",network_repr.K)
+        _lista_completa = np.array([[i, j, k, jp, kp, 0,0,0]
+                            for i in _lista_I for j in _lista_J for k in _lista_K for jp in _lista_J for kp in _lista_K])
+        _lista_completa = pd.DataFrame(_lista_completa, 
+                                       columns=['nombre_I', 
+                                                'nombre_J', 
+                                                'servicio_K',
+                                                'nombre_Jp',
+                                                'servicio_Kp',
+                                                'π_ijkjk','ϕ','π_jkjk'])
+        _lista_completa['π_jkjk'] = _lista_completa['π_jkjk'].astype(float)
+        _lista_completa['ϕ'] = _lista_completa['ϕ'].astype(float)
+        _lista_completa['π_ijkjk'] = _lista_completa['π_ijkjk'].astype(float)
+        
+        #_lista_completa.update(df_solucion)
+        df_solucion= pd.merge(_lista_completa, df_solucion, on=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp'],how='left')
+        df_solucion['π_ijkjk'] = df_solucion['π_ijkjk_x'] + df_solucion['π_ijkjk_y']
+        df_solucion.drop(['π_ijkjk_x', 'π_ijkjk_y'], axis=1, inplace=True)
+        df_solucion['π_jkjk'] = df_solucion['π_jkjk_x'] + df_solucion['π_jkjk_y']
+        df_solucion.drop(['π_jkjk_x', 'π_jkjk_y'], axis=1, inplace=True)
+        df_solucion['ϕ'] = df_solucion['ϕ_x'] + df_solucion['ϕ_y']
+        df_solucion.drop(['ϕ_x', 'ϕ_y'], axis=1, inplace=True)
+        df_solucion.fillna(0, inplace=True)
+        
+        #df_solucion=_lista_completa
+        #df_solucion['π_jkjk'] = df_solucion['π_jkjk'].astype(float)
+        #df_solucion['ϕ'] = df_solucion['ϕ'].astype(float)
+        #df_solucion['π_ijkjk'] = df_solucion['π_ijkjk'].astype(float)
+        
+        df_prob_fi_ijkjk = copy.deepcopy(df_solucion)
+        df_prob_fi_ijkjk.drop(columns=['ϕ','π_jkjk'],inplace=True)
+        
+        df_fi_ijkjk = copy.deepcopy(df_solucion)
+        df_fi_ijkjk.drop(columns=['π_ijkjk','π_jkjk'],inplace=True)
+        
+        df_prob_fi_jkjk = copy.deepcopy(df_solucion)
+        df_prob_fi_jkjk.drop(columns=['ϕ','π_ijkjk'],inplace=True)
+        df_prob_fi_jkjk = df_prob_fi_jkjk.groupby(
+            ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).mean(['π_jkjk'])
+        
+        self.df_prob_fi_ijkjk =df_prob_fi_ijkjk 
+        self.df_fi_ijkjk=df_fi_ijkjk
+        self.df_prob_fi_jkjk =df_prob_fi_jkjk 
+
+         # prob_fi_jkjk = fi_jkjk.groupby(
+         #     ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
+         # prob_fi_jkjk['fi_jkjk'] = prob_fi_jkjk['fi_jkjk'] / \
+         #     prob_fi_jkjk['lambda_ijk']
+         # prob_fi_jkjk.fillna(0, inplace=True)
+         # prob_fi_jkjk.reset_index(inplace=True)
+    
+        
         self.state="Solucionado_aproximación"
+        self.network_repr=network_repr
 
         # %% Exportar resultados 
-        # TODO Generar solución en el mismo formato que la solución exacta
-        #current_solution.network_copy.create_folders()
-        #current_solution.set_solution_excel()
-        #current_solution.set_solution_txt()
+        self.set_solution_excel()
         
     # %% Crear modelo abstracto
     def construct_model(self):

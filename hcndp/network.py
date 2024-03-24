@@ -160,10 +160,13 @@ class Network:
             df_w_ij=self.file['df_w_ij'].copy()
             
             # Actualizo df_asignacion
-            #df_asignacion=df_asignacion.reset_index(level=['servicio_K']).\
-            #            merge(df_w_ij.set_index(['nombre_I','nombre_J']),
-            #                  left_index=True,right_index=True).rename(columns={"w_ij": "Flujo_w_ij"})
-            df_asignacion=df_asignacion.set_index(['nombre_I','nombre_J']).merge(df_w_ij.set_index(['nombre_I','nombre_J']),
+            # Esta actualización es solamente de sigma y tao
+            # Queda pendiente la de lambda_ijk y prop tao
+            
+            
+            if 'nombre_I' not in df_asignacion.index.names or 'nombre_J' not in df_asignacion.index.names:
+                # Reconstruir el índice utilizando las columnas 'I' y 'J'
+                df_asignacion=df_asignacion.set_index(['nombre_I','nombre_J']).merge(df_w_ij.set_index(['nombre_I','nombre_J']),
                                                                                  left_index=True,
                                                                                  right_index=True).rename(columns={"w_ij": "Flujo_w_ij"})
             df_asignacion=df_asignacion.reset_index()
@@ -328,17 +331,18 @@ class Network:
       
         
     def get_objective_function(self):
-        # Solicito al usuario la función objetivo que desea utilizar
-        _menu_options = {
-        '1': 'Minimizar congestión máxima (rho)',
-        '2': 'Maximizar accesibilidad mínima (alpha)',
-        '3': 'Maximizar continuidad mínimia (delta)',
-        '4': 'Maximizar accesibilidad total (alpha)',
-        '5': 'Minimizar usuarios en espera total (Lq_total)',
-        '6': 'Maximizar continuidad total (delta total)',       
-        '7': 'Salir al menú anterior'
-        }   
         while True:
+            # Solicito al usuario la función objetivo que desea utilizar
+            _menu_options = {
+            '1': 'Minimizar congestión máxima (rho)',
+            '2': 'Maximizar accesibilidad mínima (alpha)',
+            '3': 'Maximizar continuidad mínimia (delta)',
+            '4': 'Maximizar accesibilidad total (alpha)',
+            '5': 'Minimizar usuarios en espera total (Lq_total)',
+            '6': 'Maximizar continuidad total (delta total)',       
+            '7': 'Salir al menú anterior'
+            }   
+        
             print("\n----------------------------------------------------------")
             print("Selección de la función objetivo")
             print("get_objective_function@network.py")
@@ -346,16 +350,20 @@ class Network:
             print("Definir función objetivo:")
             for i,j in _menu_options.items():
                 print (f"{i}. {j}")            
-            objective = int (input("Selecciona una opción: \n"))
-            if 1 <= objective <= 6:
-                self.objective=objective
-                self.optimizar=True
-                return [objective,_menu_options[str(objective)]]
+            objective = input("Selecciona una opción: \n")
+            if objective == '\n':
+                print("Opción no válida. Inténtalo de nuevo.")
+            
+            elif objective.isdigit():
+                if 1 <= int(objective) <= 6:
+                    self.objective=objective
+                    self.optimizar=True
+                    return [objective,_menu_options[str(objective)]]
                 
-            elif objective == 7:
-                self.optimizar=False
-                break
-          
+                elif objective == 7:
+                    self.optimizar=False
+                    break
+              
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
         
@@ -826,8 +834,8 @@ class Network_representation(Network):
         while suma_asignacion < path.nodes_services[_k].service_capacity:
             df_matriz=construir_matriz(_k)
             
-            # Construyo df_matriz
-            for _,_j in self.nodes_supply.items():
+            # Construyo df_matriz con los arcos ij de la mayor distancia entre cada j y todos los i
+            for _,_j in self.nodes_supply.items(): #Para cada nodo de oferta jk
                 if _j.service==_k:
                     selected, max_dist = 0 , 0
                     
@@ -864,7 +872,7 @@ class Network_representation(Network):
                 if df_matriz['reman_antes'].iloc[_i] <=0:
                     df_matriz['sigma_jk'].iloc[_i]=0
                     
-                if _i==0 and suma_asignacion==0:
+                if _i==0 and suma_asignacion==0: 
                     df_matriz['reman_antes'].iloc[_i] = path.nodes_services[_k].service_capacity
                     df_matriz['sigma_jk'].iloc[_i]=min(df_matriz['demanda_I'].iloc[_i],df_matriz['s_jk'].iloc[_i],df_matriz['reman_antes'].iloc[_i])
                     df_matriz['reman_despues'].iloc[_i]=df_matriz['reman_antes'].iloc[_i]-df_matriz['sigma_jk'].iloc[_i]
@@ -889,30 +897,48 @@ class Network_representation(Network):
     
     
     # Función que calcula los δ_ijkk
-    def asignacion_flujos_δ(self,network,path,_k):
-        print ("Inicio asignación flujos δ para ",_k) 
+    def asignacion_flujos_δ(self,network,path,_k,_kp):
+        print ("Inicio asignación flujos delta para ",_k," y ",_kp) 
         for _,_j in network.nodes_supply.items():
             if _j.service==_k:
                 for _p,_i in _j.matriz_δ.iterrows():
                     j=_j.place
                     k=_j.service
                     i=_i['nombre_I']
-                    kp=_i['servicio_Kp']
+                    kp=_kp
+                    #kp=_i['servicio_Kp']
                     
                     if k+kp in path.edges_ser_ser_R:
                         _r=path.edges_ser_ser_R[k+kp].transfer_percentage
                     else:
                         _r=0
-            
+                    # Obtengo δ_ijkkp multiplicando _r * el lambda que sale de ijk
                     δ_ijkkp=float(_j.matriz_λ.where((_j.matriz_λ['nombre_I']==i) & (_j.matriz_λ['nombre_J']==j) 
                                       & (_j.matriz_λ['servicio_K']==k))['λ_ijk'].dropna().values[0] * _r)
-                    _j.matriz_δ.loc[_p, 'δ_ijkkp'] = float(δ_ijkkp)
+                    if _j.matriz_δ.loc[_p,'nombre_I']==i and \
+                        _j.matriz_δ.loc[_p,'nombre_J']==j and \
+                        _j.matriz_δ.loc[_p,'servicio_K']==k and \
+                        _j.matriz_δ.loc[_p,'servicio_Kp']==kp:        
+                            _j.matriz_δ.loc[_p, 'δ_ijkkp'] = float(δ_ijkkp)
                 
-                #print ("Matriz de deltas actualizada para servicio origen ",_k)
-                #print (_j.matriz_δ[_j.matriz_δ['δ_ijkkp'] > 0])
-        #print ("Finalizo asignación flujos δ para ",_k) 
+                print ("Matriz de deltas actualizada para servicio origen ",_k)
+                #print (_j.matriz_δ [_j.matriz_δ ['δ_ijkkp'] > 0])
+        print ("Finalizo asignación flujos delta para ",_k) 
     
     
+    #Función para el cálculo de fi_ijkjk cuando ya se cuenta con lambdas calculados por Jackson
+    
+    def solucion_flujos_phi_post_Jackson(self,network_repr):
+       for _,_arco in network_repr.edges_sup_sup_X.items():
+           source=_arco.source
+           #target=_arco.target
+           _π=_arco.flow_sup_sup_perc
+           _population=_arco.node_demand_pop
+           _lambda=network_repr.nodes_supply[source].matriz_λ
+           _lambda=_lambda.loc[_lambda['nombre_I'] == _population, 'λ_ijk'].values[0]
+           
+           _arco.flow_sup_sup_phi=_lambda*_π
+
     
     # Función para solucionar el problema de transporte entre k y kp
     def solucion_entre_k_kp(self,network,_k,_kp,archivo):
@@ -922,40 +948,50 @@ class Network_representation(Network):
         network_x = nx.DiGraph()
         df_dist_ij = archivo['df_dist_ij']
         
-        #Creo nodos oferta
+        #Creo nodos oferta. La oferta son los sigma disponibles * tasa de servicio (rate)
         for _i,_j in network.nodes_supply.items():
             if _j.service==_kp:
-                network_x.add_node(_j.node_id,tipo="oferta",demand=_j.capac_sigma_dispon*100)
+                network_x.add_node(_j.node_id,tipo="oferta",demand=_j.capac_instal_sigma*_j.rate*100)
         
-        # Creo nodos demanda
+        # Creo nodos demanda. La demanda es el valor de delta_ijkkp
         for _i,_j in network.nodes_supply.items():
             if _j.service==_k:
                 for _,_l in _j.matriz_δ.iterrows():
-                    if _l.δ_ijkkp != 0:
+                    if _l.δ_ijkkp != 0 and _l.servicio_Kp == _kp:
                         network_x.add_node(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],
-                                           tipo="demanda",source=_j.node_id,demand=round(-_l['δ_ijkkp'])*100)
+                                           tipo="demanda",source=_j.node_id,demand=round(-_l['δ_ijkkp']*100))
                         for _m in _j.neighbors: # Creo arcos
                             if _m[-3:]==_kp:
                                 _distancia=df_dist_ij.loc[(df_dist_ij['nombre_I'] == _l["nombre_I"]) & (df_dist_ij['nombre_J'] == _m[:3]), 'dist_IJ'].values[0]
                                 #print (f"Distancia entre {_l['nombre_I']} y {_m[:3]}: {_distancia}")
                                 network_x.add_edge(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],_m,weight=_distancia)
         
+        # Nodos tipo demanda             Nodos tipo oferta 
+        # Suma_Origen                    Suma_Destino
+        #i1j1k1j2k2      ----->          i1j2k2
+        # Tienen demanda negativa        Tienen demanda positiva
+        
         #Balanceo nodos de demanda y oferta
-        _suma_demanda, _suma_oferta=0,0
+        _suma_destino, _suma_origen=0,0
         for _i in network_x.nodes(data=True):
             if _i[1]['tipo']=="oferta":
-                _suma_oferta += _i[1]["demand"]
+                _suma_destino += _i[1]["demand"] #Suma de nodos destino o tipo oferta
             else:
-                _suma_demanda += _i[1]["demand"]
-        
-        if _suma_oferta - _suma_demanda >0: #Creo nodo demanda ficticio y enlaces hacia el último jk con costo cero
-            network_x.add_node("ficticio",tipo="demanda",demand=-(_suma_oferta + _suma_demanda) )
+                _suma_origen += _i[1]["demand"] #Suma de nodos origen o tipo demanda
+        # ficticio hace las veces de nodo artificial para el balanceo de demanda
+        if abs(_suma_destino) > abs(_suma_origen) : #Creo nodo tipo demanda ficticio y enlaces hacia el último jk con costo cero
+            network_x.add_node("ficticio",tipo="demanda",demand=-(abs(_suma_destino) - abs(_suma_origen)) )
             for _i in network_x.nodes(data=True):
                 if _i[1]["tipo"]=="oferta":
                     network_x.add_edge("ficticio",_i[0],weight=0)
-        elif _suma_oferta - _suma_demanda <0: #Creo nodo oferta ficticio y enlace hacia 
-            network_x.add_node("ficticio",tipo="oferta",demand=-(_suma_oferta + _suma_demanda) )
-    
+        elif abs(_suma_destino) < abs(_suma_origen): #Creo nodo tipo oferta  ficticio de oferta y enlace desde el último jk con costo cero 
+            network_x.add_node("ficticio",tipo="oferta",demand=(abs(_suma_origen)-abs(_suma_destino)))
+            for _i in network_x.nodes(data=True):
+                if _i[1]["tipo"]=="demanda":
+                    network_x.add_edge(_i[0],"ficticio",weight=0)
+        # network_x tiene una red con el nodo ficticio, los nodos ijkk y los nodos jk.
+        # Los nodos ijkk son predecesores de los nodos jk porque allí se definen los flujos fi ijkjk
+        
         # Redondear los pesos
         #for source, target, data in network_x.edges(data=True):
         #    if 'weight' in data:
@@ -970,7 +1006,7 @@ class Network_representation(Network):
             # Itera sobre cada valor en el subdiccionario
             for _i, _j in subdiccionario.items():
                 # Divide el valor por 100
-                subdiccionario[_i] = _j / 100
+                subdiccionario[_i] = float(_j / 100)
         
         # Actualizo las capacidades instaladas disponibles en cada nodo de oferta
         for _node_from, _flows in flowDict.items():
@@ -1007,7 +1043,7 @@ class Network_representation(Network):
         #plt.show()
     
         
-        # Almaceno los ϕ_{ijkjk} en los nodo supply
+        # Almaceno los ϕ_{ijkjk} en los arcos sup_sup_X
         for _node_from, _flows in flowDict.items():
             for _node_to, _flow in _flows.items():
                 if _flow > 0 and _node_from != "ficticio":
@@ -1019,7 +1055,8 @@ class Network_representation(Network):
     
     
     # Función de obtención de porcentajes π
-    def obtencion_π(self,network,k,kp):
+    #Esta función se podría borrar si no se utiliza más adelante
+    def obtencion_π_2(self,network,k,kp):
         print ("Inicio obtención de π para ",k," y ",kp)
         _lista=[]
         for _i,_j in network.edges_sup_sup_X.items():
@@ -1042,18 +1079,56 @@ class Network_representation(Network):
                     #print (_i['porcentaje'])
                     #print (_j[:3],_enlace,_i['porcentaje'],_k.flow_sup_sup_perc)
         
-        #print ("Finalizo obtención de π para ",k," y ",kp)
+        print ("Finalizo obtención de π para ",k," y ",kp)
     
-    
+    #Esta propuesta de obtencion_π no se hace para cada k y kp
+    # Se aplica a todas las combinaciones posibles de jkjpkp
+    def obtencion_π(self,network):
+        print ("Primero calculo pi para cada i j k jp kp")
+        for _i,_j in network.edges_sup_sup_X.items():
+
+            _suma_phi = sum(objeto.flow_sup_sup_phi for objeto in network.edges_sup_sup_X.values() \
+                            if objeto.source == _j.source and \
+                               objeto.node_demand_pop == _j.node_demand_pop)
+             
+            if _j.flow_sup_sup_phi == 0 and _suma_phi == 0:
+                _j.flow_sup_sup_perc_ijkjk=0
+            else: 
+                _j.flow_sup_sup_perc_ijkjk=_j.flow_sup_sup_phi/_suma_phi
+                
+        
+        print ("Ahora calculo pi para cada j k jp kp") # Se calcula para cada jkjpkp y se almacena en los ijkjpkp
+        for _i,_j in network.edges_sup_sup_X.items():
+            
+            #pi_jkjpkp = suma_i (phi ijkjpkp) / suma_ijpkp (phi ijkjpkp)
+            #pi_jkjpkp = suma_phi_jkjpkp / suma_phi_jk
+            _suma_phi_jkjpkp = sum(objeto.flow_sup_sup_phi for objeto in network.edges_sup_sup_X.values() \
+                            if objeto.source == _j.source and \
+                                objeto.target == _j.target)
+            
+            _suma_phi_jk= sum(objeto.flow_sup_sup_phi for objeto in network.edges_sup_sup_X.values() \
+                            if objeto.source == _j.source)
+                
+            if _suma_phi_jkjpkp == 0 and _suma_phi_jk == 0:
+                _j.flow_sup_sup_perc_jkjk=0
+            else: 
+                _j.flow_sup_sup_perc_jkjk=_suma_phi_jkjpkp/_suma_phi_jk
+             
+            _j.flow_sup_sup_perc=_j.flow_sup_sup_perc_jkjk
+        return 
+        
+        
     # Función de asignación de porcentajes π para flujos cíclicos
     def asignacion_π_ciclos(self,network,k,kp):
         for _i,_j in network.edges_sup_sup_X.items():
             if _j.service_source==k and _j.service_target==kp:
                 if _i[1:3]==_i[4:6] == _i[10:12]:
                     _j.flow_sup_sup_perc=1.0
-
+    # π es el porcentaje de usuarios que habiendo recibido servicio en jk y
+    # teniendo que dirigirse a k'... son ruteados a j'
                 
-    # Función de construcción de $λ_{ijk}$
+    # Función de construcción de $λ_{ijk}$ a partir de la suma de los phi_ijkjk
+    # Es una primera aproximación de los λ_{ijk}. Los verdaderos se calculan en solutions.py línea 738
     def construyo_λ(self,network,kp):
         for _j in network.nodes_supply.values():
             if _j.service==kp:

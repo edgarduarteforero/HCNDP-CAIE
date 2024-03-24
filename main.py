@@ -87,14 +87,14 @@ while True:
     print("2. Problemas multi-objetivo")
     print("10. Salir")
 
-    _opcion = input("Selecciona una opción: \n")
+    _opcion = input("Selecciona una opción: ")
 
      #%%  Menú problemas y soluciones mono_objetivo
     if _opcion =="1":
          from hcndp import solutions
          # Indicamos origen de datos y definimos valores I,J,K
          solutions.menu_solutions(network_original=networks_dict[_name],
-                                  problems_dict=problems_dict,
+                                  problems_dict=problems_dict
                                   )    
 
     #%% Menú problemas y soluciones multi-objetivo

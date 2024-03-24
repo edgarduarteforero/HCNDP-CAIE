@@ -54,7 +54,7 @@ def p_0(sum_y,s,c): #Probabilidad de estado 0
     s=int(s)
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
-    p=((1-rho)*math.factorial(s)) and ((r)**s)/((1-rho)*math.factorial(s)) or 0
+    p=((r)**s)/((1-rho)*math.factorial(s))
     suma = sum([((r)**j)/(math.factorial(j)) for j in range (int(s))])
     p=1/(p+suma)
     return p
@@ -119,7 +119,7 @@ def p_wqt(sum_y,s,c,t):
 def L_q(r,rho,s,c,p_o):
     import math
     s=int(s)
-    Lq=(math.factorial(s)*(1-rho)**2) and ((r**s)*rho/(math.factorial(s)*(1-rho)**2))*p_o or 0
+    Lq=((r**s)*rho/(math.factorial(s)*(1-rho)**2))*p_o
     return Lq
 
 def W_q(L_q,lambdas,rho):
@@ -142,7 +142,9 @@ def set_lambda_jk (current_solution, network,_post_optima):
     import os 
     import pandas as pd
 
+
     path=os.getcwd()+'/output/'+current_solution.name_problem+'/salida_optimizacion.xlsx'
+        
     
     # Matriz de arribos externos g
     df_asignacion=network.file['df_asignacion']
@@ -211,7 +213,6 @@ def set_lambda_jk (current_solution, network,_post_optima):
         
 def set_lambda_ijk (solution, network,_post_optima):
     import numpy as np
-    import pandas as pd
     from hcndp.data_functions import reshape_matrix
 
     # Calculo los lambdas para cada ijk
@@ -224,9 +225,7 @@ def set_lambda_ijk (solution, network,_post_optima):
                                                             'servicio_K']):
         # Si no están presentes, establecer las columnas I, J y K como índice
         df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
-
-    new_index_order = ['nombre_I', 'nombre_J', 'servicio_K']
-    df_asignacion = df_asignacion.reset_index().set_index(new_index_order)    
+    
     df_asignacion = df_asignacion.sort_index(level=[0, 1, 2])
     g=np.array(df_asignacion['tao_ijk']) # Lista de arribos externos ijk
     g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
@@ -241,19 +240,20 @@ def set_lambda_ijk (solution, network,_post_optima):
     probs=df_arcos['p_jjkk']
     probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
     
-    #Para cada red i calculo un conjunto de lambda ijk
+    #Para cada i calculo el lambda ijk
     _i=0
     
     if _post_optima==False:
         network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
         network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
+        
         network.file['df_asignacion'].sort_index(inplace=True)
         for i in network.file['df_asignacion'].index.levels[0]: 
             #df_asignacion.loc[i,'lambda_ijk']=1
             network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1    
         print ("\n Se actualizaron exitosamente los lambda_ijk")
-    if _post_optima==True and solution.tecnica== "Aproximación":
+    if _post_optima==True:
         network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
         network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
         network.file['df_asignacion'].sort_index(inplace=True)
@@ -262,23 +262,7 @@ def set_lambda_ijk (solution, network,_post_optima):
             network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1
         print ("\n Se actualizaron exitosamente los lambda_ijk")
-    if _post_optima==True and solution.tecnica=="Exacta":
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        network.file['df_asignacion'].sort_index(inplace=True)
-        for i in network.file['df_asignacion'].index.levels[0]: 
-            #df_asignacion.loc[i,'lambda_ijk']=1
-            network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
-            _i+=1
-        print ("\n Se actualizaron exitosamente los lambda_ijk")
-    # Actualizo prop_tao_ijk
-    if 'demanda_i' not in network.file['df_asignacion'].columns:
-        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index().set_index(['nombre_I']),
-                                           network.file['df_demanda'][['nombre_I','demanda_i']].set_index(['nombre_I']),
-                                           left_index=True,right_index=True)
-    network.file['df_asignacion']['prop_tao_ijk']=network.file['df_asignacion']['tao_ijk']/network.file['df_asignacion']['demanda_i']
-    network.file['df_asignacion']=network.file['df_asignacion'].reset_index().set_index(['nombre_I','nombre_J','servicio_K'])
-    
+
 def set_phi_ijkjk (solution,network):
     #Calculo flujos fi_ijkjk cuando estoy usando escenario 1. Estos fi vienen de lambda según la fórmula de abajo:
     # l_ijk*p_jjkk*x_jj
@@ -288,7 +272,7 @@ def set_phi_ijkjk (solution,network):
     #Multiplico l_ijk*p_jjkk|*x_jj
     
     import pandas as pd
-    network.file['df_flujos_ijkjk']=pd.merge(network.file['df_asignacion'][['lambda_ijk']],
+    network.file['df_flujos_ijkjk']=pd.merge(network.file['df_asignacion'][['lambda_ijk']], 
                                network.file['df_probs_kk'][['servicio_K','servicio_Kp','p_kkp']].set_index(['servicio_K','servicio_Kp']),
                                left_index=True, right_index=True)
     
@@ -313,10 +297,9 @@ def set_prop_tao (solution,network):
     if solution.state=="Solucionado_aproximación" or solution.state=="Optimizado":
         #network.file['df_asignacion'] = pd.merge(network.file['df_asignacion'], df_demanda[['nombre_I', 'servicio_K', 'pi_k']], on=['nombre_I', 'servicio_K'], how='left')
         network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index(),df_demanda)
-        #network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].set_index(['nombre_I','servicio_K']), 
-        #                                       df_demanda.set_index(['nombre_I', 'servicio_K'])['pi_k'], 
-        #                                       left_index=True, right_index=True, how='left')
+        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].set_index(['nombre_I','servicio_K']), 
+                                               df_demanda.set_index(['nombre_I', 'servicio_K'])['pi_k'], 
+                                               left_index=True, right_index=True, how='left')
     else:
         df_demanda=network.file['df_demanda'].drop(['servicio_K'],axis=1)
         network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index(),df_demanda)
