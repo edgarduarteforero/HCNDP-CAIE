@@ -253,7 +253,7 @@ def set_lambda_ijk (solution, network,_post_optima):
             network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1    
         print ("\n Se actualizaron exitosamente los lambda_ijk")
-    if _post_optima==True and solution.tecnica== "Aproximación":
+    if _post_optima==True and solution.tecnica!= "Exacta":
         network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
         network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
         network.file['df_asignacion'].sort_index(inplace=True)

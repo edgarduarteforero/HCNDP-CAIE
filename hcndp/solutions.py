@@ -67,12 +67,19 @@ def menu_solutions(network_original, problems_dict):
             
             # Se ha escogido optimización exacta
             if current_solution.optimizar==True and current_solution.tecnica=='Exacta':
-                current_solution.exact_solution()
-                
+                current_solution.exact_solution()    
+           
             # Se ha escogido optimización Aproximada
             if current_solution.optimizar==True and current_solution.tecnica=="Aproximación":
                 current_solution.approximate_solution(network_original)
             print ("Los resultados de la optimización se guardaron en salida_optimizacion.xlsx.")    
+            
+            # Se ha escogido Solución Inicial
+            if current_solution.optimizar==True and current_solution.tecnica=="Local_Search":
+                from hcndp import initial_solution
+                current_solution=initial_solution.initial_solution(current_solution,network_original)
+            print ("Los resultados de la optimización se guardaron en salida_optimizacion.xlsx.")    
+            
             input("Pulsa una tecla para continuar.")
 
         elif opcion == "4":
@@ -194,8 +201,12 @@ class Problem:
             print("menu_mono_optimization@solutions.py")
             print("----------------------------------------------------------\n")
             print("1. Solución exacta (Optimización)")
-            print("2. Solución aproximada (Algoritmos de búsqueda)")
-            print("3. Regresar al menú anterior")
+            print("2. Solución inicial (Aproximación)")
+            print("3. Solución por búsqueda local (Local Search)")
+            print("4. Solución por búsqueda local iterada (Iterated Local Search)")
+            print("5. Solución por búsqueda con vecindario variable (VNS)")
+            
+            print("10. Regresar al menú anterior")
 
             opcion1 = input("Selecciona una opción: \n")
             if opcion1 == "1":
@@ -234,45 +245,57 @@ class Problem:
                 
             elif opcion1 == "2":
                 print("Has seleccionado la Opción 2.")
-                print ("Búsqueda por algoritmos de aproximación.")
+                print ("Búsqueda de solución inicial.")
                 self.optimizar=True
                 self.tecnica="Aproximación"
                 # Presento menú de funciones objetivo disponibles
                 objective_and_description = new_network.get_objective_function()
                 
-                if self.network_copy.optimizar==True and self.tecnica=="Aproximación":
-                    self.objective = objective_and_description[0]
-                    self.description_objective = objective_and_description[1]
-                    self.name_problem = objective_and_description[1]+" "+self.tecnica
-                    
-                    # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
-                    clave_temporal = 'temporal'
-                    solucion_temporal = problems_dict[clave_temporal]
-                    # problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
-                    #     clave_temporal)
-                    # problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
-                    #     problems_dict[solucion_temporal.description_objective].name_problem
-                    
-                    problems_dict[solucion_temporal.name_problem] = problems_dict.pop(
-                        clave_temporal)
-                    problems_dict[solucion_temporal.name_problem].network_copy.name_problem = \
-                        problems_dict[solucion_temporal.name_problem].name_problem
-                    print (f"Se ha actualizado el objeto {problems_dict[solucion_temporal.name_problem].name_problem}")
-    
-                    break 
-                
-                elif self.network_copy.optimizar==False:
-                    self.optimizar=False
-                    break
-                objective_and_description = new_network.get_objective_function()
-                
+            
             elif opcion1 == "3":
                 print("Has seleccionado la Opción 3.")
+                print ("Búsqueda local.")
+                self.optimizar=True
+                self.tecnica="Local_Search"
+                # Presento menú de funciones objetivo disponibles
+                objective_and_description = new_network.get_objective_function()
+                
+            
+            elif opcion1 == "10":
+                print("Has seleccionado la Opción 10.")
                 self.optimizar=False
                 break
 
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
+
+            if self.network_copy.optimizar==True and self.tecnica !="Exacta":
+                 self.objective = objective_and_description[0]
+                 self.description_objective = objective_and_description[1]
+                 self.name_problem = objective_and_description[1]+" "+self.tecnica
+                 
+                 # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
+                 clave_temporal = 'temporal'
+                 solucion_temporal = problems_dict[clave_temporal]
+                 # problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
+                 #     clave_temporal)
+                 # problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
+                 #     problems_dict[solucion_temporal.description_objective].name_problem
+                 
+                 problems_dict[solucion_temporal.name_problem] = problems_dict.pop(
+                     clave_temporal)
+                 problems_dict[solucion_temporal.name_problem].network_copy.name_problem = \
+                     problems_dict[solucion_temporal.name_problem].name_problem
+                 print (f"Se ha actualizado el objeto {problems_dict[solucion_temporal.name_problem].name_problem}")
+            
+                 break 
+             
+            elif self.network_copy.optimizar==False:
+                 self.optimizar=False
+                 break
+             
+            objective_and_description = new_network.get_objective_function()
+
 
     def solve_gurobi(self):
         
@@ -453,7 +476,8 @@ class Problem:
                                 for j in instance.J for k in instance.K])
         
         # Obtengo los datos si la solución fue por aproximación
-        if self.tecnica=='Aproximación':
+        if self.tecnica != 'Exacta':
+        #if self.tecnica=='Aproximación' or self.tecnica=="Local_Search":
             l_ijk=self.df_asignacion.reset_index()
             l_ijk.columns = ['0', '1', '2','3']
             
@@ -520,7 +544,7 @@ class Problem:
                              'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
         
        
-        if self.tecnica=="Aproximación":
+        if self.tecnica != "Exacta":
             with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
                 writer.workbook = openpyxl.load_workbook(path)
                 l_jk.to_excel(writer, sheet_name='l_jk')
@@ -536,7 +560,7 @@ class Problem:
         
         print(f"Se exportó exitosamente el archivo de Excel en {path}.\n")
         
-        if self.tecnica=='Exacta':
+        if self.tecnica == 'Exacta':
             print(f"Explora el objeto {self.name_problem} para mayor detalle de la solución.\n")
             self.detailed_solution={'tao_ijk':tao_ijk,
                                     'h_ik':h_ik,

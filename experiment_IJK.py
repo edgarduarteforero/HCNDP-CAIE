@@ -17,7 +17,7 @@ En la variable inputs se almacena la secuencia de caracteres.
 # Definir las entradas simuladas
 inputs = "3\n5\nCualquier tecla"
 #                 I  J  K 
-inputs = "\ny\n1\n7\n7\n5\n3\n\n1\n2\n1\n1\n\n2\n2\n1\n\n4\n1\n5\n5\n10\n4\n2\n5\n5\n10\n9\n10\n"
+inputs = "\ny\n1\n3\n3\n3\n3\n\n1\n2\n1\n1\n\n2\n2\n1\n\n4\n1\n5\n5\n10\n4\n2\n5\n5\n10\n9\n10\n"
 
 # Ejecutar el script opciones.py y pasar las entradas simuladas como entrada estándar
 process = subprocess.Popen(["python", "main.py"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
