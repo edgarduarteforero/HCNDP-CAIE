@@ -13,8 +13,10 @@ def local_search(solution,network_original):
 
     # Inicio la solución inicial
     # Queda grabada en un objeto solution
-    initial_solution.initial_solution(solution,network_original)
-    solucion_actual=solution
+    
+    #solucion_actual=initial_solution.initial_solution(solution,network_original)
+    solucion_actual=solution.initial_solution(network_original)
+    solucion_actual.set_solution_excel()
     calcular_kpi_local_search(solucion_actual)
     
     # Inicializar el valor de la mejor solución encontrada
@@ -23,21 +25,201 @@ def local_search(solution,network_original):
     # Bucle principal
     # Mientras no se cumpla el criterio de parada
     contador = 0
-    while contador <=  2:
+    while contador <=  3:
         # Generar vecindario de la solución actual
-        vecina = generar_vecina(solucion_actual) 
+        _solucion=copy.deepcopy(mejor_solucion)
+        
+        neighbor = generate_neighbor(_solucion) 
+        neighbor.tecnica="Local_Search"
+        calcular_kpi_local_search(neighbor)
+        contador +=1
+        
+        if  mejor_solucion.network_copy.file['df_medidas']['rho_max'][0] > neighbor.network_copy.file['df_medidas']['rho_max'][0]:
+            # Tengo una mejor solución
+            print (f"Mi mejor solución actual: {mejor_solucion.network_copy.file['df_medidas']['rho_max'][0]}")
+            print (f"Mi nueva solución: {neighbor.network_copy.file['df_medidas']['rho_max'][0]}")
+            input ("Tengo una mejor solución")
+            mejor_solucion = copy.deepcopy(neighbor)
+        else:
+            print (f"Mi mejor solución actual: {mejor_solucion.network_copy.file['df_medidas']['rho_max'][0]}")
+            print (f"Mi nueva solución: {neighbor.network_copy.file['df_medidas']['rho_max'][0]}")
+            input ("No tengo una mejor solución")
+            
+    print (f"Mejor solución encontrada: {mejor_solucion.network_copy.file['df_medidas']['rho_max'][0] }")
+    return mejor_solucion
     
 
-def generar_vecina(solucion_actual):
+def generate_neighbor(_solucion):
     # Recuerda que la propiedad objective=1 significa que el objetivo es congestión
-    if solucion_actual.objective == 1:
-    # Busco el servicio k con la mayor congestión
-    
-            return 
+    if _solucion.objective == '1':
+        # Busco el servicio k con la mayor congestión dentro de network_repr
+        #_index=_solucion.network_copy.file['df_capac']['rho'].idxmax()
+        #ser_congested = _solucion.network_copy.file['df_capac'].loc[_index]['servicio_K']
         
-def calcular_kpi_local_search(solucion_actual):
+        _mayor_rho=0
+        for _i,_j in _solucion.network_repr.nodes_supply.items():
+            if _j.service != 'k00':
+                if _j.rho > _mayor_rho:
+                    _mayor_rho=_j.rho
+                    ser_congested=_j.service
+                    print (_i,_j.service,_j.rho)
+        
+        # Crear una lista para almacenar los nodos con el servicio k congestionado
+        nodes_congested = []
+
+        for _i, _j in _solucion.network_repr.nodes_supply.items():
+            if _j.service == ser_congested:
+                # Agregar los elementos a la lista
+                nodes_congested.append((_j))
+        
+        # Verifico si puedo hacer cambios en los sigma de nodes_congested
+        for _i in nodes_congested:
+            if _i.capac_instal_max > _i.capac_instal_sigma:
+                # Puedo hacer cambios en los sigma
+                print (f"Puedo hacer cambios en los sigma del nodo {_i}")
+                change_sigma=True
+                break
+            else:
+                print (f"No puedo hacer cambios en los sigma del nodo {_i}.")
+                change_sigma=False
+        
+        if change_sigma == True:
+            # Si puedo hacer cambios en los sigma, actualizo nodes_congested con aleatorios
+            # Vector con sigmas originales
+            vector_original = [nodo.capac_instal_sigma for nodo in nodes_congested]
+            vector_constraint = [nodo.capac_instal_max for nodo in nodes_congested]           
+            
+            # Nuevo vector con sigmas
+            #new_vector=generate_random_vector_with_constraints(vector_original, vector_constraint)            
+            new_vector=intercambio_elementos_no_cero(vector_original, vector_constraint)
+            
+            # import textwrap
+            # while True:
+            #     print("\n----------------------------------------------------------")
+            #     print("Escoge el mecanismo de generación de vecinos.")
+            #     print("----------------------------------------------------------\n")
+            #     print("Selecciona una opción:")
+            #     print("1. Perturbación aleatoria de todo el vector sigma")
+            #     print("2. Intercambio de elementos no cero en el vector sigma")
+            #     print("10. Salir")
+
+            #     _opcion = input("Selecciona una opción: ")
+
+            
+            #     if _opcion=="1":
+            #         new_vector=generate_random_vector_with_constraints(vector_original, vector_constraint)            
+            #         break
+            #     elif _opcion=="2":
+            #         new_vector=intercambio_elementos_no_cero(vector_original, vector_constraint)
+            #         break
+            #     elif _opcion == "10":
+            #         break
+            #     else:
+            #         print("Opción no válida. Inténtalo de nuevo.")
+                         
+            print (f"Original: {vector_original} y nuevo {new_vector}")
+            # Inserto los nuevos sigmas en nodes_congested
+            _j=0
+            for _i in nodes_congested:    
+                _i.capac_instal_sigma=new_vector[_j]
+                _j+=1
+                
+        
+        # Creo un modelo de optimización para ser resuelto con Pyomo y Gurobi
+        # En este modelo sigma es un parámetro y no una variable
+        _solucion.tecnica="Exacta"
+        # Actualizo los nuevos valores de sigma de network_repr en network_copy > file > df_capac
+        for _i,_j in _solucion.network_repr.nodes_supply.items():
+            a = _j.place
+            b = _j.service
+            c = _j.capac_instal_sigma
+        
+            fila = _solucion.network_copy.file['df_capac'].query('nombre_J == @a and servicio_K == @b')
+            
+            if not fila.empty:
+                # Si hay coincidencias, remplazar el sigma existente por c
+                _solucion.network_copy.file['df_capac'].loc[fila.index, 'sigma_jk'] = c
+            else:
+                print("No se encontraron coincidencias para 'a'={} y 'b'={} en el DataFrame.".format(a, b))
+            
+            
+        # Creo el modelo abstracto. 
+        # Los valores de df_capac['sigma_jk'] ahora están en data.dat 
+        # Ver network.py if "Local_Search" in self.name_problem:
+        _solucion.construct_model()
+        
+        # Convierto sigma_jk de variable a parámetro
+        # _solucion.pyo_model.model_abstract=_solucion.pyo_model.var_sigma_to_param(_solucion.pyo_model.model_abstract)
+        
+        _solucion.construct_instance()
+        
+        # Fijo los nuevos valores de sigma en la instancia
+        # Con esta estrategia no tengo que construir un nuevo modelo abstracto
+        
+        for _i,_j in _solucion.network_repr.nodes_supply.items():
+            _new_sigma=_j.capac_instal_sigma
+            if _j.service != 'k00':
+             _solucion.pyo_model.instance.sigma[_j.place,_j.service].fix(_new_sigma)
+        
+        _solucion.execute_solver()
+    
+    return _solucion
+        
+        
+
+def generate_random_vector_with_constraints(vector_original, vector_constraint):
+    import random
+    print ("Utilizo el mecanismo generate_random_vector_with_constraints")
+    # Obtener la suma de los valores del vector original
+    sum_original = sum(vector_original)
+    
+    # Crear un nuevo vector del mismo tamaño que el original
+    new_vector = []
+    
+    # Generar valores aleatorios para el nuevo vector manteniendo la suma igual y cumpliendo las restricciones
+    while True:
+        # Generar valores aleatorios para el nuevo vector
+        new_vector = [random.randint(0, vector_constraint[i]) for i in range(len(vector_original))]
+        
+        # Verificar si la suma del nuevo vector es igual a la suma del original
+        if sum(new_vector) == sum_original:
+            break
+    
+    return new_vector
+
+def intercambio_elementos_no_cero (vector_original, vector_constraint):
+    import random
+    print ("Utilizo el mecanismo intercambio_elementos_no_cero ")
+    
+    # Encontrar las posiciones de los elementos no cero
+    posiciones_no_cero = [i for i, valor in enumerate(vector_original) if valor != 0]
+
+    # Verificar si hay al menos dos elementos no cero para intercambiar
+    if len(posiciones_no_cero) < 2:
+        print("No hay suficientes elementos no cero para intercambiar.")
+        return vector_original
+
+    x=False
+    while x==False:
+
+        # Seleccionar aleatoriamente dos posiciones no cero para intercambiar
+        pos1, pos2 = random.sample(posiciones_no_cero, 2)
+        # Intercambiar los valores en las posiciones seleccionadas
+        vector_original[pos1], vector_original[pos2] = vector_original[pos2], vector_original[pos1]
+        
+        # Comparar vector_original con vector_constraint
+        hay_mayor = any(sigma_orig > sigma_constr for sigma_orig, 
+                        sigma_constr in zip(vector_original, vector_constraint))
+        if hay_mayor==True:
+            x=False #No se cumple la restricción
+        else:
+            x=True #Sí se cumple la restricción
+            
+    return vector_original
+
+def calcular_kpi_local_search(current_solution):
     from hcndp import kpi
-    current_solution=solucion_actual
+    current_solution
 
     # Creo carpetas para current solution
     current_solution.create_folders_problem()
@@ -49,7 +231,7 @@ def calcular_kpi_local_search(solucion_actual):
     current_solution.network_copy.create_df_arcos(_post_optima=True)
                      
     kpi.calculate_kpi(current_solution,_post_optima=True)
-    print (f"Se calcularon los KPI para la solución {solucion_actual.description_objective}.")
+    print (f"Se calcularon los KPI para la solución {current_solution.description_objective}.")
 
 
     '''

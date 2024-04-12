@@ -17,10 +17,8 @@ print (textwrap.dedent(''' \
         sobre diseño de redes en salud. 
        
        '''))
-print ("#" * 60)
-
-input ("\nPulsa cualquier tecla para continuar.")
-
+print ("#" * 60 )
+print ("\n\n\n")
 #%% Borrar carpetas antiguas
 def borrar_carpeta(prompt):
     while True:

@@ -356,3 +356,15 @@ class Model_pyomo:
         # %%  Modelo abstracto en model_abstract
         self.model_abstract=model
     
+    # %%  Cambio de la variable sigma por parámetro sigma 
+    def var_sigma_to_param (self,model_abstract):
+        import pyomo.environ as pyo
+        
+        # Eliminar la variable model.sigma del modelo
+        model_abstract.del_component(model_abstract.sigma)
+
+        # Crear un nuevo parámetro con los mismos índices y valores que model.sigma
+        model_abstract.sigma = pyo.Param(model_abstract.J, model_abstract.K, initialize=0)
+        #model_abstract.add_component(model_abstract.J, model_abstract.K)
+        
+        return model_abstract        

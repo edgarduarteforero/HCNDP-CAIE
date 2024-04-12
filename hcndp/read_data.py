@@ -72,21 +72,22 @@ def update_parameters():
     # Indica la cantidad de nodos de origen
     print (f"La cantidad de nodos origen por defecto es {I}")
     I= input("Ingresa la cantidad de nodos origen: ") or I
+    print ("\n")
     
     # Indica la cantidad de nodos de oferta
     print (f"La cantidad de nodos oferta por defecto es {J}")
     J= input("Ingresa la cantidad de nodos oferta: ") or J
-    
+    print ("\n")
     #Indica la cantidad de nodos de servicio
     print (f"La cantidad de servicios por defecto es {K}")
     K= input("Ingresa la cantidad de servicios: ") or K
-    
+    print ("\n")
     print (textwrap.dedent(f""" \
     \nParámetros actualizados:
     I={I}
     J={J}
     K={K}
-     archivo = datos_i16_j10_k10_base.xlsx
+    Archivo = datos_i16_j10_k10_base.xlsx
      """))
            
     return I,J,K,archivo           

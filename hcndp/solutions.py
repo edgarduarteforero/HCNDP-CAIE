@@ -33,23 +33,29 @@ def menu_solutions(network_original, problems_dict):
         if opcion == "1":
             print("Has seleccionado la Opción 1.")
             print(textwrap.dedent(""" \
+                  ----------------------------------------------------------
                   Vamos a ingresar tu propia solución.
+                  ----------------------------------------------------------
+                 
                   Se utilizarán las variables sigma_jk, tao_ijk, z_ijk
                   del archivo de datos de excel.
+                  
                   Los flujos entre nodos de servicio 
                   se calculan dividiendo el flujo saliente de cada nodo 
                   en partes iguales. Consulta la matriz df_arcos."""))
             create_problem_object(
                 network_original, problems_dict, name_problem="solución_subóptima")
-            
 
-            print("Se ha cargado tu solución propia.")
+            print("\nSe ha cargado tu solución propia.")
             input("Pulsa una tecla para continuar.")
 
         elif opcion == "2":
             print("Has seleccionado la Opción 2.")
             print(textwrap.dedent(""" \
+                  ----------------------------------------------------------
                   Vamos a obtener soluciones mono-objetivo.
+                  ----------------------------------------------------------                
+                  
                   A continuación ingresarás a un menú para escoger
                   la función objetivo y el solver respectivo.
                   """))
@@ -63,6 +69,7 @@ def menu_solutions(network_original, problems_dict):
             current_solution.optimizar=True
             current_solution.menu_mono_optimization(new_network=current_solution.network_copy,
                                                      problems_dict=problems_dict,)
+            
             # El usuario ha seleccionado optimizar y la técnica 
             
             # Se ha escogido optimización exacta
@@ -71,13 +78,15 @@ def menu_solutions(network_original, problems_dict):
            
             # Se ha escogido optimización Aproximada
             if current_solution.optimizar==True and current_solution.tecnica=="Aproximación":
-                current_solution.approximate_solution(network_original)
+                current_solution.initial_solution(network_original)
+                current_solution.set_solution_excel()
             print ("Los resultados de la optimización se guardaron en salida_optimizacion.xlsx.")    
             
-            # Se ha escogido Solución Inicial
+            # Se ha escogido Local Search
             if current_solution.optimizar==True and current_solution.tecnica=="Local_Search":
-                from hcndp import initial_solution
-                current_solution=initial_solution.initial_solution(current_solution,network_original)
+                from hcndp import local_search
+                current_solution= local_search.local_search(current_solution,network_original)
+                
             print ("Los resultados de la optimización se guardaron en salida_optimizacion.xlsx.")    
             
             input("Pulsa una tecla para continuar.")
@@ -86,7 +95,7 @@ def menu_solutions(network_original, problems_dict):
             print("\nHas seleccionado la Opción 4.")
             print("\n----------------------------------------------------------")
             print ("KPI de soluciones y gráficos.")
-            print("\n----------------------------------------------------------")
+            print("----------------------------------------------------------")
             print ("Estas son las soluciones construidas:\n")
             
             # Listar las soluciones existentes
@@ -155,10 +164,6 @@ def create_problem_object(network_original, problems_dict, name_problem):
     import textwrap
 
     # Creamos un objeto solution
-    # new_name_solution=input(textwrap.dedent(f""" \
-    # Ingresa el nombre de la solución.
-    # Si pulsas enter se asigna '{name_solution}': """))
-    # if not new_name_solution:  # Si la entrada está vacía
     new_name_problem = name_problem
     problems_dict[new_name_problem] = Problem(name_problem=new_name_problem,
                                                  objective="Nulo",
@@ -226,10 +231,6 @@ class Problem:
                     # Actualizo nombre del problema en problems_dict (Ya no es "temporal")
                     clave_temporal = 'temporal'
                     solucion_temporal = problems_dict[clave_temporal]
-                    #problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
-                    #    clave_temporal)
-                    #problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
-                    #    problems_dict[solucion_temporal.description_objective].name_problem
                     problems_dict[solucion_temporal.name_problem] = problems_dict.pop(
                         clave_temporal)
                     problems_dict[solucion_temporal.name_problem].network_copy.name_problem = \
@@ -277,10 +278,6 @@ class Problem:
                  # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
                  clave_temporal = 'temporal'
                  solucion_temporal = problems_dict[clave_temporal]
-                 # problems_dict[solucion_temporal.description_objective] = problems_dict.pop(
-                 #     clave_temporal)
-                 # problems_dict[solucion_temporal.description_objective].network_copy.name_problem = \
-                 #     problems_dict[solucion_temporal.description_objective].name_problem
                  
                  problems_dict[solucion_temporal.name_problem] = problems_dict.pop(
                      clave_temporal)
@@ -478,7 +475,7 @@ class Problem:
         # Obtengo los datos si la solución fue por aproximación
         if self.tecnica != 'Exacta':
         #if self.tecnica=='Aproximación' or self.tecnica=="Local_Search":
-            l_ijk=self.df_asignacion.reset_index()
+            l_ijk=self.df_asignacion
             l_ijk.columns = ['0', '1', '2','3']
             
             l_jk = l_ijk.set_index(['1','2']).groupby(level=['1', '2']).sum()
@@ -631,7 +628,7 @@ class Problem:
             self.construct_instance()
             self.execute_solver()
 
-    def approximate_solution(self,network_original):
+    def initial_solution(self,network_original):
         #Creo la representación de la red
         import pandas as pd
         import numpy as np
@@ -649,7 +646,7 @@ class Problem:
         # Asignación de recurso σ_k para cada nodo de oferta j 
         for _k in path_repr.nodes_services.keys():
             if _k !=  'k00':
-                #print ("Asignación de recursos para: ", _k)
+                print ("Asignación de recursos para: ", _k)
                 network_repr.asignacion_recursos(path_repr,_k)
                 #for _i,_j in network.nodes_supply.items():
                  #   if _j.capac_instal_sigma != 0:
@@ -702,30 +699,9 @@ class Problem:
                 # Obtengo las aproximaciones de lambda
             network_repr.construyo_λ(network_repr,kp)
             
-            
-            #if k == kp:
-                # Obtengo los delta ijkk
-            #    network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
-            
-            
         # Porcentajes de flujo. Obtengo los pi jk jk
         network_repr.obtencion_π(network_repr)
-            
-        
-        
-        # for _i in path_repr.edges_ser_ser_R.values():
-        #     k=_i.source
-        #     kp=_i.target
-        #     network_repr.construyo_λ(network_repr,kp)
-        
-            #elif k == kp:
-            #    network_repr.asignacion_π_ciclos(network_repr,k,kp)
-        
-            #elif k > kp:
-            #    network_repr.asignacion_π_ciclos(network_repr,kp,k)
-            
-        
-        
+                    
         # Construyo una matriz g con los arribos externos, es decir los ϕi.j.k0jk
         from hcndp.data_functions import indices
     
@@ -733,8 +709,6 @@ class Problem:
         _lista_j=indices("j",network_original.J)
         _lista_k=indices("k",network_original.K)
         
-        #_lista_k_00=_lista_k
-        #_lista_k_00.append('k00')
         from itertools import product
         _lista = list(product(_lista_i, _lista_j,_lista_k))
         _g=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
@@ -773,9 +747,7 @@ class Problem:
             
             for _nombre,_arco in path_repr.edges_ser_ser_R.items():
                 if  _nombre == _k+_kp:
-                    _π.loc[_,'p*π'] = _arco.transfer_percentage  * _π.loc[_,'π_ijkjk']
-       
-            
+                    _π.loc[_,'p*π'] = _arco.transfer_percentage  * _π.loc[_,'π_ijkjk']           
        
         # Calculo los flujos entrantes lambda ijk basado en redes de Jackson
         _lista = list(product(_lista_i, _lista_j,_lista_k))
@@ -817,9 +789,10 @@ class Problem:
                
         # Actualizo el df_asignacion en network
         
-        self.df_asignacion=_df_asignacion
+        self.df_asignacion=_df_asignacion.reset_index()
         network_repr.df_asignacion=_df_asignacion
         self.df_l_jk = network_repr.df_asignacion.groupby(level=['nombre_J', 'servicio_K']).sum()
+        self.df_l_jk.reset_index(inplace=True)
         
         # Llevar solución a un df_solucion
         _lista=[] 
@@ -869,11 +842,6 @@ class Problem:
         df_solucion.drop(['ϕ_x', 'ϕ_y'], axis=1, inplace=True)
         df_solucion.fillna(0, inplace=True)
         
-        #df_solucion=_lista_completa
-        #df_solucion['π_jkjk'] = df_solucion['π_jkjk'].astype(float)
-        #df_solucion['ϕ'] = df_solucion['ϕ'].astype(float)
-        #df_solucion['π_ijkjk'] = df_solucion['π_ijkjk'].astype(float)
-        
         df_prob_fi_ijkjk = copy.deepcopy(df_solucion)
         df_prob_fi_ijkjk.drop(columns=['ϕ','π_jkjk'],inplace=True)
         
@@ -888,20 +856,20 @@ class Problem:
         self.df_prob_fi_ijkjk =df_prob_fi_ijkjk 
         self.df_fi_ijkjk=df_fi_ijkjk
         self.df_prob_fi_jkjk =df_prob_fi_jkjk 
-
-         # prob_fi_jkjk = fi_jkjk.groupby(
-         #     ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
-         # prob_fi_jkjk['fi_jkjk'] = prob_fi_jkjk['fi_jkjk'] / \
-         #     prob_fi_jkjk['lambda_ijk']
-         # prob_fi_jkjk.fillna(0, inplace=True)
-         # prob_fi_jkjk.reset_index(inplace=True)
-    
         
-        self.state="Solucionado_aproximación"
-        self.network_repr=network_repr
+        # Calculo los rho para cada nodo jk y lo almaceno en nodes_supply
+        for _i,_j in network_repr.nodes_supply.items():
+            if _j.service != 'k00':
+                _j.rho = _j.matriz_λ['λ_ijk'].sum()/(_j.capac_instal_sigma*_j.rate)
 
+        self.state="Solucionado Solución Inicial"
+        self.network_repr=network_repr
+        
+
+
+        return self
         # %% Exportar resultados 
-        self.set_solution_excel()
+        #self.set_solution_excel()
         
     # %% Crear modelo abstracto
     def construct_model(self):

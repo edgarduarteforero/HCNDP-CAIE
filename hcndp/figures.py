@@ -280,6 +280,10 @@ def figure_prob_custom_queue(network):
     
     df_capac=network.file['df_capac'].reset_index()
     
+    #Asigno customers a 5. Comentar esta fila si quiero obtener medidas para otra
+    #cantidad de usuarios.
+    network.file['customers']=5
+    
     if 'customers' not in network.file:
         print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
         customers = int(input("Ingresa un valor para clientes: \n"))

@@ -18,18 +18,30 @@ def calculate_kpi(current_solution,_post_optima):
     set_prop_tao(current_solution,network)
     set_prob_k(current_solution,network)
     
+    #Asigno customers a 5. Comentar esta fila si quiero obtener medidas para otra
+    #cantidad de usuarios.
+    network.file['customers']=5
+    
     # Calculo las probabilidades de tener cantidades de clientes y tiempo en cola
     if 'customers' not in network.file:
         print("Uno de los KPI consiste en la probabilidad de tener x clientes o menos en cola.")
         customers = int(input("Ingresa un valor para clientes: \n"))
-    
+    else:
+        customers=network.file['customers']
+        
     set_prob_custom_queue(network,customers)
     network.file['customers']=customers
+    
+    #Asigno time a 5. Comentar esta fila si quiero obtener medidas para otra
+    #cantidad de tiempo.
+    network.file['time']=5
     
     if 'time' not in network.file:
         print("Uno de los KPI consiste en la probabilidad de esperar t o menos tiempo en cola.")
         time = int(input("Ingresa un valor para t: \n"))
-        
+    else:
+        time=network.file['time']
+            
     set_prob_wait_time (network,time)
     network.file['time']=time
     
@@ -146,25 +158,20 @@ def set_lambda_jk (current_solution, network,_post_optima):
     
     # Matriz de arribos externos g
     df_asignacion=network.file['df_asignacion']
-    # Verificar si las columnas I, J y K están presentes en el índice
-    if not all(col in df_asignacion.index.names for col in ['nombre_I', 
-                                                            'nombre_J', 
-                                                            'servicio_K']):
-        # Si no están presentes, establecer las columnas I, J y K como índice
-        df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
-        
+    df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)      
     df_asignacion = df_asignacion.sort_index(level=[0, 1, 2])
     g=np.array(df_asignacion['tao_ijk']) # Lista de arribos externos ijk
     g=reshape_matrix(g, network.I, network.J*network.K)
     g=np.sum(g,axis=0) #Lista de suma por cada jk. Son los gamma jk
     # Nótese que se hace la suma de los g en el eje 0 para obtener los g_jk a partir de la suma en i de los g_ijk
 
-    # SEGUNDO BLOQUE
+    # Si _post_optima= false significa que estoy trabajando con una solución 
+    # suministrada por el usuario
     # Cálculo de lambdas y rho para cada par j k
     if _post_optima==False:
         df_capac=network.file['df_capac']
         df_arcos=network.file['df_arcos']
-        df_arcos = df_arcos.set_index(['servicio_K','nombre_Jp','servicio_Kp'], append=True)
+        df_arcos.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'], inplace=True)
         df_arcos=df_arcos.sort_index(level=[0,1,2,3])
         probs=df_arcos['p_jjkk']
         probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
@@ -174,16 +181,22 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
         df_capac.replace([np.inf,-np.inf], 0, inplace=True)
         df_capac.fillna(0,inplace=True)
+        
+        #df_capac.reset_index(inplace=True)
+        df_arcos.reset_index(inplace=True)
+        df_asignacion.reset_index(inplace=True)
+        
         network.file['df_capac']=df_capac
+        network.file['df_arcos']=df_arcos
+        network.file['df_asignacion']=df_asignacion
+        
         print ("\n Se actualizaron exitosamente los lambda_jk")
 
+    # Si _post_optima= true significa que estoy trabajando con una solución 
+    # generada por el código. Por lo tanto lee los datos desde salida_optimizacion.xlsx
     if _post_optima==True:
-        #TERCER BLOQUE
-        ## También puedo importar los datos de lambda_jk desde el archivo datos.xlxs
-        #df_capac['lambdas']=pd.read_excel (r'datos.xlsx', sheet_name='df_capac')
         
-        data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)
-        
+        data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)     
         df_capac=network.file['df_capac']
 
         #data = path['l_jk']
@@ -205,7 +218,13 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
         df_capac.fillna(0,inplace=True)
         df_capac.replace([np.inf, -np.inf], 0, inplace=True)
+        
+        #df_capac.reset_index(drop=True,inplace=True)
+        df_asignacion.reset_index(inplace=True)
+        
         network.file['df_capac']=df_capac
+        network.file['df_asignacion']=df_asignacion
+        
         
         print ("\n Se actualizaron exitosamente los lambda_jk")
         
@@ -213,30 +232,23 @@ def set_lambda_ijk (solution, network,_post_optima):
     import numpy as np
     import pandas as pd
     from hcndp.data_functions import reshape_matrix
+    import copy
 
     # Calculo los lambdas para cada ijk
-    # Se calculan a través de un loop asumiendo que solo hay arribos en cada i
-    #g=np.array(network.file['df_asignacion']['tao_ijk']) # Lista de arribos externos ijk
-    #g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
+    # Se calculan a través de un loop asumiendo que solo hay arribos 
+    # en cada i
+    
     df_asignacion=network.file['df_asignacion']
-    if not all(col in df_asignacion.index.names for col in ['nombre_I', 
-                                                            'nombre_J', 
-                                                            'servicio_K']):
-        # Si no están presentes, establecer las columnas I, J y K como índice
-        df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
-
-    new_index_order = ['nombre_I', 'nombre_J', 'servicio_K']
-    df_asignacion = df_asignacion.reset_index().set_index(new_index_order)    
+    df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
     df_asignacion = df_asignacion.sort_index(level=[0, 1, 2])
     g=np.array(df_asignacion['tao_ijk']) # Lista de arribos externos ijk
     g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
 
-
-    # Puedo calcular los lambda ijk basado en redes de Jackson
-    #network.file['df_asignacion']["lambda_ijk"] = 0.0
     df_asignacion["lambda_ijk"] = 0.0
+    
+    
     df_arcos=network.file['df_arcos']
-    df_arcos = df_arcos.set_index(['servicio_K','nombre_Jp','servicio_Kp'], append=True)
+    df_arcos.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'], inplace=True)    
     df_arcos=df_arcos.sort_index(level=[0,1,2,3])
     probs=df_arcos['p_jjkk']
     probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
@@ -245,42 +257,38 @@ def set_lambda_ijk (solution, network,_post_optima):
     _i=0
     
     if _post_optima==False:
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        network.file['df_asignacion'].sort_index(inplace=True)
-        for i in network.file['df_asignacion'].index.levels[0]: 
-            #df_asignacion.loc[i,'lambda_ijk']=1
-            network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+        for i in df_asignacion.index.levels[0]: 
+            df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1    
         print ("\n Se actualizaron exitosamente los lambda_ijk")
-    if _post_optima==True and solution.tecnica!= "Exacta":
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        network.file['df_asignacion'].sort_index(inplace=True)
-        for i in network.file['df_asignacion'].index.levels[0]: 
-            #df_asignacion.loc[i,'lambda_ijk']=1
-            network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+    
+    if _post_optima==True and solution.tecnica != "Exacta":
+        for i in df_asignacion.index.levels[0]: 
+            df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1
         print ("\n Se actualizaron exitosamente los lambda_ijk")
+    
     if _post_optima==True and solution.tecnica=="Exacta":
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-        network.file['df_asignacion'].sort_index(inplace=True)
-        for i in network.file['df_asignacion'].index.levels[0]: 
-            #df_asignacion.loc[i,'lambda_ijk']=1
-            network.file['df_asignacion'].loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+        for i in df_asignacion.index.levels[0]: 
+            df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1
         print ("\n Se actualizaron exitosamente los lambda_ijk")
+    
     # Actualizo prop_tao_ijk
-    if 'demanda_i' not in network.file['df_asignacion'].columns:
-        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index().set_index(['nombre_I']),
+    if 'demanda_i' not in df_asignacion.columns:
+        df_asignacion=pd.merge(df_asignacion.reset_index().set_index(['nombre_I']),
                                            network.file['df_demanda'][['nombre_I','demanda_i']].set_index(['nombre_I']),
                                            left_index=True,right_index=True)
-    network.file['df_asignacion']['prop_tao_ijk']=network.file['df_asignacion']['tao_ijk']/network.file['df_asignacion']['demanda_i']
-    network.file['df_asignacion']=network.file['df_asignacion'].reset_index().set_index(['nombre_I','nombre_J','servicio_K'])
+    df_asignacion['prop_tao_ijk']=df_asignacion['tao_ijk']/df_asignacion['demanda_i']
+    
+    df_arcos.reset_index(inplace=True)
+    df_asignacion.reset_index(inplace=True)
+    
+    network.file['df_arcos']=copy.deepcopy(df_arcos)
+    network.file['df_asignacion']=copy.deepcopy(df_asignacion)
     
 def set_phi_ijkjk (solution,network):
-    #Calculo flujos fi_ijkjk cuando estoy usando escenario 1. Estos fi vienen de lambda según la fórmula de abajo:
+    #Calculo flujos fi_ijkjk. Estos fi vienen de lambda según la fórmula de abajo:
     # l_ijk*p_jjkk*x_jj
         
     # Construyo df_fi_ijkjk a partir de los lambda_ijk que se han calculado
@@ -288,8 +296,14 @@ def set_phi_ijkjk (solution,network):
     #Multiplico l_ijk*p_jjkk|*x_jj
     
     import pandas as pd
-    network.file['df_flujos_ijkjk']=pd.merge(network.file['df_asignacion'][['lambda_ijk']],
-                               network.file['df_probs_kk'][['servicio_K','servicio_Kp','p_kkp']].set_index(['servicio_K','servicio_Kp']),
+    
+    df_asignacion=network.file['df_asignacion']
+    df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
+    df_probs_kk=network.file['df_probs_kk']
+    df_probs_kk.set_index(['servicio_K', 'servicio_Kp'], inplace=True)
+    
+    network.file['df_flujos_ijkjk']=pd.merge(df_asignacion[['lambda_ijk']],
+                               df_probs_kk['p_kkp'],
                                left_index=True, right_index=True)
     
     network.file['df_flujos_ijkjk']=pd.merge(network.file['df_flujos_ijkjk'], 
@@ -303,27 +317,36 @@ def set_phi_ijkjk (solution,network):
     network.file['df_flujos_ijkjk']['fi_ijkjk']=network.file['df_flujos_ijkjk']['lambda_ijk']*network.file['df_flujos_ijkjk']['p_jjkk']*network.file['df_flujos_ijkjk']['x_jjp']
     
     network.file['df_flujos_ijkjk'] = network.file['df_flujos_ijkjk'].reorder_levels(['nombre_I', 'nombre_J', 'servicio_K','nombre_Jp', 'servicio_Kp'])
+    
+    network.file['df_flujos_ijkjk'].reset_index(inplace=True)
+    df_asignacion.reset_index(inplace=True)
+    df_probs_kk.reset_index(inplace=True)
+    
     print ("\n Se actualizaron exitosamente los phi_ijkjk")
    
 def set_prop_tao (solution,network):
     # Calculo los valores de prop_tao_ijk. Proporción de clientes que son dirigidos desde ik a jk
     import pandas as pd
     df_demanda=network.file['df_demanda']
+    df_asignacion=network.file['df_asignacion']
     
     if solution.state=="Solucionado_aproximación" or solution.state=="Optimizado":
-        #network.file['df_asignacion'] = pd.merge(network.file['df_asignacion'], df_demanda[['nombre_I', 'servicio_K', 'pi_k']], on=['nombre_I', 'servicio_K'], how='left')
-        network.file['df_asignacion']=network.file['df_asignacion'].reset_index()
-        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index(),df_demanda)
-        #network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].set_index(['nombre_I','servicio_K']), 
-        #                                       df_demanda.set_index(['nombre_I', 'servicio_K'])['pi_k'], 
-        #                                       left_index=True, right_index=True, how='left')
-    else:
-        df_demanda=network.file['df_demanda'].drop(['servicio_K'],axis=1)
-        network.file['df_asignacion']=pd.merge(network.file['df_asignacion'].reset_index(),df_demanda)
+        if solution.tecnica == "Exacta":
+            df_asignacion = pd.merge(df_asignacion, df_demanda, how='outer')
+            df_asignacion.fillna(0, inplace=True)
+            
+    elif solution.state == "Solucionado_Solución_Inicial": 
+        df_asignacion.fillna(0, inplace=True)
     
-    network.file['df_asignacion']['prop_tao_ijk']=network.file['df_asignacion']['tao_ijk']/network.file['df_asignacion']['demanda_i']
-    #network.file['df_asignacion'].drop(['demanda_i'],axis=1,inplace=True)
-    network.file['df_asignacion']['prop_tao_ijk'] = network.file['df_asignacion']['prop_tao_ijk'].fillna(0)
+    elif solution.state == "":
+        #solution_state es cero. No se ha solucionado. Es solución brindada por el usuario.
+        df_demanda=df_demanda.drop(['servicio_K'],axis=1)
+        df_asignacion = pd.merge(df_asignacion, df_demanda, how='outer')
+        df_asignacion.fillna(0, inplace=True)
+ 
+    df_asignacion['prop_tao_ijk']=df_asignacion['tao_ijk']/df_asignacion['demanda_i']
+
+    network.file['df_asignacion']['prop_tao_ijk'] = df_asignacion['prop_tao_ijk'].fillna(0)
     print ("\n Se actualizaron exitosamente los tao_ijk (prop)")
 
 def set_prob_k (solution,network):
@@ -364,20 +387,18 @@ def set_prob_k (solution,network):
     df_pi_k=df_pi_k[:-1]
     
     df_demanda=network.file['df_demanda']
-    df_demanda=df_demanda.drop(['servicio_K'], axis=1)
-    df_demanda = df_demanda.loc[:, ~df_demanda.columns.str.startswith('index')] #Elimino columnas con texto "index"
-    df_demanda=pd.merge(df_demanda.reset_index(),df_pi_k.reset_index(),how="cross")
     
-    #Si voy a utilizar probabilidades de estado estable para definir la demanda en la red habilito esta línea
-    #df_demanda['h_ik']=df_demanda['demanda_i']*df_demanda['pi_k']
+    if 'pi_k' not in df_demanda:
+        df_demanda=pd.merge(df_demanda,df_pi_k,how='cross')     
+        df_demanda.drop(['servicio_K_x'],axis=1,inplace=True)
+        df_demanda.rename(columns = {'servicio_K_y':'servicio_K'}, inplace = True)
+        df_demanda['h_ik'] = df_demanda.apply(lambda row: row['demanda_i'] if row['servicio_K'] == 'k01' else 0, axis=1)
     
-    #De lo contrario asumo que la demanda_i es la misma h_ik. siempre debo usar axis=1 cuando recorro un dataframe por filas
-    df_demanda['h_ik']=df_demanda.apply (lambda row: row['demanda_i'] if row['servicio_K']=='k01' else "0",axis=1) 
-    if solution.state=="Solucionado_aproximación" or solution.state=="Optimizado":
+    if solution.state=="Optimizado":
         print ("Ya está preparada la matriz df_demanda.")
     else:
         print ("Actualizo df_demanda.")
-        network.file['df_demanda']=df_demanda
+        network.file['df_demanda_ik']=df_demanda
     print ("\n Se actualizaron exitosamente las demandas en estado estable df_pi.")
 
 
@@ -390,19 +411,25 @@ def set_prob_custom_queue (network,customers):
     import pandas as pd
 
     # Creo una columna en df_capac con las demandas asignadas sum tao_ij
-    network.file['df_capac']=network.file['df_capac'].reset_index().set_index(['nombre_J','servicio_K'])
-    network.file['df_capac']=(pd.merge(network.file['df_capac'],network.file['df_asignacion'].groupby(['nombre_J','servicio_K']).tao_ijk.sum(),
-                       left_index=True,
-                       right_index=True,how='outer').fillna(0)) 
-    network.file['df_capac'].rename(columns = {'tao_ijk':'Sum_tao_ij'}, inplace = True)
+    df_capac = network.file['df_capac'].set_index(['nombre_J','servicio_K'])
+    df_capac = pd.merge(df_capac, 
+                        network.file['df_asignacion'].groupby(['nombre_J', 'servicio_K']).tao_ijk.sum(),
+                        left_index=True, 
+                        right_index=True, 
+                        how='outer', 
+                        suffixes=('_old', '')).fillna(0)
+
+    df_capac.rename(columns = {'tao_ijk':'Sum_tao_ij'}, inplace = True)
     
     #Calculo la probabilidad de tener b clientes o menos en cola
-    network.file['df_capac']['prob_b'+str(customers)]=network.file['df_capac'].apply(lambda row: p_total(row["lambdas"],row["sigma_jk"],row["c_jk"],customers),axis='columns')
+    df_capac['prob_b'+str(customers)]=df_capac.apply(lambda row: p_total(row["lambdas"],row["sigma_jk"],row["c_jk"],customers),axis='columns')
     
     #Calculo la probabilidad de tener cero clientes en espera en cola
-    network.file['df_capac']['prob_b'+str(0)]=network.file['df_capac'].apply(lambda row: p_total(row["lambdas"],row["sigma_jk"],row["c_jk"],0),axis='columns')
+    df_capac['prob_b'+str(0)]=df_capac.apply(lambda row: p_total(row["lambdas"],row["sigma_jk"],row["c_jk"],0),axis='columns')
     
-
+    df_capac.reset_index(inplace=True)        
+    network.file['df_capac']=df_capac
+    
 def set_prob_wait_time (network,t):
     # Cálculo de probabilidades Ptjk en estado estable para MMs
     # Consiste en la probabilidad de tener que esperar t o menos unidades de tiempo en cola
@@ -417,6 +444,7 @@ def set_kpi_per_node(network):
     df_capac['W_q']=df_capac.apply(lambda row: W_q(row["L_q"],row["lambdas"],row['rho']),axis='columns')
     df_capac['L']=df_capac['L_q']+df_capac['r']
     df_capac['W']=df_capac['W_q']+1/(df_capac['sigma_jk']+df_capac['c_jk'])
+    network.file['df_capac']=df_capac
 
 #%% <codecell> Funciones para accesibilidad
 
@@ -424,9 +452,12 @@ def set_e2sfca(network):
     import pandas as pd
     import numpy as np 
     
-    df_asignacion=network.file['df_asignacion'].reset_index()
-    df_capac=network.file['df_capac'].reset_index()
-    df_capac=df_capac.set_index(['nombre_J','servicio_K'])
+    #if 'level_0' in network.file['df_asignacion'].index.names:
+    #    df_asignacion = network.file['df_asignacion'].reset_index(drop=True)
+    #else:
+    #    df_asignacion = network.file['df_asignacion'].reset_index()
+    df_asignacion = network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
+    df_capac=network.file['df_capac'].set_index(['nombre_J','servicio_K'])
     df_demanda = network.file['df_demanda']
     
     # Calculo los numeradores
@@ -435,12 +466,10 @@ def set_e2sfca(network):
     
     # Calculo el denominador como el producto de la demanda y las distancias gaussianas
     # Hay un 'Pf' por cada combinación ijk
-    df_asignacion=pd.merge(df_asignacion,df_demanda[['nombre_I','servicio_K','demanda_i']])
     df_asignacion['Pf']=df_asignacion['lambda_ijk']*df_asignacion['f_dij'] 
     
     # Los denominadores son sumatorias dejando fijos k y j y modificando i. 
-    df_asignacion=pd.merge(df_asignacion.groupby(['servicio_K','nombre_J']).Pf.sum(),df_asignacion,on=['servicio_K','nombre_J'],how='left')
-    df_asignacion=df_asignacion.rename(columns={"Pf_x":"Pf_grup","Pf_y":"Pf"})
+    df_asignacion ['Pf_grup'] = df_asignacion .groupby(['servicio_K','nombre_J'])['Pf'].transform('sum')
     
     # Calculo las accesibilidades R de cada combinación i j k
     
@@ -450,12 +479,23 @@ def set_e2sfca(network):
     
     # Agrupo las accesibilidades por cada cliente y servicio K
     df_accesibilidad=df_asignacion.groupby(['nombre_I','servicio_K']).R.sum()
-    df_demanda=pd.merge(df_demanda,df_accesibilidad,on=['nombre_I','servicio_K'],how='left')
-    df_demanda=df_demanda.rename(columns={"R":"acces_H2SFCA"})
     
+    #df_demanda=pd.merge(df_demanda,df_accesibilidad,on=['nombre_I','servicio_K'],how='left',suffixes=('_old', ''))
+    df_demanda['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum') 
+    network.file['df_demanda_ik']['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum')
     #Agrego las demandas a df_accesibildiad
-    df_accesibilidad=pd.merge(df_accesibilidad.reset_index().set_index('nombre_I'),df_demanda.groupby(['nombre_I']).demanda_i.sum(),left_on=['nombre_I'],right_on='nombre_I').set_index(['servicio_K'],append=True)
+    df_accesibilidad = pd.merge(df_accesibilidad,network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K']),left_index=True, right_index=True)
+    #df_accesibilidad = pd.merge(df_accesibilidad.reset_index().set_index('nombre_I'),
+    #                            df_demanda.groupby(['nombre_I']).demanda_i.sum(),
+    #                            left_index=True, 
+    #                            right_index=True, 
+    #                            suffixes=('_old', '')
+    #                           ).set_index(['servicio_K'], append=True)
+    
     df_accesibilidad['Acc_ponderado']=df_accesibilidad['R']*df_accesibilidad['demanda_i']
+    
+    df_asignacion.reset_index(inplace=True)
+    df_accesibilidad.reset_index(inplace=True)
     
     network.file['df_demanda']=df_demanda
     network.file['df_asignacion']=df_asignacion
@@ -465,55 +505,56 @@ def set_accessibility_per_node(network):
     import pandas as pd    
     # Calculo accesibilidad para cada nodo de demanda i
     
-    df_demanda=network.file['df_demanda']
-    df_asignacion=network.file['df_asignacion']
+    df_demanda=network.file['df_demanda'].set_index(['nombre_I','servicio_K'])
+    df_demanda_ik=network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K'])
+    df_asignacion=network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
+
     #Calculo la accesibilidad ponderada por la población (lambdas) para cada i
     #Equivale a Acc_ik*lambda_ik / sum_lambda_ik
-    df_demanda=pd.merge(df_demanda.set_index(['nombre_I','servicio_K']),
-                        df_asignacion.groupby(['nombre_I','servicio_K']).sum(numeric_only=True)['lambda_ijk'],
-                        left_index=True,right_index=True)
-    df_demanda['weighted']=df_demanda['acces_H2SFCA']*df_demanda['lambda_ijk']/df_demanda.groupby('nombre_I').lambda_ijk.sum()
+    df_demanda_ik['lambda_ijk']=df_asignacion.groupby(['nombre_I','servicio_K']).sum()['lambda_ijk']
+    df_demanda_ik['weighted_ik'] = df_demanda_ik['acces_H2SFCA']*df_demanda_ik['lambda_ijk']/df_demanda_ik.groupby('nombre_I').lambda_ijk.sum()
     
     #En el paso anterior se calcularon accesibilidades ponderadas por la población. 
     #La suma de estas accesibilidades dará el promedio ponderado de accesibilidades.
-    prueba=pd.merge(df_demanda,df_demanda.groupby('nombre_I')['weighted'].sum(),left_index=True,right_index=True)
-    df_demanda['weighted']=prueba['weighted_y']
+    df_demanda_ik['weighted_i'] = df_demanda_ik.groupby(['nombre_I'])['weighted_ik'].transform('sum')
+
+    
+    #Creo la accesibilidad media
+    #prueba=df_demanda.groupby('nombre_I')['weighted'].mean()    
+    network.file['df_acces_node']=df_demanda_ik.groupby('nombre_I')['weighted_ik'].mean()
+    network.file['df_acces_node'].name='Access_by_node'
+
+    df_demanda.reset_index(inplace=True)
+    df_demanda_ik.reset_index(inplace=True)
+    df_asignacion.reset_index(inplace=True)
     
     network.file['df_demanda']=df_demanda
-    #prueba contendrá la accesibilidad obtenida para cada nodo demanda i
-    prueba=df_demanda.groupby('nombre_I')['weighted'].mean()    
-    network.file['df_acces_node']=prueba
-    network.file['df_acces_node'].name='Access_by_node'
+    network.file['df_demanda_ik']=df_demanda_ik
+    network.file['df_asignacion']=df_asignacion    
+    
 
 def set_accessibility_per_service(network):
     import pandas as pd
     
-    df_demanda=network.file['df_demanda']
+    df_demanda_ik=network.file['df_demanda_ik']
     # Calculo accesibilidad para cada servicio k
-    
-    #Calculo la accesibilidad ponderada por la población (lambdas) para cada k
-    #Equivale a Acc_ik*lambda_ik / sum_lambda_ik
-    df_demanda['weighted_k']=df_demanda['acces_H2SFCA']*df_demanda['lambda_ijk']/df_demanda.groupby('servicio_K').lambda_ijk.sum()
     
     #En el paso anterior se calcularon accesibilidades ponderadas por la población. 
     #La suma de estas accesibilidades dará el promedio ponderado de accesibilidades.
-    prueba=pd.merge(df_demanda,df_demanda.groupby('servicio_K')['weighted_k'].sum(),left_index=True,right_index=True)
-    df_demanda['weighted_k']=prueba['weighted_k_y']
-    
-    network.file['df_demanda']=df_demanda
-    #prueba contendrá la accesibilidad obtenida para cada servicio k
-    prueba=df_demanda.groupby('servicio_K')['weighted_k'].mean()
-    network.file['df_acces_service']=prueba
+    df_demanda_ik['weighted_k'] = df_demanda_ik.groupby(['servicio_K'])['weighted_ik'].transform('sum')
+        
+    network.file['df_acces_service']=df_demanda_ik.groupby('servicio_K')['weighted_k'].mean()
     network.file['df_acces_service'].name='Access_by_service'
     
+    network.file['df_demanda_ik']=df_demanda_ik
+
 
 def set_accessibility_network(network):
-    df_demanda=network.file['df_demanda']
-    df_demanda['h_ik'] = df_demanda['h_ik'].astype(int)
-    #prueba=df_demanda['lambda_ijk']*df_demanda['acces_H2SFCA']/df_demanda['lambda_ijk'].sum()
-    prueba=df_demanda['demanda_i']*df_demanda['acces_H2SFCA']/(df_demanda['demanda_i'].sum())
-    #print ("Accesibilidad total=",prueba.sum())
+    df_demanda_ik=network.file['df_demanda']
+    prueba=df_demanda_ik['demanda_i']*df_demanda_ik['acces_H2SFCA']/(df_demanda_ik['demanda_i'].sum())
     network.file['df_medidas']['Alpha_total']= [prueba.sum()]
+    
+    
 
 #%% <codecell> Funciones para continuidad
 
@@ -521,22 +562,34 @@ def set_continuity_per_node(network):
     import pandas as pd 
     
     
-    df_asignacion=network.file['df_asignacion'].copy()
+    df_asignacion=network.file['df_asignacion']
     df_asignacion['gamma_ijk']= df_asignacion['lambda_ijk'].apply(lambda x: 1 if x != 0 else 0)
 
     #Calculo los delta_ij
-    df_asignacion=pd.merge(df_asignacion,df_asignacion.groupby(['nombre_I','nombre_J']).gamma_ijk.sum(),on=['nombre_I','nombre_J'],how='left')
-    df_asignacion=df_asignacion.rename(columns={"gamma_ijk_x":"gamma_ijk","gamma_ijk_y":"delta_ij"})
+    #df_asignacion=pd.merge(df_asignacion,df_asignacion.groupby(['nombre_I','nombre_J']).gamma_ijk.sum(),
+    #                       on=['nombre_I','nombre_J'],how='left',
+    #                       suffixes=('_old', ''))
+    df_asignacion['delta_ij'] = df_asignacion.groupby(['nombre_I','nombre_J'])['gamma_ijk'].transform('sum')
+
+    #df_asignacion=df_asignacion.rename(columns={"gamma_ijk_old":"gamma_ijk","gamma_ijk":"delta_ij"})
     
     #Calculo delta para cada i 
     df_continuidad=df_asignacion[['nombre_I','nombre_J','demanda_i','delta_ij']].drop_duplicates()
     df_continuidad['delta_ij']= df_continuidad['delta_ij'].apply(lambda x: 1 if x != 0 else 0)
     
-    df_continuidad=pd.merge(df_continuidad,df_continuidad.groupby(['nombre_I']).delta_ij.sum(),on=['nombre_I'],how='left')
-    df_continuidad=df_continuidad.rename(columns={"delta_ij_x":"delta_ij","delta_ij_y":"delta_i"})
+    #df_continuidad=pd.merge(df_continuidad,df_continuidad.groupby(['nombre_I']).delta_ij.sum(),
+    #                        on=['nombre_I'],how='left',
+    #                        suffixes=('_old', ''))
+    df_continuidad['delta_i'] = df_continuidad.groupby(['nombre_I'])['delta_ij'].transform('sum')
+
+    #df_continuidad=df_continuidad.rename(columns={"delta_ij_old":"delta_ij","delta_ij":"delta_i"})
     df_continuidad=df_continuidad.drop_duplicates(subset = ['nombre_I']).drop(['delta_ij'], axis=1)
     df_continuidad['delta_i']=network.J-df_continuidad['delta_i']
+    
     network.file['df_continuidad']=df_continuidad
+    network.file['df_asignacion']=df_asignacion
+    
+    
 
 
 #%% <codecell> Funciones para medidas globales
@@ -545,10 +598,11 @@ def set_kpi_network(network):
     import pandas as pd    
     import numpy as np
     
-    df_capac=network.file['df_capac'].copy()
-    df_continuidad=network.file['df_continuidad'].copy()
-    df_accesibilidad=network.file['df_accesibilidad'].copy()
-    df_demanda=network.file['df_demanda'].copy()
+    df_capac=network.file['df_capac']
+    df_continuidad=network.file['df_continuidad']
+    df_accesibilidad=network.file['df_accesibilidad']
+    df_demanda=network.file['df_demanda']
+    df_demanda_ik=network.file['df_demanda_ik']
            
     df_medidas=pd.DataFrame()
     df_medidas['Wtotal']=[df_capac['L'].sum()/df_capac['Sum_tao_ij'].sum()]
@@ -562,7 +616,6 @@ def set_kpi_network(network):
     df_medidas['alpha_min']= [df_accesibilidad['R'].min()]
     df_medidas['delta_min']=[df_continuidad['delta_i'].min()]
 
-
     #df_demanda['h_ik'] = df_demanda['h_ik'].astype(int)
     #prueba=df_demanda['lambda_ijk']*df_demanda['acces_H2SFCA']/df_demanda['lambda_ijk'].sum()
     prueba=df_demanda['demanda_i']*df_demanda['acces_H2SFCA']/(df_demanda['demanda_i'].sum())
@@ -574,12 +627,11 @@ def set_kpi_network(network):
 def set_df_grafo_flujo_jkjk(network):
     import pandas as pd 
 
-    df_grafo=network.file['df_arcos'].reset_index().copy()
+    df_grafo=network.file['df_arcos'].copy()
     df_capac=network.file['df_capac'].copy()
-    df_flujos_jj=network.file['df_flujos_jj'].copy()
-    df_probs_kk=network.file['df_probs_kk'].copy()
-    df_arcos=network.file['df_arcos'].copy()
-    df_capac=network.file['df_capac'].reset_index().copy()
+    df_flujos_jj=network.file['df_flujos_jj']
+    df_probs_kk=network.file['df_probs_kk']
+    df_arcos=network.file['df_arcos']
     df_capac.set_index(['nombre_J','servicio_K'],inplace=True)
     df_capac['t_jk']=df_capac.apply (lambda row: 1 if row['s_jk*c_jk']>0 else 1, axis=1)
     
@@ -589,10 +641,10 @@ def set_df_grafo_flujo_jkjk(network):
     
     df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
     df_temporal['lambdas*probs']=df_temporal['lambdas']*df_temporal['p_jjkk']
-    df_temporal=df_temporal.reset_index()
+    df_temporal=df_temporal.reset_index(drop=True)
     df_temporal['jk_origen']=df_temporal['nombre_J']+df_temporal['servicio_K']
     df_temporal['jk_destino']=df_temporal['nombre_Jp']+df_temporal['servicio_Kp']
-    df_grafo=df_temporal.reset_index()
+    df_grafo=df_temporal.reset_index(drop=True)
     df_grafo = df_grafo.loc[df_grafo['lambdas*probs'] != 0]
     
     network.file['df_grafo']=df_grafo
