@@ -19,7 +19,9 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 # <codecell> Clase network
-class Network:
+from hcndp.solutions import Problem
+
+class Network():
     def __init__(self,I,J,K,archivo,name):
         self.I=I
         self.J=J
@@ -27,24 +29,27 @@ class Network:
         self.archivo=archivo
         self.name=name
         
+
+        
     def create_folders(self):
         import os
-
+        
         # Comprueba si el directorio no existe antes de intentar crearlo
         if not os.path.exists(os.getcwd()+'/data/'+self.name+'/'):
             # Crea el directorio
             os.makedirs(os.getcwd()+'/data/'+self.name+'/')
-            print(f"Directorio /data/'{self.name}' creado con éxito.")
+            #print(f"Directorio /data/'{self.name}' creado con éxito.")
         else:
-            print(f"El directorio /data/'{self.name}' ya existe.")
-            
+            #print(f"El directorio /data/'{self.name}' ya existe.")
+            pass
         
         if not os.path.exists(os.getcwd()+'/output/'+self.name+'/'):
             # Crea el directorio
             os.makedirs(os.getcwd()+'/output/'+self.name+'/')
-            print(f"Directorio /output/'{self.name}' creado con éxito.")
+            #print(f"Directorio /output/'{self.name}' creado con éxito.")
         else:
-            print(f"El directorio /output/'{self.name}' ya existe.")
+            #print(f"El directorio /output/'{self.name}' ya existe.")
+            pass
         
     def read_file_excel(self,path):
         print ("Leyendo datos del archivo de Excel.")
@@ -52,7 +57,77 @@ class Network:
         import os
         self.file = pd.read_excel(path, sheet_name=None)
     
-    
+    def read_file_txt(self,path):
+        print ("Leyendo datos del archivo de text.")
+        import pandas as pd
+        import os
+        
+        from io import StringIO
+        
+        # Leer todo el archivo de texto
+        with open(path, 'r') as file:
+            data = file.readlines()
+        self.file={}
+        
+        # Separar las secciones según el encabezado
+        sections = {}
+        current_section = None
+        current_data = []
+        
+        for line in data:
+            line = line.strip()
+            if line.startswith("#"):  # Reconocer los encabezados de sección
+                if current_section:
+                    # Crear un dataframe para la sección actual
+                    sections[current_section] = pd.read_csv(StringIO("\n".join(current_data)),sep='\t')
+                current_section = line[2:]  # Remover el '#' y el espacio
+                current_data = []
+            else:
+                if current_section:  # Acumular datos para la sección actual
+                    current_data.append(line)
+        
+        # Agregar la última sección al diccionario
+        if current_section and current_data:
+            sections[current_section] = pd.read_csv(StringIO("\n".join(current_data)),sep='\t')
+        
+        # Ahora puedes acceder a los dataframes por nombre de sección
+        self.file['df_oferta'] = sections['df_oferta']
+        self.file['df_niveles']= sections['df_niveles']
+        self.file['df_capac']= sections['df_capac']
+        self.file['df_demanda']= sections['df_demanda']
+        self.file['df_dist_ij']= sections['df_dist_ij']
+        self.file['df_dist_ij_k']= sections['df_dist_ij_k']
+        self.file['df_sigma_max']= sections['df_sigma_max']
+        self.file['df_w_ij']= sections['df_w_ij']
+        self.file['df_flujos_ijk']= sections['df_flujos_ijk']
+        self.file['flujos_jj']= sections['flujos_jj']
+        self.file['prob_serv']= sections['prob_serv']
+
+        self.file['flujos_jj']=self.file['flujos_jj'].reset_index().rename(columns={'index':'Unnamed: 0'})
+        self.file['prob_serv']=self.file['prob_serv'].reset_index().rename(columns={'index':'Unnamed: 0'})
+        
+        
+        # Función para verificar si los nombres de un dataframe son números enteros
+        def es_entero(cadena):
+            try:
+                int(cadena)  # Intentar convertir a entero
+                return True  # Si no hay error, es un entero
+            except ValueError:
+                return False  # Si hay error, no es un entero
+
+        # Convertir solo los nombres de columnas que son enteros
+        nuevos_nombres = [
+            int(col) if es_entero(col) else col  # Convertir a entero solo si es un número
+            for col in self.file['prob_serv'].columns
+        ]
+
+        # Asignar los nuevos nombres al DataFrame
+        self.file['prob_serv'].columns = nuevos_nombres
+        
+        
+        #print("DF self.file")
+        #print(self.file)
+        
     def delete_surplus_data(self):
         from hcndp.data_functions import indices
         
@@ -84,13 +159,24 @@ class Network:
         if _post_optima==True:
             
             output_file=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
-    
-            data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+            
+            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+                data = self.problem.df_sigma 
+            else:
+                data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
+            
+            if 'nombre_J' not in data.columns:
+                data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})
             self.file['df_capac']= pd.merge(self.file['df_capac'].set_index(['nombre_J','servicio_K']),data.set_index(['nombre_J','servicio_K']),left_index=True,right_index=True)
         
-            self.file['df_capac'].drop(['sigma_jk_x'],axis=1,inplace=True)
-            self.file['df_capac'].insert(4,'sigma_jk',self.file['df_capac'].pop('sigma_jk_y'))        
+            try:  #Utilizo try porque al usar Local Search genera error.
+                self.file['df_capac'].drop(['sigma_jk_x'],axis=1,inplace=True)
+                self.file['df_capac'].insert(4,'sigma_jk',self.file['df_capac'].pop('sigma_jk_y'))    
+            except KeyError as e:
+                pass
+            
+                
             self.file['df_capac']['sigma_jk'] = self.file['df_capac']['sigma_jk'].round(0).astype('int')
             self.file['df_capac'].reset_index(inplace=True)
 
@@ -140,11 +226,15 @@ class Network:
             self.file['df_flujos_ijk'].reset_index(inplace=True)
         if _post_optima == True:
             # Cargo los resultados obtenidos de la optimización
-            path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
-            archivo_salida_optim = pd.read_excel(path, sheet_name=None)
-    
-            self.file['df_flujos_ijk']=archivo_salida_optim['f_ijk']
-            self.file['df_fi_ijkjk'] = archivo_salida_optim['fi_ijkjk']
+            
+            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+                self.file['df_flujos_ijk']=self.problem.df_f_ijk
+                self.file['df_fi_ijkjk'] = self.problem.df_fi_ijkjk
+            else:
+                path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
+                archivo_salida_optim = pd.read_excel(path, sheet_name=None)
+                self.file['df_flujos_ijk']=archivo_salida_optim['f_ijk']
+                self.file['df_fi_ijkjk'] = archivo_salida_optim['fi_ijkjk']
             
             # Elimino los flujos que no quiero contemplar en el ejercicio
             #import delete_surplus_data
@@ -178,12 +268,25 @@ class Network:
                 df_asignacion.drop(columns=['Unnamed: 0'], inplace=True)
             
             # Actualizo los valores de sigma nuevos
-            data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+            
+            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+                data=self.problem.df_sigma
+            else:
+                data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
+                
+            if 'nombre_J' not in data.columns:
+                data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})            
+            
             df_asignacion = pd.merge(df_asignacion,data.set_index(['nombre_J','servicio_K']),left_index=True,right_index=True)
         
-            df_asignacion.drop(['sigma_jk_x'],axis=1,inplace=True)
-            df_asignacion.insert(4,'sigma_jk',df_asignacion.pop('sigma_jk_y'))
+        
+            try : # Utilizo try porque al ejecutar en Local Search genera error
+                df_asignacion.drop(['sigma_jk_x'],axis=1,inplace=True)
+                df_asignacion.insert(4,'sigma_jk',df_asignacion.pop('sigma_jk_y'))
+            except KeyError as e:
+                pass 
+            
             
             df_asignacion['sigma_jk'] = df_asignacion['sigma_jk'].round(0).astype('int')
             df_asignacion.reset_index(inplace=True)
@@ -252,15 +355,20 @@ class Network:
     
         
         if _post_optima==True:
-            path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
-            archivo_salida_optim = pd.read_excel(path, sheet_name=None)
-            data = archivo_salida_optim['prob_fi_jkjk']
-            #data = pd.read_excel (archivo, sheet_name='df_probs')
-            #data = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/FLNDP/datos.xlsx',sheet_name='probs')
-            data= data.drop(['Unnamed: 0'], axis=1)
-            #data= data.drop(['Unnamed: 1'], axis=1)
-            #data= data.drop(index=0)
-            #probs = np.array(data)
+            
+            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+                data=self.problem.df_prob_fi_jkjk
+            else:
+                path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
+                archivo_salida_optim = pd.read_excel(path, sheet_name=None)
+                data = archivo_salida_optim['prob_fi_jkjk']
+            
+                #data = pd.read_excel (archivo, sheet_name='df_probs')
+                #data = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/FLNDP/datos.xlsx',sheet_name='probs')
+                data= data.drop(['Unnamed: 0'], axis=1)
+                #data= data.drop(['Unnamed: 1'], axis=1)
+                #data= data.drop(index=0)
+                #probs = np.array(data)
              
             probs=data.loc[:]['Probs'].to_numpy().reshape(self.J*self.K,self.J*self.K)
         
@@ -370,48 +478,8 @@ class Network:
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
         
-            
-    # def calculate_exact_optima(self,objective,networks) :
-    #     from hcndp import optima
-    #     from hcndp import network_data
-    #     from hcndp.network_data import _I,_J,_K,_archivo,_name_network,_models
-    #     from hcndp import kpi 
-        
-    #     _menu_options = {
-    #     '1': 'Minimizar congestión máxima (rho)',
-    #     '2': 'Maximizar accesibilidad mínima (alpha)',
-    #     '3': 'Maximizar continuidad mínimia (delta)',
-    #     '4': 'Maximizar accesibilidad total (alpha)',
-    #     '5': 'Minimizar usuarios en espera total (Lq_total)',
-    #     '6': 'Maximizar continuidad total (delta total)',
-    #     '7': 'Salir al menú anterior'
-    #     }
-    #     _name=str(f"objective_{_menu_options[str(objective)]}")
-        
-    #     optima.set_model_abstract(objetivo=objective,
-    #                               nombre_modelo=_name,
-    #                               _menu_options=_menu_options,
-    #                               self=self,
-    #                               networks=networks)
-    #     model=self.models[_name]
-    
-        
-    #     optima.read_data_dat(self,model)
-    #     optima.set_instance(model.model_abstract , model.data_dat, objective, model)
-    #     if objective == 5:
-    #         optima.solve_ipopt(self, model,model.instance)
-    #     else:
-    #         optima.solve_gurobi(self, model,model.instance)          
-    #     optima.get_degrees_freedom(model.instance)           
-    #     optima.set_solution_excel(self, model.instance)
-    #     optima.set_solution_txt(self, model.instance)
-        
-    #     # Actualizo la red original con una nueva red
-    #     optima.update_solution_post_optima(original_network=self,
-    #                                        new_network=networks[_name])
 
-        
-        
+
     def create_data_dat(self):
         import os
         from hcndp.data_functions import indices
@@ -527,6 +595,10 @@ class Network:
         file.write(";\n\n")
         
         file.close()
+    
+    # Uso getattr para que el objeto network_copy pueda acceder a los atributos del objeto padre 
+
+
 
 class Node:
     def __init__(self, node_id):
@@ -831,14 +903,14 @@ class Network_representation(Network):
                 _i.distance_origin_target_covered=math.nan
                 
         #Valido que s_max sea menor a la suma de los s_jk
-        if _x < path.nodes_services[_k].service_capacity:
-            #print ("Hay más recursos que capacidad disponible")
-            print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
-            print ("Suma de capacidades: ", _x)
-        else:
-            #print ("Hay más capacidad disponible que recursos")
-            print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
-            print ("Suma de capacidades: ", _x)
+        # if _x < path.nodes_services[_k].service_capacity:
+        #     #print ("Hay más recursos que capacidad disponible")
+        #     print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
+        #     print ("Suma de capacidades: ", _x)
+        # else:
+        #     #print ("Hay más capacidad disponible que recursos")
+        #     print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
+        #     print ("Suma de capacidades: ", _x)
         
         while suma_asignacion < path.nodes_services[_k].service_capacity:
             df_matriz=construir_matriz(_k)
@@ -859,7 +931,7 @@ class Network_representation(Network):
                                       'dist_max': selected.distance_origin_target_covered, 
                                       'nombre_I': selected.node_demand_pop, 
                                       'demanda_I': self.nodes_demand[selected.node_demand_pop].demand, 
-                                      's_jk': self.nodes_supply[selected.target].capac_instal_disponible,
+                                      's_jk': self.nodes_supply[selected.target].capac_instal_disponible-1, # Resto 1 para que no se asigne toda la capacidad s_jk
                                       'sigma_jk':0,
                                       'reman_despues':math.nan,
                                       'reman_antes':math.nan}
@@ -871,7 +943,7 @@ class Network_representation(Network):
             
             # remanente antes (fila0) = smax
             if df_matriz.empty :
-                print ("No hay más capacidad disponible")
+                print (" ")
                 break 
             else: 
                 df_matriz['reman_antes'].iloc[0] = path.nodes_services[_k].service_capacity
@@ -902,12 +974,32 @@ class Network_representation(Network):
             suma_asignacion+=sum(df_matriz['sigma_jk'])
             df_matriz_todos = df_matriz_todos._append(df_matriz,ignore_index=True)
         
-        print ("Final")
+        #print ("Final")
     
     
     # Función que calcula los δ_ijkk
-    def asignacion_flujos_δ(self,network,path,_k,_kp):
-        print ("Inicio asignación flujos delta para ",_k," y ",_kp) 
+    
+    def asignacion_flujos_δ(self, network, path, _k, _kp):
+        for _j in network.nodes_supply.values():
+            if _j.service == _k:
+                λ_ijk = _j.matriz_λ[(_j.matriz_λ['servicio_K'] == _k) & (_j.matriz_λ['nombre_J'] == _j.place)]
+                δ_ij = _j.matriz_δ[(_j.matriz_δ['servicio_K'] == _k) & (_j.matriz_δ['nombre_J'] == _j.place)]
+                
+                for _p, _i in _j.matriz_δ.iterrows():
+                    i = _i['nombre_I']
+                    kp = _kp
+                    
+                    if _j.matriz_δ.loc[_p, 'servicio_Kp'] == kp:
+                        if f"{_k}{kp}" in path.edges_ser_ser_R:
+                            _r = path.edges_ser_ser_R[f"{_k}{kp}"].transfer_percentage
+                        else:
+                            _r = 0
+                        
+                        δ_ijkkp = λ_ijk.loc[(λ_ijk['nombre_I'] == i), 'λ_ijk'].iloc[0] * _r
+                        _j.matriz_δ.loc[_p, 'δ_ijkkp'] = float(δ_ijkkp)
+        
+    def asignacion_flujos_δ2(self,network,path,_k,_kp):
+        #print ("Inicio asignación flujos delta para ",_k," y ",_kp) 
         for _,_j in network.nodes_supply.items():
             if _j.service==_k:
                 for _p,_i in _j.matriz_δ.iterrows():
@@ -930,9 +1022,9 @@ class Network_representation(Network):
                         _j.matriz_δ.loc[_p,'servicio_Kp']==kp:        
                             _j.matriz_δ.loc[_p, 'δ_ijkkp'] = float(δ_ijkkp)
                 
-                print ("Matriz de deltas actualizada para servicio origen ",_k)
+                #print ("Matriz de deltas actualizada para servicio origen ",_k)
                 #print (_j.matriz_δ [_j.matriz_δ ['δ_ijkkp'] > 0])
-        print ("Finalizo asignación flujos delta para ",_k) 
+        #print ("Finalizo asignación flujos delta para ",_k) 
     
     
     #Función para el cálculo de fi_ijkjk cuando ya se cuenta con lambdas calculados por Jackson
@@ -960,13 +1052,13 @@ class Network_representation(Network):
         #Creo nodos oferta. La oferta son los sigma disponibles * tasa de servicio (rate)
         for _i,_j in network.nodes_supply.items():
             if _j.service==_kp:
-                network_x.add_node(_j.node_id,tipo="oferta",demand=_j.capac_instal_sigma*_j.rate*100)
-        
+                network_x.add_node(_j.node_id,tipo="oferta",demand= ( round(_j.capac_instal_sigma) *_j.rate * 100 ))
+                # Resto 10 a demand para que la solución no quede en el borde: capac_instal_sigma != s_jk
         # Creo nodos demanda. La demanda es el valor de delta_ijkkp
         for _i,_j in network.nodes_supply.items():
-            if _j.service==_k:
-                for _,_l in _j.matriz_δ.iterrows():
-                    if _l.δ_ijkkp != 0 and _l.servicio_Kp == _kp:
+            if _j.service==_k: #Servicio origen
+                for _,_l in _j.matriz_δ.iterrows(): 
+                    if _l.δ_ijkkp != 0 and _l.servicio_Kp == _kp: #Si hay arco con _kp
                         network_x.add_node(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],
                                            tipo="demanda",source=_j.node_id,demand=round(-_l['δ_ijkkp']*100))
                         for _m in _j.neighbors: # Creo arcos
@@ -989,12 +1081,12 @@ class Network_representation(Network):
                 _suma_origen += _i[1]["demand"] #Suma de nodos origen o tipo demanda
         # ficticio hace las veces de nodo artificial para el balanceo de demanda
         if abs(_suma_destino) > abs(_suma_origen) : #Creo nodo tipo demanda ficticio y enlaces hacia el último jk con costo cero
-            network_x.add_node("ficticio",tipo="demanda",demand=-(abs(_suma_destino) - abs(_suma_origen)) )
+            network_x.add_node("ficticio",tipo="demanda",demand=-abs(_suma_destino +_suma_origen) )
             for _i in network_x.nodes(data=True):
                 if _i[1]["tipo"]=="oferta":
                     network_x.add_edge("ficticio",_i[0],weight=0)
         elif abs(_suma_destino) < abs(_suma_origen): #Creo nodo tipo oferta  ficticio de oferta y enlace desde el último jk con costo cero 
-            network_x.add_node("ficticio",tipo="oferta",demand=(abs(_suma_origen)-abs(_suma_destino)))
+            network_x.add_node("ficticio",tipo="oferta",demand=abs(_suma_origen + _suma_destino))
             for _i in network_x.nodes(data=True):
                 if _i[1]["tipo"]=="demanda":
                     network_x.add_edge(_i[0],"ficticio",weight=0)
@@ -1020,12 +1112,13 @@ class Network_representation(Network):
         # Actualizo las capacidades instaladas disponibles en cada nodo de oferta
         for _node_from, _flows in flowDict.items():
             for _node_to, _flow in _flows.items():
-                if _flow > 0  and _node_from!= "ficticio":
-                    #print(f"{_node_from}, {_flows}-> {_node_to}: {_flow}")
-                    #print (network.nodes_supply[_node_to].capac_sigma_dispon)
-                    network.nodes_supply[_node_to].capac_sigma_dispon-=_flow
-                    #print (network.nodes_supply[_node_to].capac_sigma_dispon)
-        
+                if _flow > 0  :
+                    if _node_from != "ficticio" and _node_to != 'ficticio':
+                        #print(f"{_node_from}, {_flows}-> {_node_to}: {_flow}")
+                        #print (network.nodes_supply[_node_to].capac_sigma_dispon)
+                        network.nodes_supply[_node_to].capac_sigma_dispon -= _flow
+                        #print (network.nodes_supply[_node_to].capac_sigma_dispon)
+            
         # Imprimir resultados
         _resultado={}
         #print("Costo Total:", flowCost)
@@ -1055,11 +1148,12 @@ class Network_representation(Network):
         # Almaceno los ϕ_{ijkjk} en los arcos sup_sup_X
         for _node_from, _flows in flowDict.items():
             for _node_to, _flow in _flows.items():
-                if _flow > 0 and _node_from != "ficticio":
-                    _direccion = _node_from[:-3]+_node_to
-                    network.edges_sup_sup_X[_direccion].flow_sup_sup_phi=_flow
+                if _flow > 0 :
+                    if _node_from != "ficticio" and _node_to != "ficticio" :
+                        _direccion = _node_from[:-3]+_node_to
+                        network.edges_sup_sup_X[_direccion].flow_sup_sup_phi=_flow
         
-        print ("Termino solución del problema de transporte entre ",_k, " y ",_kp)
+        #print ("Termino solución del problema de transporte entre ",_k, " y ",_kp)
     
     
     
@@ -1088,12 +1182,12 @@ class Network_representation(Network):
                     #print (_i['porcentaje'])
                     #print (_j[:3],_enlace,_i['porcentaje'],_k.flow_sup_sup_perc)
         
-        print ("Finalizo obtención de π para ",k," y ",kp)
+        #print ("Finalizo obtención de π para ",k," y ",kp)
     
     #Esta propuesta de obtencion_π no se hace para cada k y kp
     # Se aplica a todas las combinaciones posibles de jkjpkp
     def obtencion_π(self,network):
-        print ("Primero calculo pi para cada i j k jp kp")
+        #print ("Primero calculo pi para cada i j k jp kp")
         for _i,_j in network.edges_sup_sup_X.items():
 
             _suma_phi = sum(objeto.flow_sup_sup_phi for objeto in network.edges_sup_sup_X.values() \
@@ -1106,7 +1200,7 @@ class Network_representation(Network):
                 _j.flow_sup_sup_perc_ijkjk=_j.flow_sup_sup_phi/_suma_phi
                 
         
-        print ("Ahora calculo pi para cada j k jp kp") # Se calcula para cada jkjpkp y se almacena en los ijkjpkp
+        #print ("Ahora calculo pi para cada j k jp kp") # Se calcula para cada jkjpkp y se almacena en los ijkjpkp
         for _i,_j in network.edges_sup_sup_X.items():
             
             #pi_jkjpkp = suma_i (phi ijkjpkp) / suma_ijpkp (phi ijkjpkp)
@@ -1193,7 +1287,7 @@ class Path_representation:
         
         # Creación de los nodos de servicios
         for _,row in df_niveles.iterrows():
-            self.add_node_service(row['servicio_K'],row['Servicio'],row['s_k_max'],row['d_o_k'])
+            self.add_node_service(row['servicio_K'],row['Servicio'],row['sigma_max'],row['d_o_k'])
         
         #Creación de nodo del servicio artificial k00
         self.add_node_service('k00','Servicio artificial',math.nan,math.nan)

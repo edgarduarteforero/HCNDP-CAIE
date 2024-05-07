@@ -5,12 +5,19 @@ Created on Mon Dec 11 12:20:02 2023
 @author: edgar
 """
 
+import os
+import numpy as np
+from hcndp.data_functions import reshape_matrix
+import pandas as pd
+import copy
+from hcndp.data_functions import indices
+
+
 #%% Calcular kpi para una solución
 
 def calculate_kpi(current_solution,_post_optima):    
-    import os
     network=current_solution.network_copy
-    print (_post_optima)
+    #print (_post_optima)
 
     set_lambda_jk(current_solution, network,_post_optima)
     set_lambda_ijk(current_solution, network,_post_optima)
@@ -53,7 +60,7 @@ def calculate_kpi(current_solution,_post_optima):
     set_kpi_network(network)
     set_df_grafo_flujo_jkjk(network)
     
-    print (f"\nSe han calculado los KPI y se guardaron en {network.name_problem}.")
+    #print (f"\nSe han calculado los KPI y se guardaron en {network.name_problem}.")
         
 
 #%% <codecell> Funciones para cálculo de probabilidades por teoría de colas
@@ -149,10 +156,6 @@ def W_q(L_q,lambdas,rho):
 
 
 def set_lambda_jk (current_solution, network,_post_optima):
-    import numpy as np
-    from hcndp.data_functions import reshape_matrix
-    import os 
-    import pandas as pd
 
     path=os.getcwd()+'/output/'+current_solution.name_problem+'/salida_optimizacion.xlsx'
     
@@ -190,29 +193,54 @@ def set_lambda_jk (current_solution, network,_post_optima):
         network.file['df_arcos']=df_arcos
         network.file['df_asignacion']=df_asignacion
         
-        print ("\n Se actualizaron exitosamente los lambda_jk")
+        #print ("\n Se actualizaron exitosamente los lambda_jk")
 
     # Si _post_optima= true significa que estoy trabajando con una solución 
     # generada por el código. Por lo tanto lee los datos desde salida_optimizacion.xlsx
+    # También puedo leer los datos desde df_l_jk pues 
     if _post_optima==True:
         
-        data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)     
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Aproximación" :
+            data = current_solution.df_l_jk # Puedo leer desde best_neighbor. df_l_ijk
+        else:
+            data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)     
+        
         df_capac=network.file['df_capac']
 
         #data = path['l_jk']
         df_capac=df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')
+        # Reemplazar los valores de la columna lambda_jk de df_capac por los nuevos valores de data
+        try: # Utilizo try por si acaso no se crea un lambda_jk_y o lambda_jk_x
+            df_capac['lambda_jk'] = df_capac['lambda_jk_y'].fillna(df_capac['lambda_jk_x'])
+            
+            # Eliminar columnas lambda_jk_y y lambda_jk_x si es necesario
+            df_capac.drop(['lambda_jk_y', 'lambda_jk_x'], axis=1, inplace=True)
+        except Exception:
+            pass
+        
         #df_capac=df_capac.rename(columns={"lambda_jk": "lambdas"})
         df_capac['lambdas'] = df_capac['lambda_jk']
+        df_capac['lambdas']=df_capac['lambdas'].astype(float)
         df_capac = df_capac.drop(columns=['lambda_jk'])
         df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
         
         #Actualizo los sigma
-        data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
-                             index_col=0)
-        df_capac = df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')        
         
-        df_capac.drop(['sigma_jk_x'],axis=1,inplace=True)
-        df_capac.insert(4,'sigma_jk',df_capac.pop('sigma_jk_y'))
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Aproximación":
+            data = current_solution.df_sigma # Puedo leer desde best_neighbor. df_l_ijk
+        else:
+            data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+                             index_col=0)
+        
+        if 'nombre_J' not in data.columns:
+            data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})       
+        df_capac = df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')        
+        try: 
+            df_capac.drop(['sigma_jk_x'],axis=1,inplace=True)
+            df_capac.insert(4,'sigma_jk',df_capac.pop('sigma_jk_y'))
+        except KeyError as e:
+            pass            
+        
         df_capac['sigma_jk'] = df_capac['sigma_jk'].round(0).astype('int')
         
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
@@ -226,13 +254,10 @@ def set_lambda_jk (current_solution, network,_post_optima):
         network.file['df_asignacion']=df_asignacion
         
         
-        print ("\n Se actualizaron exitosamente los lambda_jk")
+        #print ("\n Se actualizaron exitosamente los lambda_jk")
         
 def set_lambda_ijk (solution, network,_post_optima):
-    import numpy as np
-    import pandas as pd
-    from hcndp.data_functions import reshape_matrix
-    import copy
+    
 
     # Calculo los lambdas para cada ijk
     # Se calculan a través de un loop asumiendo que solo hay arribos 
@@ -260,19 +285,19 @@ def set_lambda_ijk (solution, network,_post_optima):
         for i in df_asignacion.index.levels[0]: 
             df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1    
-        print ("\n Se actualizaron exitosamente los lambda_ijk")
+        #print ("\n Se actualizaron exitosamente los lambda_ijk")
     
     if _post_optima==True and solution.tecnica != "Exacta":
         for i in df_asignacion.index.levels[0]: 
             df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1
-        print ("\n Se actualizaron exitosamente los lambda_ijk")
+        #print ("\n Se actualizaron exitosamente los lambda_ijk")
     
     if _post_optima==True and solution.tecnica=="Exacta":
         for i in df_asignacion.index.levels[0]: 
             df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1
-        print ("\n Se actualizaron exitosamente los lambda_ijk")
+        #print ("\n Se actualizaron exitosamente los lambda_ijk")
     
     # Actualizo prop_tao_ijk
     if 'demanda_i' not in df_asignacion.columns:
@@ -294,9 +319,7 @@ def set_phi_ijkjk (solution,network):
     # Construyo df_fi_ijkjk a partir de los lambda_ijk que se han calculado
     #Para cada i hago lo siguiente
     #Multiplico l_ijk*p_jjkk|*x_jj
-    
-    import pandas as pd
-    
+        
     df_asignacion=network.file['df_asignacion']
     df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
     df_probs_kk=network.file['df_probs_kk']
@@ -322,11 +345,10 @@ def set_phi_ijkjk (solution,network):
     df_asignacion.reset_index(inplace=True)
     df_probs_kk.reset_index(inplace=True)
     
-    print ("\n Se actualizaron exitosamente los phi_ijkjk")
+    #print ("\n Se actualizaron exitosamente los phi_ijkjk")
    
 def set_prop_tao (solution,network):
     # Calculo los valores de prop_tao_ijk. Proporción de clientes que son dirigidos desde ik a jk
-    import pandas as pd
     df_demanda=network.file['df_demanda']
     df_asignacion=network.file['df_asignacion']
     
@@ -347,13 +369,10 @@ def set_prop_tao (solution,network):
     df_asignacion['prop_tao_ijk']=df_asignacion['tao_ijk']/df_asignacion['demanda_i']
 
     network.file['df_asignacion']['prop_tao_ijk'] = df_asignacion['prop_tao_ijk'].fillna(0)
-    print ("\n Se actualizaron exitosamente los tao_ijk (prop)")
+    #print ("\n Se actualizaron exitosamente los tao_ijk (prop)")
 
 def set_prob_k (solution,network):
     # Construyo las probabilidades de estado estable utilizando ecuaciones estacionarias. Son las π_k.
-    import numpy as np
-    import pandas as pd
-    from hcndp.data_functions import indices
     
     data1 = network.file['prob_serv']
     data1=data1.drop(['Unnamed: 0'], axis=1)
@@ -395,11 +414,12 @@ def set_prob_k (solution,network):
         df_demanda['h_ik'] = df_demanda.apply(lambda row: row['demanda_i'] if row['servicio_K'] == 'k01' else 0, axis=1)
     
     if solution.state=="Optimizado":
-        print ("Ya está preparada la matriz df_demanda.")
+        #print ("Ya está preparada la matriz df_demanda.")
+        pass
     else:
-        print ("Actualizo df_demanda.")
+        #print ("Actualizo df_demanda.")
         network.file['df_demanda_ik']=df_demanda
-    print ("\n Se actualizaron exitosamente las demandas en estado estable df_pi.")
+    #print ("\n Se actualizaron exitosamente las demandas en estado estable df_pi.")
 
 
 def set_prob_custom_queue (network,customers):
@@ -408,7 +428,6 @@ def set_prob_custom_queue (network,customers):
     #sum_y=tasa de arribos
     #s=número de servidores
     #c=tasa de servicio de cada servidor
-    import pandas as pd
 
     # Creo una columna en df_capac con las demandas asignadas sum tao_ij
     df_capac = network.file['df_capac'].set_index(['nombre_J','servicio_K'])
@@ -449,8 +468,6 @@ def set_kpi_per_node(network):
 #%% <codecell> Funciones para accesibilidad
 
 def set_e2sfca(network):
-    import pandas as pd
-    import numpy as np 
     
     #if 'level_0' in network.file['df_asignacion'].index.names:
     #    df_asignacion = network.file['df_asignacion'].reset_index(drop=True)
@@ -502,7 +519,6 @@ def set_e2sfca(network):
     network.file['df_accesibilidad']=df_accesibilidad
     
 def set_accessibility_per_node(network):
-    import pandas as pd    
     # Calculo accesibilidad para cada nodo de demanda i
     
     df_demanda=network.file['df_demanda'].set_index(['nombre_I','servicio_K'])
@@ -534,7 +550,6 @@ def set_accessibility_per_node(network):
     
 
 def set_accessibility_per_service(network):
-    import pandas as pd
     
     df_demanda_ik=network.file['df_demanda_ik']
     # Calculo accesibilidad para cada servicio k
@@ -559,7 +574,6 @@ def set_accessibility_network(network):
 #%% <codecell> Funciones para continuidad
 
 def set_continuity_per_node(network):
-    import pandas as pd 
     
     
     df_asignacion=network.file['df_asignacion']
@@ -595,8 +609,7 @@ def set_continuity_per_node(network):
 #%% <codecell> Funciones para medidas globales
 
 def set_kpi_network(network):    
-    import pandas as pd    
-    import numpy as np
+    
     
     df_capac=network.file['df_capac']
     df_continuidad=network.file['df_continuidad']
@@ -625,7 +638,6 @@ def set_kpi_network(network):
     network.file['df_medidas']=df_medidas
 
 def set_df_grafo_flujo_jkjk(network):
-    import pandas as pd 
 
     df_grafo=network.file['df_arcos'].copy()
     df_capac=network.file['df_capac'].copy()

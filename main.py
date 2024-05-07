@@ -65,8 +65,16 @@ print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 #%%  Llenar objeto con datos de Excel
 
-networks_dict[_name].read_file_excel(archivo)
+if archivo.endswith('xlsx'):
+    networks_dict[_name].read_file_excel(archivo)
+    
+elif archivo.endswith('txt'):
+    networks_dict[_name].read_file_txt(archivo)
+
 networks_dict[_name].delete_surplus_data()
+
+# Esta sección actualiza los sigma_max para que sean inferiores a la suma de los s_jk
+networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name)
 
 print ("#" * 60)
 print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")

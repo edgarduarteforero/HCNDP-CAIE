@@ -4,15 +4,15 @@ Created on Tue Mar 26 22:19:25 2024
 
 @author: edgar
 """
+import pandas as pd
+import numpy as np
+from hcndp import network
+import copy
+from hcndp import local_search
 
-def initial_solution(solution,network_original):
+    
+def initial_solution(current_solution,network_original):
     #Creo la representación de la red
-    import pandas as pd
-    import numpy as np
-    from hcndp import network
-    import copy
-    
-    
     network_repr=network.Network_representation(network_original.I,
                                                 network_original.J,
                                                 network_original.K,
@@ -23,14 +23,12 @@ def initial_solution(solution,network_original):
                                           network_original.file)
     
     # Asignación de recurso σ_k para cada nodo de oferta j 
+    print ("Inicio construcción de solución inicial con la asignación de recursos sigma")
     for _k in path_repr.nodes_services.keys():
         if _k !=  'k00':
             #print ("Asignación de recursos para: ", _k)
             network_repr.asignacion_recursos(path_repr,_k)
-            #for _i,_j in network.nodes_supply.items():
-             #   if _j.capac_instal_sigma != 0:
-                    #print (_i,_j.capac_instal_sigma)
-
+            
 
     # Construyo el df_sigma con los resultados de la asignacion
     # Crear listas vacías para almacenar los datos
@@ -51,7 +49,10 @@ def initial_solution(solution,network_original):
         'capac_instal_sigma': capac_instal_sigma
          })            
     network_repr.df_sigma = network_repr.df_sigma.dropna(subset=['capac_instal_sigma'])
-    solution.df_sigma=network_repr.df_sigma
+    current_solution.df_sigma=network_repr.df_sigma
+    current_solution.df_sigma = current_solution.df_sigma.rename(columns={'place':'nombre_J', 'service':'servicio_K', 'capac_instal_sigma':'sigma_jk'})
+
+
     # Para k=0 creo valores de λ_ijk0 
     # El valor de λ_ijk0 es igual a la demanda que hay en cada nodo ik0.
     for _,_j in network_repr.nodes_supply.items():
@@ -62,12 +63,13 @@ def initial_solution(solution,network_original):
     # Ordeno el diccionario de ser_ser_R
     path_repr.edges_ser_ser_R=dict(sorted(path_repr.edges_ser_ser_R.items()))
     
+    #print ("Asignación de flujos ijkkp")
     for _i in path_repr.edges_ser_ser_R.values():
         k=_i.source
         kp=_i.target
     
-        #if k < kp:
             # Obtengo los delta ijkk
+
         network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
         
             # Solución entre k y kp* obtengo los phi ijkjk
@@ -78,30 +80,9 @@ def initial_solution(solution,network_original):
             # Obtengo las aproximaciones de lambda
         network_repr.construyo_λ(network_repr,kp)
         
-        
-        #if k == kp:
-            # Obtengo los delta ijkk
-        #    network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
-        
-        
     # Porcentajes de flujo. Obtengo los pi jk jk
     network_repr.obtencion_π(network_repr)
-        
-    
-    
-    # for _i in path_repr.edges_ser_ser_R.values():
-    #     k=_i.source
-    #     kp=_i.target
-    #     network_repr.construyo_λ(network_repr,kp)
-    
-        #elif k == kp:
-        #    network_repr.asignacion_π_ciclos(network_repr,k,kp)
-    
-        #elif k > kp:
-        #    network_repr.asignacion_π_ciclos(network_repr,kp,k)
-        
-    
-    
+                
     # Construyo una matriz g con los arribos externos, es decir los ϕi.j.k0jk
     from hcndp.data_functions import indices
 
@@ -109,14 +90,12 @@ def initial_solution(solution,network_original):
     _lista_j=indices("j",network_original.J)
     _lista_k=indices("k",network_original.K)
     
-    #_lista_k_00=_lista_k
-    #_lista_k_00.append('k00')
     from itertools import product
     _lista = list(product(_lista_i, _lista_j,_lista_k))
     _g=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
     _g['tao_ijk'] = 0.0
     _g=_g.sort_values(by=['nombre_I', 'nombre_J','servicio_K'])
-    solution.df_f_ijk=_g
+    current_solution.df_f_ijk=_g
     
     def arribos_externos(poblacion_origen,servicio_origen,nodo_destino):
         suma_acumulativa=0
@@ -125,7 +104,7 @@ def initial_solution(solution,network_original):
                 suma_acumulativa += valor.flow_sup_sup_phi
         return suma_acumulativa
         
-    _g['tao_ijk']=_g.apply (lambda row: arribos_externos(row['nombre_I'],'k00',row['nombre_J']+row['servicio_K']),axis=1)
+    _g['tao_ijk']=_g.apply(lambda row: arribos_externos(row['nombre_I'],'k00',row['nombre_J']+row['servicio_K']),axis=1)
     _g=np.array(_g['tao_ijk']) # Lista de arribos externos ijk
     _g=np.reshape(_g,([network_original.I,network_original.J*(network_original.K)])) # Matriz de arribos externos de i por (jk)
     
@@ -149,9 +128,7 @@ def initial_solution(solution,network_original):
         
         for _nombre,_arco in path_repr.edges_ser_ser_R.items():
             if  _nombre == _k+_kp:
-                _π.loc[_,'p*π'] = _arco.transfer_percentage  * _π.loc[_,'π_ijkjk']
-   
-        
+                _π.loc[_,'p*π'] = _arco.transfer_percentage  * _π.loc[_,'π_ijkjk']           
    
     # Calculo los flujos entrantes lambda ijk basado en redes de Jackson
     _lista = list(product(_lista_i, _lista_j,_lista_k))
@@ -168,11 +145,10 @@ def initial_solution(solution,network_original):
         probs=_π.loc[(_π['nombre_I']==_lista_i[_fila])]
         probs=probs.sort_values(by=['nombre_J', 'servicio_K','nombre_Jp','servicio_Kp'])
         probs=np.array(probs['π_ijkjk'])
-        #probs=np.array(probs['p*π'])
         probs=np.reshape(probs,([network_original.J*(network_original.K),network_original.J*(network_original.K)]))
         _df_asignacion.loc[i,'lambda_ijk']=np.matmul(_g[_fila],np.linalg.inv(np.identity(len(probs))-(probs)))
         _fila+=1
-    # Actualizo los valores de lambda en las matrices en cada nodo oferta
+    # Actualizo los valoes de lambda en las matrices en cada nodo oferta
     for _,_j in network_repr.nodes_supply.items():
         if _j.service!='k00':
             _j.matriz_λ=_df_asignacion.loc[(slice(None),_j.place,_j.service),:]
@@ -180,11 +156,13 @@ def initial_solution(solution,network_original):
             _j.matriz_λ = _j.matriz_λ.rename(columns={'lambda_ijk': 'λ_ijk'})
     
     # Actualizo los delta con base en los nuevos lambda
+    #print ("Actualización de flujos ijkkp")
     for _i in path_repr.edges_ser_ser_R.values():
         k=_i.source
         kp=_i.target
     
         # Obtengo los delta ijkk
+        
         network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
         
     # Actualizo los phi con base en los nuevos lambda
@@ -193,9 +171,11 @@ def initial_solution(solution,network_original):
            
     # Actualizo el df_asignacion en network
     
-    solution.df_asignacion=_df_asignacion
+    current_solution.df_asignacion=_df_asignacion.reset_index()
     network_repr.df_asignacion=_df_asignacion
-    solution.df_l_jk = network_repr.df_asignacion.groupby(level=['nombre_J', 'servicio_K']).sum()
+    current_solution.df_l_jk = network_repr.df_asignacion.groupby(level=['nombre_J', 'servicio_K']).sum()
+    current_solution.df_l_jk = current_solution.df_l_jk.rename(columns={'lambda_ijk': 'lambda_jk'})
+    current_solution.df_l_jk.reset_index(inplace=True)
     
     # Llevar solución a un df_solucion
     _lista=[] 
@@ -207,7 +187,7 @@ def initial_solution(solution,network_original):
                        _j.flow_sup_sup_perc_jkjk])
     df_solucion = pd.DataFrame(_lista, columns=['nombre_I', 'origen', 'destino','π_ijkjk','ϕ','π_jkjk'])
     
-    solution.solution=df_solucion
+    current_solution.solution=df_solucion
     
     # Preparo los df_prob_fi_jkjk y df_fi_ijkjk
     df_solucion['nombre_J'] = df_solucion['origen'].str[:3]
@@ -245,11 +225,6 @@ def initial_solution(solution,network_original):
     df_solucion.drop(['ϕ_x', 'ϕ_y'], axis=1, inplace=True)
     df_solucion.fillna(0, inplace=True)
     
-    #df_solucion=_lista_completa
-    #df_solucion['π_jkjk'] = df_solucion['π_jkjk'].astype(float)
-    #df_solucion['ϕ'] = df_solucion['ϕ'].astype(float)
-    #df_solucion['π_ijkjk'] = df_solucion['π_ijkjk'].astype(float)
-    
     df_prob_fi_ijkjk = copy.deepcopy(df_solucion)
     df_prob_fi_ijkjk.drop(columns=['ϕ','π_jkjk'],inplace=True)
     
@@ -261,22 +236,212 @@ def initial_solution(solution,network_original):
     df_prob_fi_jkjk = df_prob_fi_jkjk.groupby(
         ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).mean(['π_jkjk'])
     
-    solution.df_prob_fi_ijkjk =df_prob_fi_ijkjk 
-    solution.df_fi_ijkjk=df_fi_ijkjk
-    solution.df_prob_fi_jkjk =df_prob_fi_jkjk 
-
-     # prob_fi_jkjk = fi_jkjk.groupby(
-     #     ['nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp']).sum(['lambda_ijk'])
-     # prob_fi_jkjk['fi_jkjk'] = prob_fi_jkjk['fi_jkjk'] / \
-     #     prob_fi_jkjk['lambda_ijk']
-     # prob_fi_jkjk.fillna(0, inplace=True)
-     # prob_fi_jkjk.reset_index(inplace=True)
-
+    df_prob_fi_jkjk=df_prob_fi_jkjk.rename(columns={'π_jkjk':'Probs'})
     
-    solution.state="Solucionado_Solución_Inicial"
-    solution.network_repr=network_repr
-
-    # %% Exportar resultados 
-    solution.set_solution_excel()
+    current_solution.df_prob_fi_ijkjk =df_prob_fi_ijkjk 
+    current_solution.df_fi_ijkjk=df_fi_ijkjk
+    current_solution.df_prob_fi_jkjk =df_prob_fi_jkjk 
     
-    return solution
+    # Calculo los rho para cada nodo jk y lo almaceno en nodes_supply
+    for _i,_j in network_repr.nodes_supply.items():
+        if _j.service != 'k00':
+            if _j.matriz_λ['λ_ijk'].sum() == 0:
+                _j.rho=0
+            else: 
+                _j.rho = _j.matriz_λ['λ_ijk'].sum()/(_j.capac_instal_sigma*_j.rate)
+
+    current_solution.state="Solucionado Solución Inicial"
+    current_solution.network_repr=network_repr
+    
+    local_search.calcular_kpi_local_search(current_solution)
+
+
+
+    return current_solution
+
+def fix_initial_solution(current_solution):
+    # Corrige la solución inicial existente para evitar que tenga rho > 1
+    local_search.calcular_kpi_local_search(current_solution)
+
+    if current_solution.network_copy.file['df_capac']['rho'].max() > 1 == True:
+        # Si todavía quedan nodos con rho > 1
+        # Construyo modelo de optimización
+        current_solution.construct_model()
+        
+        # Creo el archivo datos.dat
+        current_solution.network_copy.create_data_dat()
+        
+        # Convierto sigma_jk de variable a parámetro
+        # _solucion.pyo_model.model_abstract=_solucion.pyo_model.var_sigma_to_param(_solucion.pyo_model.model_abstract)
+        current_solution.construct_instance()
+        
+        # Fijo los nuevos valores de sigma en la instancia
+        # Con esta estrategia no tengo que construir un nuevo modelo abstracto
+        
+        for _i,_j in current_solution.network_repr.nodes_supply.items():
+            _new_sigma=_j.capac_instal_sigma
+            if _j.service != 'k00':
+              current_solution.pyo_model.instance.sigma[_j.place,_j.service].fix(_new_sigma)
+        #print (f"Solucionando modelo de optimización para corregir errores")
+        current_solution.execute_solver()
+    
+            
+    print ("")
+    local_search.calcular_kpi_local_search(current_solution)
+            
+    return  current_solution
+
+
+def fix_initial_solution2(current_solution):
+    # Corrige la solución inicial existente para evitar que tenga rho > 1
+    
+    local_search.calcular_kpi_local_search(current_solution)
+    
+    # Comprobar si las columnas son diferentes donde 'rho' > 1
+    def check_conditions(df):
+        # Filtrar filas donde 'rho' > 1
+        rho_gt_one = df[df['rho'] > 1]
+    
+        # Verificar si hay diferencias entre 's_jk' y 'sigma_jk'
+        return rho_gt_one['s_jk'].ne(rho_gt_one['sigma_jk']).any()
+    
+    while current_solution.network_copy.file['df_capac']['rho'].max() > 1 and\
+        check_conditions(current_solution.network_copy.file['df_capac']): 
+            # Mientras que haya algún nodo sobresaturado y existan diferencias entre 's_jk' y 'sigma_jk'
+
+
+        for _index,_jnode in current_solution.network_repr.nodes_supply.items():
+            if _jnode.service != 'k00' and _jnode.rho > 1 and _jnode.capac_instal_disponible != 0: # Identifico elementos con rho > 1
+                #print (_i,_j.rho)
+                nodo_mayor_congest= _index
+                servicio_congest=_jnode.service # Identifico el servicio del elemento congestionado
+                menor_congestion=2
+                # Identifico el sigma menos congestionado de servicio_congest 
+                for _m,_k in  current_solution.network_repr.nodes_supply.items():
+                    if _k.service == servicio_congest and _k.rho < menor_congestion and _k.capac_instal_disponible>=1:
+                        menor_congestion=_k.rho
+                        nodo_menos_congest=_m
+                        #print (_m,_k,menor_congestion)
+                # Ajusto sigmas entre nodo_mayor_congest y nodo_menor_congest
+                current_solution.network_repr.nodes_supply[nodo_mayor_congest].capac_instal_disponible -= 1 
+                current_solution.network_repr.nodes_supply[nodo_mayor_congest].capac_instal_sigma += 1
+                
+                current_solution.network_repr.nodes_supply[nodo_menos_congest].capac_instal_disponible += 1 
+                current_solution.network_repr.nodes_supply[nodo_menos_congest].capac_instal_sigma -= 1
+                
+                # Actualizo los nuevos valores de sigma de network_repr en network_copy > file > df_capac
+                for _i,_j in current_solution.network_repr.nodes_supply.items():
+                    a = _j.place
+                    b = _j.service
+                    c = _j.capac_instal_sigma
+                
+                    fila = current_solution.network_copy.file['df_capac'].query('nombre_J == @a and servicio_K == @b')
+                    current_solution.network_copy.file['df_capac'].loc[fila.index, 'sigma_jk'] = c
+                    fila = current_solution.df_sigma.query('nombre_J == @a and servicio_K == @b')
+                    current_solution.df_sigma.loc[fila.index, 'sigma_jk'] = c
+                    
+                # Calculo los rho para cada nodo jk y lo almaceno en nodes_supply
+                for _i,_j in current_solution.network_repr.nodes_supply.items():
+                     if _j.service != 'k00':                                    
+                        if _j.matriz_λ['λ_ijk'].sum() == 0:
+                            _j.rho=0
+                        else: 
+                            _j.rho = _j.matriz_λ['λ_ijk'].sum()/(_j.capac_instal_sigma*_j.rate)                        
+                
+                
+                
+        local_search.calcular_kpi_local_search(current_solution)
+
+    if current_solution.network_copy.file['df_capac']['rho'].max() > 1 == True:
+        # Si todavía quedan nodos con rho > 1
+        # Construyo modelo de optimización
+        current_solution.construct_model()
+        
+        # Convierto sigma_jk de variable a parámetro
+        # _solucion.pyo_model.model_abstract=_solucion.pyo_model.var_sigma_to_param(_solucion.pyo_model.model_abstract)
+        current_solution.construct_instance()
+        
+        # Fijo los nuevos valores de sigma en la instancia
+        # Con esta estrategia no tengo que construir un nuevo modelo abstracto
+        
+        for _i,_j in current_solution.network_repr.nodes_supply.items():
+            _new_sigma=_j.capac_instal_sigma
+            if _j.service != 'k00':
+             current_solution.pyo_model.instance.sigma[_j.place,_j.service].fix(_new_sigma)
+        #print (f"Solucionando modelo de optimización para corregir errores")
+        current_solution.execute_solver()
+
+            
+    print ("")
+    local_search.calcular_kpi_local_search(current_solution)
+            
+    return  current_solution
+
+
+
+# %% <codecell> main
+if __name__ == "__main__":
+
+        # Borro carpeta con resultados previos
+        from hcndp import data_functions
+        import os
+        data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
+        print("\nContenidos borrados. \nContinuando...")
+        
+        from hcndp import read_data
+        networks_dict={} #Diccionario con las redes utilizadas en el programa
+        problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
+
+        # Indicamos origen de datos y definimos valores I,J,K
+        I,J,K= [6,6,6]
+        archivo = r"C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\Códigos Python\HcNDP\Health-Care-Network-Design-Problem\hcndp/data/red_original/datos_i16_j10_k10_base.xlsx"
+        # Objeto network
+        from hcndp import network
+
+        # Creamos un objeto network
+        _name="red_original"
+
+        networks_dict[_name] = network.Network(I,J,K,archivo,_name)
+        networks_dict[_name].create_folders()
+        print (f"\nSe ha creado exitosamente el objeto {_name}.")
+
+
+        # Llenar objeto con datos de Excel
+
+        networks_dict[_name].read_file_excel('C:/Users/edgar/OneDrive - Universidad Libre/Doctorado/Códigos Python/HcNDP/Health-Care-Network-Design-Problem/data/red_original/datos_i16_j10_k10_base.xlsx')
+        networks_dict[_name].delete_surplus_data()
+        networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name)
+
+        print ("#" * 60)
+        print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
+    
+
+        # Creo el objeto solucion
+        from hcndp import solutions
+
+        solutions.create_problem_object(networks_dict['red_original'], problems_dict, name_problem="temporal")
+        current_solution = problems_dict["temporal"]
+
+        # Defino objetivo y método
+        current_solution.optimizar=True
+        current_solution.tecnica="Aproximación"
+        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        current_solution.objective = _objective_and_description[0]
+        current_solution.description_objective = _objective_and_description[1]
+        current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica
+        
+        # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
+        _clave_temporal = 'temporal'
+        _solucion_temporal = problems_dict[_clave_temporal]
+        
+        problems_dict[_solucion_temporal.name_problem] = problems_dict.pop(_clave_temporal)
+        problems_dict[_solucion_temporal.name_problem].network_copy.name_problem = \
+            problems_dict[_solucion_temporal.name_problem].name_problem
+        print (f"Se ha actualizado el objeto {problems_dict[_solucion_temporal.name_problem].name_problem}")
+        
+        # Ejecuto initial solution
+        current_solution= initial_solution(current_solution,networks_dict['red_original'])
+        local_search.calcular_kpi_local_search(current_solution)
+        current_solution= fix_initial_solution(current_solution)
+
+        

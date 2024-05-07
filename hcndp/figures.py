@@ -169,14 +169,14 @@ def figure_network_cartesian(network):
                     right_on=['nombre_I','nombre_J'], how='left')
     prueba=prueba[(prueba['w_ij']>0)]
     # Dibujo una flecha para cada arco posible existente en prueba.
-    prueba.apply(lambda row: ax.arrow(row['ubicacionesI_x'],row['ubicacionesI_y'],
-                                      row['ubicacionesJ_x']-row['ubicacionesI_x'],
-                                      row['ubicacionesJ_y']-row['ubicacionesI_y'],
-                                      width=0.0001,alpha=0.5,color='orangered',                            
-                                      fill=True,length_includes_head=True,
-                                      head_width=0.055,
-                                      ),
-                                      axis=1)
+    # prueba.apply(lambda row: ax.arrow(row['ubicacionesI_x'],row['ubicacionesI_y'],
+    #                                   row['ubicacionesJ_x']-row['ubicacionesI_x'],
+    #                                   row['ubicacionesJ_y']-row['ubicacionesI_y'],
+    #                                   width=0.0001,alpha=0.5,color='orangered',                            
+    #                                   fill=True,length_includes_head=True,
+    #                                   head_width=0.055,
+    #                                   ),
+    #                                   axis=1)
 
     # prueba2 contiene los flujos entre j y j'
     prueba2=pd.merge(network.file['df_arcos'].reset_index(),
@@ -186,9 +186,9 @@ def figure_network_cartesian(network):
 
     # Los grises son los flujos entre j para cualquier k.
     # Consultar detalles de anotaciones en: https://matplotlib.org/stable/tutorials/text/annotations.html
-    for _, row in prueba2.iterrows():
-        ax.annotate("", xy=(row.iloc[5], row.iloc[6]), xytext=(row.iloc[7], row.iloc[8]),
-                    arrowprops=dict(color="grey", linewidth=0.9, arrowstyle="->", connectionstyle="arc3,rad=0.3"))
+    # for _, row in prueba2.iterrows():
+    #     ax.annotate("", xy=(row.iloc[5], row.iloc[6]), xytext=(row.iloc[7], row.iloc[8]),
+    #                 arrowprops=dict(color="grey", linewidth=0.9, arrowstyle="->", connectionstyle="arc3,rad=0.3"))
 
 
     # Agrego los nombres de nodos de demanda
@@ -547,11 +547,12 @@ def figure_nodes_coverage(network):
     import os
     import numpy as np
     
-    df_demanda=network.file['df_demanda']
+    #df_demanda=network.file['df_demanda']
     df_capac=network.file['df_capac']
     df_niveles=network.file['df_niveles']
     df_oferta=network.file['df_oferta']
     df_asignacion=network.file['df_asignacion'].copy()
+    df_demanda=network.file['df_demanda_ik']
     
     fig, ax = plt.subplots(network.K,figsize=(6,6*network.K),constrained_layout=True) #Figura con K axes, uno para cada servicio
     #gs = gridspec.GridSpec(2, 3)
@@ -661,12 +662,13 @@ def figure_accessibility(network):
     import numpy as np
     plt.rcdefaults()
     
-    df_demanda=network.file['df_demanda'].copy()
+    #df_demanda=network.file['df_demanda'].copy()
     df_capac=network.file['df_capac']
     df_niveles=network.file['df_niveles']
     df_oferta=network.file['df_oferta']
     df_asignacion=network.file['df_asignacion'].copy()
-    
+    df_demanda=network.file['df_demanda_ik'].copy()
+
     fig, ax = plt.subplots(network.K,figsize=(8,8*network.K),constrained_layout=True) #Figura con K axes, uno para cada servicio
 
     fig.suptitle('Accesibilidad para cada nodo de demanda',fontsize=14,weight="bold")
@@ -959,7 +961,8 @@ def figure_flows_f_jpkpjk(network):
 
     df_capac=network.file['df_capac'].copy()
     df_arcos=network.file['df_arcos'].reset_index().copy()
-    df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
+    #df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
+    df_temporal=pd.merge(df_capac,df_arcos,on=["nombre_J",'servicio_K'],how="left")
     df_temporal['lambdas*probs']=df_temporal['lambdas']*df_temporal['p_jjkk']
     df_temporal=df_temporal.reset_index()
     df_temporal['jk_origen']=df_temporal['nombre_J']+df_temporal['servicio_K']
@@ -1066,7 +1069,7 @@ def figure_sankey(network):
     # Obtengo los nombres de los nodos de oferta
     # Uno las dos listas anteriores e una sola lista y la numero
     
-    df_demanda=network.file['df_demanda']
+    df_demanda=network.file['df_demanda_ik']
     df_capac=network.file['df_capac']
     df_asignacion=network.file['df_asignacion']
     df_arcos=network.file['df_arcos']

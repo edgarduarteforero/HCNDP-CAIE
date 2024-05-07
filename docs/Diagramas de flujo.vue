@@ -1,14 +1,14 @@
-<!-- Tufts VUE 3.3.0 concept-map (Diagramas de flujo.vue) 2024-03-13 -->
+<!-- Tufts VUE 3.3.0 concept-map (Diagramas de flujo.vue) 2024-05-05 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/C:/Program%20Files%20(x86)/VUE/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Wed Mar 13 04:37:06 COT 2024 by edgar on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
+<!-- Do Not Remove: Saved date Sun May 05 13:16:49 COT 2024 by edgar on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built October 8 2015 at 1658 by tomadm on Linux 2.6.32-504.23.4.el6.x86_64 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0"
     label="Diagramas de flujo.vue" created="1704812190924" x="0.0"
     y="0.0" width="2053.783" height="3006.7222" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1710322626384" size="493739"
+    <resource referenceCreated="1714933009978" size="499087"
         spec="C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\C&#xf3;digos Python\HcNDP\Health-Care-Network-Design-Problem\docs\Diagramas de flujo.vue"
         type="1" xsi:type="URLResource">
         <title>Diagramas de flujo.vue</title>
@@ -333,19 +333,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8177ca3c0a801660095d728026e9aa5</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #404040" color="#404040"&gt;
+  &lt;head color="#404040" style="color: #404040"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #404040; font-size: 11; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 11; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #404040; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 11; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 11; margin-bottom: 0px; color: #404040; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 11; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #404040; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 11; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #404040" color="#404040"&gt;
+    &lt;p color="#404040" style="color: #404040"&gt;
       (Problem.menu_mono_optimization@solutions.py)
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1300,19 +1300,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8177cc8c0a801660095d728ba1a6f49</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Mensaje de bienvenida
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1331,16 +1331,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1356,19 +1356,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8177cc9c0a801660095d72888cd58bd</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       &amp;#191;Borrar carpetas?
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1397,16 +1397,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1422,19 +1422,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8177ccac0a801660095d72854ef7ddc</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       importo read_data
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1493,16 +1493,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1518,19 +1518,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8177cccc0a801660095d72846bda741</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       creo network
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1592,16 +1592,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1617,19 +1617,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8177ccdc0a801660095d72839445d4b</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       lleno network con datos
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1670,16 +1670,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -1695,19 +1695,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c81dbbdbc0a801660095d728ba9a1a21</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       men&amp;#250; mono objetivo o multiobjetivo
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2281,19 +2281,19 @@
                 <font>SansSerif-plain-14</font>
                 <URIString>http://vue.tufts.edu/rdf/resource/c8c62400c0a801660095d728fb2cd084</URIString>
                 <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Muestro men&amp;#250; de agregar soluciones
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2312,16 +2312,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2361,16 +2361,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2470,16 +2470,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2531,19 +2531,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/ef959c9ec0a8016600dd45aa87dc1cd6</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Si la soluci&amp;#243;n fue ingresada por usuario calculo_kpi con 
       _post_optima=False
     &lt;/p&gt;
@@ -2563,24 +2563,24 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/ef959c9fc0a8016600dd45aa50e40f22</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Si la soluci&amp;#243;n fue optimizada capturo soluci&amp;#243;n obtenida con 
       merge_niveles, create_df_asignacion, create_df_probs y 
       create_df_arcoscon _post_optima=False
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Luego hago calculate_kpi con _post_optima=False
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2643,16 +2643,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2681,16 +2681,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2719,16 +2719,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2809,19 +2809,19 @@
         <font>SansSerif-plain-14</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c8c62401c0a801660095d728f21afb3c</URIString>
         <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       solutions.menu_solutions(network_original , problems_dict)
     &lt;/p&gt;
   &lt;/body&gt;
@@ -2919,16 +2919,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -3014,16 +3014,16 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       ---------------
     &lt;/p&gt;
   &lt;/body&gt;
@@ -3541,19 +3541,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d728df5b6bee</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Objective: &amp;quot;Nulo&amp;quot;
     &lt;/p&gt;
   &lt;/body&gt;
@@ -3570,19 +3570,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d72804b94597</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       network_copy: network_original
     &lt;/p&gt;
   &lt;/body&gt;
@@ -3678,19 +3678,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d7285df2873a</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Objective: &amp;quot;Nulo&amp;quot;
     &lt;/p&gt;
   &lt;/body&gt;
@@ -3707,19 +3707,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d7287de831e2</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       network_copy: network_original
     &lt;/p&gt;
   &lt;/body&gt;
@@ -3736,19 +3736,19 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/c8c62403c0a801660095d72879a84168</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       current_problem.optimizar=True
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4151,22 +4151,22 @@
         <font>SansSerif-plain-14</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdac0a801660095d72806ed678a</URIString>
         <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Usan solution y
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       network
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4247,19 +4247,19 @@
         <font>SansSerif-plain-14</font>
         <URIString>http://vue.tufts.edu/rdf/resource/c9b40cdec0a801660095d72810aafb81</URIString>
         <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Usan network
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4541,19 +4541,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c9de8cdcc0a801660095d7282a3af43b</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Objective: &amp;quot;Nulo&amp;quot;
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4570,19 +4570,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c9de8cdcc0a801660095d72855608253</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       network_copy: network_original
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4599,19 +4599,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c9de8cdcc0a801660095d728a389bde3</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       network._optimizar=False
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4709,19 +4709,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c9de8cdcc0a801660095d72852568e83</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Objective: &amp;quot;Nulo&amp;quot;
     &lt;/p&gt;
   &lt;/body&gt;
@@ -4738,19 +4738,19 @@
                     <font>SansSerif-plain-14</font>
                     <URIString>http://vue.tufts.edu/rdf/resource/c9de8cdcc0a801660095d7289a78b10c</URIString>
                     <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       network_copy: network_original
     &lt;/p&gt;
   &lt;/body&gt;
@@ -5230,22 +5230,22 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/ef959cc5c0a8016600dd45aa1a41d8be</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Asumo que K00 es el servicio de los nodos de demanda
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Para cada k != k00 aplico:
     &lt;/p&gt;
   &lt;/body&gt;
@@ -5283,45 +5283,45 @@
             <font>SansSerif-plain-14</font>
             <URIString>http://vue.tufts.edu/rdf/resource/f932e282c0a8016600dd45aa152cf44e</URIString>
             <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Construyo primera soluci&amp;#243;n:
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Para k &amp;lt; k' construyo delta ijkkp
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Flujo de usuarios i que salen de jk y van a kp
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       solucion_entre_k_kp: Problema de transporte entre k ykp. Las soluciones 
       son los flow_sup_sup_phi que est&amp;#225;n en edges_sup_sup_X
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       obtencion_&amp;#960;: convierte los flow_sup_sup_phi (flujos) en porcentajes que 
       est&amp;#225;n en edges_sup_sup_X como sup_sup_perc
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       construyo_&amp;#955;: construye los lambda como la suma de los flow_sup_sup_phi. 
       Se almacenanen nodes_supply
     &lt;/p&gt;
@@ -5371,204 +5371,204 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       suma_asignacion=0
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Construyo df_matriz_todos vac&amp;#237;a
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       _x = suma de los s_jk (Puestos disponibles para k en la red)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Para c/arco sup sup X (ijkjk)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Calculo &amp;quot;distance_origin_target_covered&amp;quot; si distancia est&amp;#225; cubierta
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Comparo _x vs service_capacity(k) Servidores disponibles para asignar
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Imprimo si _x != service_capacity(k)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Mientras que suma_asignacion &amp;lt; service_capacity(k)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       df_matriz=construir_matriz(_k) Matriz que tendr&amp;#225; para cada jk el nodo i 
       m&amp;#225;s lejano
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Para cada nodo jk de oferta
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Si j.servicio=k
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       selected=0
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       max_dist=0
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Hallo los nodos i y j que est&amp;#225;n m&amp;#225;s separados
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       para cada arco ijkj'k'
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       si j'k' == jk
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       si distance_origin_covered &amp;gt; max dist
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       max_dist = distance_origin_covered
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       selected = i
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       si selected !=0
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       agrego nueva fila a df_matriz con el par encontrado
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Ordeno df_matriz por distancia m&amp;#225;xima
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Si df_matriz == vac&amp;#237;o
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       break
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       De lo contrario
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Para fila 0 declaro reman_antes=service_capacity
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Asigno sigma a cada jk
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Para cada fila _i en df_matriz
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Si reman_antes &amp;lt;= 0, sigma_jk = 0
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Si suma_asignacion=0 y _i=0
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       reman_antes=service_capacity
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       sigma_jk = min (demanda,s_jk,reman_antes)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       reman_despues=reman_antes-sigma_jk
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       else:
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       reman_antes=reman_despues(del anterior)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       sigma_jk = min (demanda,s_jk,reman_antes)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       reman_despues=reman_antes-sigma_jk
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Los valores de sigma_jk en df_matriz se llevan a los objetos 
       network.supply node como
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       capac_instal_disponible
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       capac_instal_sigma
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       capac_sigma_dispon
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Actualizo suma_asignacion+=sigma_jk
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Agrego df_matriz a df_matriz_todos
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       
     &lt;/p&gt;
   &lt;/body&gt;
@@ -5607,31 +5607,31 @@
   &lt;head&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       Resultados de salida_optimizacion.
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       fi_jkjk es la suma de los flujos fi_ijkjk que hay entre cada par jkjk.
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       prob_fi_jkjk es el cociente de
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       suma_i(fi_ijkjk) (Flujo que va de jk a jk)
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       /
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       suma_i(lambda_ijk) (Flujo que sale de jk)
     &lt;/p&gt;
   &lt;/body&gt;
@@ -5652,20 +5652,20 @@
         <ID1 xsi:type="node">1014</ID1>
         <ID2 xsi:type="text">1243</ID2>
     </child>
-    <child ID="1245" layerID="1" created="1709899977650" x="1334.1893"
-        y="460.8104" width="162.05359" height="32.66342"
+    <child ID="1245" layerID="1" created="1709899977650" x="1591.7305"
+        y="462.0736" width="218.96631" height="222.74591"
         strokeWidth="1.0" autoSized="false" controlCount="2"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/2e84643ec0a801640130660a15b35ee9</URIString>
-        <point1 x="1495.7429" y="461.3104"/>
-        <point2 x="1334.6893" y="490.2529"/>
+        <point1 x="1713.9929" y="462.5736"/>
+        <point2 x="1592.2305" y="684.3195"/>
         <ID1 xsi:type="node">48</ID1>
-        <ID2 xsi:type="node">55</ID2>
-        <ctrlPoint0 x="1341.4268" y="459.78802" xsi:type="point"/>
-        <ctrlPoint1 x="1385.6616" y="504.2788" xsi:type="point"/>
+        <ID2 xsi:type="node">1268</ID2>
+        <ctrlPoint0 x="1936.7959" y="462.95468" xsi:type="point"/>
+        <ctrlPoint1 x="1719.913" y="696.7719" xsi:type="point"/>
     </child>
     <child ID="1246" label="set_lambda_jk" layerID="1"
         created="1710278483971" x="1221.3779" y="2941.1777" width="93.0"
@@ -5688,15 +5688,15 @@
         <shape xsi:type="rectangle"/>
     </child>
     <child ID="1253" label="df_capac" layerID="1"
-        created="1710278715804" x="1290.6279" y="2942.8027"
-        width="82.58325" height="14.0" strokeWidth="1.0"
+        created="1710278715804" x="1313.8779" y="2945.6777"
+        width="59.333252" height="14.0" strokeWidth="1.0"
         autoSized="false" controlCount="0" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/372c2fd1c0a8016401d24da5ee653a86</URIString>
-        <point1 x="1291.1279" y="2949.8027"/>
-        <point2 x="1372.7112" y="2949.8025"/>
+        <point1 x="1314.3779" y="2952.6777"/>
+        <point2 x="1372.7112" y="2952.6777"/>
         <ID1 xsi:type="node">1246</ID1>
         <ID2 xsi:type="node">1252</ID2>
     </child>
@@ -5722,14 +5722,14 @@
     </child>
     <child ID="1256" label="df_asignacion" layerID="1"
         created="1710278805644" x="1127.1697" y="2896.531"
-        width="136.4596" height="45.146484" strokeWidth="1.0"
+        width="136.93701" height="45.14673" strokeWidth="1.0"
         autoSized="false" controlCount="2" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/372c2fd2c0a8016401d24da5dfa1183e</URIString>
         <point1 x="1127.6697" y="2897.031"/>
-        <point2 x="1253.6488" y="2941.1775"/>
+        <point2 x="1261.4686" y="2941.1777"/>
         <ID1 xsi:type="node">1251</ID1>
         <ID2 xsi:type="node">1246</ID2>
         <ctrlPoint0 x="1239.4994" y="2898.1348" xsi:type="point"/>
@@ -5756,7 +5756,7 @@
         <shape xsi:type="rectangle"/>
     </child>
     <child ID="1255" label="l_jk" layerID="1" created="1710278792699"
-        x="1184.4197" y="2957.9277" width="67.67102" height="35.61377"
+        x="1184.4197" y="2963.6777" width="72.97742" height="30.58252"
         strokeWidth="1.0" autoSized="false" controlCount="2"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
@@ -5764,11 +5764,125 @@
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/372c2fd4c0a8016401d24da5fdba8937</URIString>
         <point1 x="1184.9197" y="2991.5645"/>
-        <point2 x="1251.5907" y="2958.4277"/>
+        <point2 x="1256.8971" y="2964.1777"/>
         <ID1 xsi:type="node">1254</ID1>
         <ID2 xsi:type="node">1246</ID2>
         <ctrlPoint0 x="1258.4913" y="2996.292" xsi:type="point"/>
         <ctrlPoint1 x="1237.5034" y="2984.488" xsi:type="point"/>
+    </child>
+    <child ID="1268" label="Men&#xfa; de m&#xe9;todo de b&#xfa;squeda"
+        layerID="1" created="1714930517128" x="1290.7305" y="585.74243"
+        width="301.5" height="167.75" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#DAA9FF</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e31ae3cde7</URIString>
+        <child ID="1269"
+            label="1. Soluci&#xf3;n exacta (Optimizaci&#xf3;n)"
+            created="1714930517128" x="34.0" y="23.0" width="192.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e304207176</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <child ID="1270"
+            label="2. Soluci&#xf3;n inicial (Aproximaci&#xf3;n)"
+            created="1714930517129" x="34.0" y="43.25" width="192.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e37e64c36a</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <child ID="1271"
+            label="3. Soluci&#xf3;n por b&#xfa;squeda local (Local Search)"
+            created="1714930517129" x="34.0" y="63.5" width="264.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e369e07c5c</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <child ID="1272"
+            label="4. Soluci&#xf3;n por b&#xfa;squeda local iterada (Iterated Local Search)"
+            created="1714930517129" x="34.0" y="83.75" width="349.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e38724681b</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <child ID="1273"
+            label="5. Soluci&#xf3;n por b&#xfa;squeda con vecindario variable (VNS)"
+            created="1714930517129" x="34.0" y="104.0" width="315.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e398ffcfc5</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <child ID="1274" label="10. Regresar al men&#xfa; anterior"
+            created="1714930517129" x="34.0" y="124.25" width="176.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e313b89d90</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <child ID="1275" label="7. Salir al men&#xfa; anterior"
+            created="1714930517129" x="34.0" y="144.5" width="142.0"
+            height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+            <fillColor>#F1A83E</fillColor>
+            <strokeColor>#000000</strokeColor>
+            <textColor>#000000</textColor>
+            <font>Arial-plain-12</font>
+            <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e3842d2177</URIString>
+            <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+        </child>
+        <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+    </child>
+    <child ID="1278" layerID="1" created="1714930716921" x="955.2176"
+        y="319.02826" width="371.07928" height="405.03143"
+        strokeWidth="1.0" strokeStyle="4" autoSized="false"
+        controlCount="2" arrowState="2" xsi:type="link">
+        <strokeColor>#A6A6A6</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e3e9a88bf6</URIString>
+        <point1 x="1325.7969" y="723.3694"/>
+        <point2 x="997.5379" y="319.52826"/>
+        <ID1 xsi:type="node">1274</ID1>
+        <ID2 xsi:type="node">33</ID2>
+        <ctrlPoint0 x="1131.8707" y="737.56116" xsi:type="point"/>
+        <ctrlPoint1 x="848.0903" y="354.82172" xsi:type="point"/>
+    </child>
+    <child ID="1279" layerID="1" created="1714930755383" x="1201.0724"
+        y="540.5049" width="90.15808" height="113.88379"
+        strokeWidth="1.0" autoSized="false" controlCount="1"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/49f90e99c0a80164013cf5e3832bd2e0</URIString>
+        <point1 x="1290.7305" y="653.8887"/>
+        <point2 x="1203.1768" y="541.0049"/>
+        <ID1 xsi:type="node">1268</ID1>
+        <ID2 xsi:type="node">55</ID2>
+        <ctrlPoint0 x="1189.5885" y="643.3358" xsi:type="point"/>
     </child>
     <child ID="157" label="Objeto" layerID="115" created="1704816653036"
         x="63.407166" y="582.67773" width="101.0" height="29.6"
@@ -6417,22 +6531,22 @@
                 <font>SansSerif-plain-14</font>
                 <URIString>http://vue.tufts.edu/rdf/resource/f01bd84cc0a8016401c57e38961ec585</URIString>
                 <richText>&lt;html&gt;
-  &lt;head style="color: #000000" color="#000000"&gt;
+  &lt;head color="#000000" style="color: #000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { color: #000000; font-size: 12; font-family: Arial; margin-top: 0px; margin-right: 0px; margin-left: 0px; margin-bottom: 0px }
-        ol { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
-        p { color: #000000; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0 }
-        ul { font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-top: 6; margin-left: 30 }
+        body { margin-top: 0px; font-size: 12; margin-bottom: 0px; color: #000000; margin-right: 0px; font-family: Arial; margin-left: 0px }
+        ol { margin-top: 6; font-size: 12; vertical-align: middle; margin-left: 30; font-family: Arial; list-style-position: outside }
+        p { margin-top: 0; margin-bottom: 0; color: #000000; margin-right: 0; margin-left: 0 }
+        ul { margin-top: 6; font-size: 12; vertical-align: middle; font-family: Arial; margin-left: 30; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       (new_network=current_solution.network_copy,
     &lt;/p&gt;
-    &lt;p style="color: #000000" color="#000000"&gt;
+    &lt;p color="#000000" style="color: #000000"&gt;
       problems_dict=problems_dict)
     &lt;/p&gt;
   &lt;/body&gt;
@@ -9309,6 +9423,28 @@
         <URIString>http://vue.tufts.edu/rdf/resource/18be6aadc0a801640130660ad370bb73</URIString>
         <shape xsi:type="rectangle"/>
     </child>
+    <child ID="1266" label="objeto problem" layerID="115"
+        created="1714310057274" x="1221.1266" y="754.824"
+        width="159.83757" height="36.167625" strokeWidth="1.0"
+        autoSized="false" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/263f662bc0a8016600fc512411945c5e</URIString>
+        <shape xsi:type="rectangle"/>
+    </child>
+    <child ID="1267" label="adfasdffas" layerID="115"
+        created="1714310090060" x="1253.7942" y="751.3239"
+        width="206.50546" height="54.834785" strokeWidth="1.0"
+        autoSized="false" xsi:type="node">
+        <fillColor>#F1A83E</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/263f662bc0a8016600fc5124f5ad6e4e</URIString>
+        <shape xsi:type="rectangle"/>
+    </child>
     <layer ID="1" label="Menus" created="1704812190930" x="0.0" y="0.0"
         width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/eebaac69c0a80164006507776fa2a06d</URIString>
@@ -9318,8 +9454,8 @@
         strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/eef1ee10c0a801640065077774438027</URIString>
     </layer>
-    <userZoom>1.5</userZoom>
-    <userOrigin x="-458.62048" y="-85.295944"/>
+    <userZoom>1.0653813320170893</userZoom>
+    <userOrigin x="-328.6346" y="-255.60208"/>
     <presentationBackground>#202020</presentationBackground>
     <PathwayList currentPathway="0" revealerIndex="-1">
         <pathway ID="0" label="Camino sin t&#xed;tulo"

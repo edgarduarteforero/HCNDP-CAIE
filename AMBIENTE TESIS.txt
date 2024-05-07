@@ -1,0 +1,94 @@
+AMBIENTE TESIS
+VUE esquema documento tesis
+VUE diagramas de flujo
+Zotero
+Focus
+Firefox
+Whiteboard con algoritmos
+Spyder 3
+StarUML
+Inkscape Esquemas_tesis
+Texmaker
+QA2Do
+Word Criterios AOCE.docx
+Excel
+
+El código tiene dos partes fundamentales:
+1. Problemas mono_objetivo
+2. Problemas multi_objetivo
+
+Voy en problemas mono_objetivo
+
+Ya puedo hacer todo lo que aparece en el menú de "Agregar soluciones a red"
+1. Puedo cargar mi propia solución desde un archivo de Excel
+2. Puedo obtener soluciones mono_objetivo 
+4. Puedo generar los KPI para soluciones bien sea que las haya cargado o que las haya obtenido por optimización
+
+Cuando selecciono la opción 2 de obtener soluciones mono_objetivo paso al menú azul. 
+Allí puedo hacer optimización exacta o
+Puedo hacer optimización por métodos aproximados
+
+
+Para las metaheurísticas me voy a basar en Gendreau y Potvin (Handbook of Metaheuristics) y en Brownlee, y en Talbi
+Estoy leyendo "Metaheuristcs: from design to implementation", de Talbi, 2009. Hay aspectos MUY IMPORTANTES. Están en el archivo de notas de Zotero.
+
+Voy a implementar varios métodos de única solución. Inicio por Local search en su versión básica.
+¿Qué quiero explorar usando el Local Search?
+Quiero establecer la calidad de la metaheurística para resolver distintos problemas HCFNDP. También quiero explorar el Landscape para caracterizar la dificultad de los problemas.
+
+Puedo hacer el experimento para una misma metaheurística con una misma instancia. Los factores podrían ser: operadores y los factores propios de cada metaheurística (temperatura, tamaño de lista tabú, tamaño del vecindario). La idea es asegurar la robustez de la metaheurística para resolver varias instancias. 
+Medidas de desempeño: diferencia entre solución y solución óptima, diferencia entre solución y cotas inferiores o superiores que pueda generar. Una cota inferior es un valor inalcanzable de referencia en minimización. Tiempo CPU y Wall Clock time.
+Statistycal analysis: t-test, Wilcoxon, Friedman, ANOVA. otros. Calcular intervalos de confianza. Ordinal data analysis.
+
+También deseo explorar el fitness landscape. El libro de Talbi tiene indicadores de distribución de locales en el espacio de búsqueda, entropía, distribución en el espacio objetivo, longitud de caminos, función de autocorrelación, correlación de la distancia de fitness.  Las medidas que se proponen pueden ser calculadas tomando cada solución como un nodo de la red. Un arco existe si hay una permutación que lleva de una solución a otra. Puedo usar NetworkX para explorar el Landscape como un grafo con medidas de distribución y correlación. 
+
+
+
+Voy a implementar varias metaheurísticas:
+* Local Search
+* Simulated annealing
+* Tabu Search
+* VNS
+* LNS
+* ILS
+* GRASP
+* Ant Colony
+
+
+Simplifiqué el uso ingresando directamente a local_search.py
+Este archivo usa network_original para crear la solución inicial.
+
+
+******************GESTIÓN DE DATOS ******************************
+La estrategia de gestión de información en el código es:
+1. Leo los datos desde un assSrchivo de Excel.
+2. Los datos son guardados en un objeto netowrk y una copia se guarda en un objeto solution. 
+3. Para construir el modelo de optimización exacta no se requiere network_repr, los datos pasan del objeto network_original a un archivo datos.dat y de allí pasan al modelo de Pyomo (Create_data_dat). 
+4. Tras resolver el modelo por Gurobi (execute_solver), los datos se guardan en Excel (Set_solution_excel salida_optimizacion) y en un txt (set_solution_txt). Si estoy en "Exacta", los datos de la solución también se guardan en un dataframe "detailed_solution" (Set_solution_excel). Hasta aquí, los datos de la solución no se han guardado ni en el objeto solution ni en el objeto network,
+5. Paso a evauar KPI con la opción 4. 
+Si current_solution.objective != "Nulo", llevo los datos de Excel a file.network_copy (merge_niveles_capac,create_df_asignacion,create_df_probs_kk,create_df_arcos)
+Si tecnica != "Local_Search", estas funciones toman datos del archivo de excel salida_optimizacion.xlsx y los llevan a solution.file.network_copy
+Si técnica == Local_Search,estas funciones toman datos de network.problem (Ver más adelante el uso de Aproximada)
+6. Aplico kpi.calculate_kpi (usando los datos de file.network_copy). Todos los cálculos se realizan sobre network_copy
+Aquí termina el proceso cuando uso "Exacta"
+
+Ahora miro qué sucede cuando uso "Aproximada"
+Escojo el tipo de problema monoobjetivo escojo Aproximación. 
+optimizar=True, tecnica=Aproximacion
+Al escoger Aproximación, se llama la función initial_solution. Allí se crea un objeto network_repr. Los nuevos sigma quedan guardados en network_repr, y se construyen los df_sigma, df_f_ijk, df_l_jk, df_solucion, df_prob_fi_ijkjk, df_fi_ijkjk, df_prob_fi_jkjk  que se guardan en network_repr y en solution (quedan por fuera de network_copy). Los nuevos lambda, phi, pi son construidos en el network_repr.
+Los datos quedan grabados en network_repr. No se ha modificado network_copy
+No se han calculado KPIs.
+Luego, llevo los datos a un Excel (set_solution_excel), y procedo  ejecutar fix_initial solution, se calculan los kpi con kpi_local_search. Al interior de kpi_calculate, se deben halar los datos de la solución. Como la solución es _post_optima y no es LocalSearch, se halan desde el excel que se ha construido.
+
+En todos los casos, al ejecutar kpi_calculate, se actualizan los datos que están en solution.file.network_copy
+
+Ahora voy a escoger el problema monoobjetivo y escojo Local_Search.
+se ejecuta initial_solution, se crea el objeto network_repr
+Al ejecutar initial_solution y fix_initial_solution, el código toma los datos de network_repr y construye nuevas matrices df_sigma, df_asignacion, df_l_jk, solution, df_prob_fi_ijkjk, df_fi_ijkjk, df_prob_fi_jkjk
+Luego se ejecuta fix_initial_solution. 
+
+Allí se hace un kpi_calculate y se leen los datos que quedaron en el objeto solution (porque estoy con tecnica=Local_Search), no los que están en file.network_copy, ni los que están en network_repr. Los datos que están en el objeto solution fueron tomados de network_repr. 
+
+Por lo tanto, si deseo evaluar un objeto neighbor y es la solución inicial, puedo usar los datos que están en solution, pero no necesariamente los que es´tan en network_repr.
+
+	
