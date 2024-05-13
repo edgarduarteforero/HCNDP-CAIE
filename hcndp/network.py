@@ -11,15 +11,15 @@ Created on Fri Dec 29 12:33:35 2023
 import numpy as np
 import pandas as pd
 import math
-import random
-import sys
-import re
+import os
 import networkx as nx
-import matplotlib.pyplot as plt
 from itertools import product
+from io import StringIO
+from hcndp.data_functions import indices
+from hcndp.data_functions import decay_gauss
+
 
 # <codecell> Clase network
-from hcndp.solutions import Problem
 
 class Network():
     def __init__(self,I,J,K,archivo,name):
@@ -32,7 +32,6 @@ class Network():
 
         
     def create_folders(self):
-        import os
         
         # Comprueba si el directorio no existe antes de intentar crearlo
         if not os.path.exists(os.getcwd()+'/data/'+self.name+'/'):
@@ -53,16 +52,13 @@ class Network():
         
     def read_file_excel(self,path):
         print ("Leyendo datos del archivo de Excel.")
-        import pandas as pd
-        import os
+        
         self.file = pd.read_excel(path, sheet_name=None)
     
     def read_file_txt(self,path):
         print ("Leyendo datos del archivo de text.")
-        import pandas as pd
-        import os
         
-        from io import StringIO
+        
         
         # Leer todo el archivo de texto
         with open(path, 'r') as file:
@@ -129,7 +125,6 @@ class Network():
         #print(self.file)
         
     def delete_surplus_data(self):
-        from hcndp.data_functions import indices
         
         items=indices("i",self.I)
         self.file['df_demanda']=self.file['df_demanda'].query('nombre_I in @items')
@@ -153,8 +148,7 @@ class Network():
     
     def merge_niveles_capac(self,_post_optima):
         #Agrego las columna nivel de atención y ubicaciones
-        import pandas as pd
-        import os
+
         
         if _post_optima==True:
             
@@ -192,11 +186,7 @@ class Network():
                 raise SystemExit("Stop right there!")
             
     def create_df_asignacion(self,_post_optima):
-        import pandas as pd
-        from hcndp.data_functions import decay_gauss
-        import os
-        from hcndp.data_functions import indices
-        import numpy as np
+
     
         if _post_optima == False:
             # Creo la matriz df_asignación para construir los arcos de la red
@@ -298,9 +288,7 @@ class Network():
 
     
     def create_df_probs_kk(self):
-        import numpy as np
-        import pandas as pd
-        from hcndp.data_functions import indices
+
         
         # Obtengo las probabilidades de transferencia entre servicios y lo covierto en un df kk'
         data1 = self.file['prob_serv']
@@ -336,10 +324,7 @@ class Network():
     def create_df_arcos(self,_post_optima): 
         # Creo df_arcos con los índices de j y de k. Es un df con [j j' k k']
         # Explicación en p- 9B Notas del doctorado
-        from hcndp.data_functions import indices
-        import pandas as pd
-        import numpy as np
-        import os
+
         
         lista=[]
         j=indices("j",self.J)
@@ -481,8 +466,7 @@ class Network():
 
 
     def create_data_dat(self):
-        import os
-        from hcndp.data_functions import indices
+
         
         path=os.getcwd()+'/data/'+self.name+'/datos.dat'
     
@@ -682,7 +666,6 @@ class Network_representation(Network):
         self.nodes_supply = {}
         self.edges_dem_sup_W = {}
         self.edges_sup_sup_X = {}
-        from hcndp.data_functions import indices
         
         # Matriz de servicios
         
@@ -1268,7 +1251,6 @@ class Path_representation:
         self.file=file
         self.nodes_services = {}
         self.edges_ser_ser_R = {}
-        from hcndp.data_functions import indices
 
         # Matriz de servicios
         df_niveles = file['df_niveles']

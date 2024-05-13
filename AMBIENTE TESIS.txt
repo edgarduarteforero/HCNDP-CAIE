@@ -17,30 +17,29 @@ El código tiene dos partes fundamentales:
 1. Problemas mono_objetivo
 2. Problemas multi_objetivo
 
-Voy en problemas mono_objetivo
-
-Ya puedo hacer todo lo que aparece en el menú de "Agregar soluciones a red"
-1. Puedo cargar mi propia solución desde un archivo de Excel
-2. Puedo obtener soluciones mono_objetivo 
-4. Puedo generar los KPI para soluciones bien sea que las haya cargado o que las haya obtenido por optimización
-
-Cuando selecciono la opción 2 de obtener soluciones mono_objetivo paso al menú azul. 
-Allí puedo hacer optimización exacta o
-Puedo hacer optimización por métodos aproximados
-
-
-Para las metaheurísticas me voy a basar en Gendreau y Potvin (Handbook of Metaheuristics) y en Brownlee, y en Talbi
+Para las metaheurísticas me voy a basar  en Talbi
 Estoy leyendo "Metaheuristcs: from design to implementation", de Talbi, 2009. Hay aspectos MUY IMPORTANTES. Están en el archivo de notas de Zotero.
 
 Voy a implementar varios métodos de única solución. Inicio por Local search en su versión básica.
 ¿Qué quiero explorar usando el Local Search?
-Quiero establecer la calidad de la metaheurística para resolver distintos problemas HCFNDP. También quiero explorar el Landscape para caracterizar la dificultad de los problemas.
+Quiero establecer la calidad de la metaheurística para resolver distintos problemas HCFNDP. 
+También quiero explorar el Landscape para caracterizar la dificultad de los problemas.
 
 Puedo hacer el experimento para una misma metaheurística con una misma instancia. Los factores podrían ser: operadores y los factores propios de cada metaheurística (temperatura, tamaño de lista tabú, tamaño del vecindario). La idea es asegurar la robustez de la metaheurística para resolver varias instancias. 
 Medidas de desempeño: diferencia entre solución y solución óptima, diferencia entre solución y cotas inferiores o superiores que pueda generar. Una cota inferior es un valor inalcanzable de referencia en minimización. Tiempo CPU y Wall Clock time.
 Statistycal analysis: t-test, Wilcoxon, Friedman, ANOVA. otros. Calcular intervalos de confianza. Ordinal data analysis.
 
 También deseo explorar el fitness landscape. El libro de Talbi tiene indicadores de distribución de locales en el espacio de búsqueda, entropía, distribución en el espacio objetivo, longitud de caminos, función de autocorrelación, correlación de la distancia de fitness.  Las medidas que se proponen pueden ser calculadas tomando cada solución como un nodo de la red. Un arco existe si hay una permutación que lleva de una solución a otra. Puedo usar NetworkX para explorar el Landscape como un grafo con medidas de distribución y correlación. 
+
+En cada iteración determino un vecindario compuesto por soluciones cercanas a neighbor. En el tamizaje elimino las soluciones no factibles. ¿Cómo puedo eliminar más soluciones?
+Una solución de k=3 tiene tres vectores sigma [3,5,6,4], [5,8,7,9], [2,7,6,0]
+Cada vector tiene un valor de rho k1=[0.8], k2=[0.6], k3=[0.9]. Vale la pena aplicar el operador de perturbación al primero y al tercer vector, al segundo no porque no se espera que mejora el rho máximo (que está en el tercero). 
+
+A tener en cuenta:
+La relación entre sigma_max y los s_jk es muy importante.
+Si sigma_max es más grande que la suma de los s_jk significa que tengo más servidores que capacidad. Esto da lugar a que se llenen los nodos de servicio y el problema alcanza su solución fácilmente.
+Si sigma_max es menor a la suma de los s_jk, significa que tengo menos servidores que capacidad. Ahí el problema se complejiza porque debo tomar decisiones de dónde asignar.
+Un cuello de botella se forma cuando un lambda es mayor a s_jk y el nodo se congestiona con un rho mayor a 1. En ese caso, el problema es infactible. En tal caso habría que aumentar las capacidades de los nodos de servicio.
 
 
 
@@ -54,9 +53,6 @@ Voy a implementar varias metaheurísticas:
 * GRASP
 * Ant Colony
 
-
-Simplifiqué el uso ingresando directamente a local_search.py
-Este archivo usa network_original para crear la solución inicial.
 
 
 ******************GESTIÓN DE DATOS ******************************

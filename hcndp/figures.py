@@ -5,6 +5,26 @@ Created on Sat Dec  9 17:42:37 2023
 @author: edgar
 """
 
+import matplotlib.pyplot as plt
+import pandas as pd
+
+import os
+import seaborn as sns
+import numpy as np
+import holoviews as hv
+hv.extension('bokeh','matplotlib')
+import webbrowser
+plt.clf() #Evita que se sobreescriban imágenes de seaborn
+# Construyo gráficos para representar las accesibilidades por cada servicio
+import re
+import plotly.graph_objects as go
+import plotly.io as io
+io.renderers.default='browser'
+#from plotly.offline import plot
+#import plotly.express as px
+import networkx as nx
+plt.rcdefaults()
+
 def show_menu_figures(solution):
     network=solution.network_copy
     
@@ -132,11 +152,6 @@ def show_menu_figures(solution):
 
 def figure_network_cartesian(network):
     # Gráfico de la red completo (incluye flujos de ij y de jj')
-    import matplotlib.pyplot as plt
-    import pandas as pd
-    plt.rcdefaults()
-    import matplotlib
-    import os
     
 
     fig, ax = plt.subplots(1,figsize=(6,6*1),constrained_layout=True) #Figura con 1 axes, que contiene toda la red
@@ -146,9 +161,9 @@ def figure_network_cartesian(network):
     capacidad=network.file['df_capac']
     #Se asume que se está utilizando toda la capacidad disponible en cada nodo de oferta j y servicio k
     capacidad['cap_total']=capacidad.c_jk*capacidad.sigma_jk #Capacidad de atención (cli/serv * serv/nodo)
-    idx = pd.IndexSlice #Permite referenciar más fácilmente en un multiindex.
+    #idx = pd.IndexSlice #Permite referenciar más fácilmente en un multiindex.
     datos_dem=demanda[['ubicacionesI_x','ubicacionesI_y','demanda_i']] #Datos de la demanda 
-    datos_cap=capacidad[['ubicacionesJ_x','ubicacionesJ_y','cap_total']] #Datos de la oferta
+    #datos_cap=capacidad[['ubicacionesJ_x','ubicacionesJ_y','cap_total']] #Datos de la oferta
 
     # Construyo los scatter con datos de oferta y de demanda
     ax.scatter(network.file['df_oferta']['ubicacionesJ_x'],
@@ -220,11 +235,6 @@ def figure_chord_diagram(network):
     # Es necesario tener en cuenta que existen flujos entre los servidores de la red. Cada flujo se da 
     # entre un par de nodos de servicio y un par de servicios: jj'kk'
     # Construyo un Chord Diagram para representar los flujos entre servidores jj'kk'
-    import pandas as pd
-    import holoviews as hv
-    hv.extension('bokeh','matplotlib')
-    import webbrowser
-    import os
     path=os.getcwd()+'/output/'+network.name_problem+'/'
 
     # Construyo un dataframe con jjpkkp y pjjkk
@@ -273,10 +283,6 @@ def figure_chord_diagram(network):
 
 def figure_prob_custom_queue(network):
     # Construyo gráficos para representar las probabilidades de tener clientes en cola
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import os
-    plt.rcdefaults()
     
     df_capac=network.file['df_capac'].reset_index()
     
@@ -328,10 +334,7 @@ def figure_prob_custom_queue(network):
     
 def figure_prob_time_in_queue(network):
     # Construyo gráficos para representar las probabilidades de tiempo en cola
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import os
-    plt.rcdefaults()
+    
 
     df_capac=network.file['df_capac'].reset_index()
 
@@ -375,15 +378,12 @@ def figure_prob_time_in_queue(network):
 
 def figure_Lq_per_node (network):
     # Construyo gráficos para representar las medidas de desempeño
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import os
-    plt.rcdefaults()
+
     
     df_capac=network.file['df_capac'].reset_index()
     labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
     serie1 = df_capac['L_q']
-    serie2 = df_capac['W_q']
+    #serie2 = df_capac['W_q']
 
     x = np.arange(len(labels))  # the label locations
     width = 0.35  # the width of the bars
@@ -417,10 +417,6 @@ def figure_Lq_per_node (network):
     
 def figure_Wq_per_node (network):
     # Construyo gráficos para representar las medidas de desempeño
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import os
-    plt.rcdefaults()
     
     df_capac=network.file['df_capac'].reset_index()
     labels = df_capac['nombre_J']+'K'+df_capac['servicio_K'].astype(str)
@@ -454,11 +450,7 @@ def figure_Wq_per_node (network):
     plt.show()  
 def figure_service_rate_per_node(network):
     # Construyo gráficos de calor para analizar los recursos disponibles en cada par j k
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import seaborn as sns
-    import os
-    plt.clf() #Evita que se sobreescriban imágenes de seaborn
+   
     
     df_capac=network.file['df_capac'] 
     df_temporal = df_capac.pivot_table( index='nombre_J', columns='servicio_K', values='cap_total')
@@ -479,11 +471,7 @@ def figure_service_rate_per_node(network):
     
 def figure_rho_per_node(network):
     # Construyo gráficos de calor para analizar la congestión para cada par j k
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import seaborn as sns
-    import os
-    plt.clf() #Evita que se sobreescriban imágenes de seaborn
+   
     
     df_capac=network.file['df_capac'] 
     df_temporal = df_capac.pivot_table( index='nombre_J', columns='servicio_K', values='rho')
@@ -503,12 +491,7 @@ def figure_rho_per_node(network):
 
 def figure_rho_weighted(network):
     # Calculo utilización para cada nodo de servicio j
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import seaborn as sns
-    import os
-    import numpy as np
-    plt.clf() #Evita que se sobreescriban imágenes de seaborn
+    
     
     df_capac=network.file['df_capac'] 
     prueba=df_capac[df_capac['rho']!=0].groupby('nombre_J')['rho'].mean()
@@ -541,11 +524,7 @@ def figure_rho_weighted(network):
 
 def figure_nodes_coverage(network):
     # Mapa de puntos y círculos de cobertura
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import pandas as pd
-    import os
-    import numpy as np
+
     
     #df_demanda=network.file['df_demanda']
     df_capac=network.file['df_capac']
@@ -632,9 +611,7 @@ def figure_nodes_coverage(network):
     plt.show()
     
 def figure_gaussian(network):
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import os
+
 
     # Representación gráfica de las coberturas utilizando la función gaussiana
     df_asignacion=network.file['df_asignacion']
@@ -655,18 +632,13 @@ def figure_gaussian(network):
     plt.show()
     
 def figure_accessibility(network):
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import pandas as pd
-    import os
-    import numpy as np
-    plt.rcdefaults()
+   
     
     #df_demanda=network.file['df_demanda'].copy()
     df_capac=network.file['df_capac']
     df_niveles=network.file['df_niveles']
     df_oferta=network.file['df_oferta']
-    df_asignacion=network.file['df_asignacion'].copy()
+    #df_asignacion=network.file['df_asignacion'].copy()
     df_demanda=network.file['df_demanda_ik'].copy()
 
     fig, ax = plt.subplots(network.K,figsize=(8,8*network.K),constrained_layout=True) #Figura con K axes, uno para cada servicio
@@ -761,9 +733,7 @@ def figure_accessibility(network):
     plt.show()
     
 def figure_heatmap_accessibility(network):
-    import seaborn as sns
-    import os
-    import matplotlib.pyplot as plt
+   
     
     # Construyo gráficos de calor para analizar la accesibilidad para cada par i k
     df_accesibilidad=network.file['df_accesibilidad']
@@ -787,10 +757,7 @@ def figure_heatmap_accessibility(network):
 
 def figure_accessibility_per_node(network):    
     # Construyo gráficos para representar las accesibilidades
-    import os
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import numpy as np
+ 
     
     df_capac=network.file['df_capac']
     df_capac=df_capac.reset_index()
@@ -823,11 +790,7 @@ def figure_accessibility_per_node(network):
 
 
 def figure_accessibility_per_service(network):
-    # Construyo gráficos para representar las accesibilidades por cada servicio
-    import os
-    import matplotlib.pyplot as plt
-    plt.rcdefaults()
-    import numpy as np
+    
     
     df_capac=network.file['df_capac']
     df_capac=df_capac.reset_index()
@@ -865,9 +828,7 @@ def figure_flows_f_ijk(network):
     # Creo un mapa de calor con los flujos fijk
     # en las filas van los orígenes ik
     # en las columnas van los destinos jk
-    import seaborn as sns
-    from matplotlib import pyplot as plt
-    import os 
+
     
     df_temporal=network.file['df_flujos_ijk'].reset_index().copy()
     df_temporal['ik']=df_temporal['nombre_I']+df_temporal['servicio_K']
@@ -895,9 +856,7 @@ def figure_flows_f_ijk_k1(network):
     # en las filas van los orígenes ij
     # en las columnas van los destinos jk
 
-    import seaborn as sns
-    from matplotlib import pyplot as plt
-    import os 
+ 
 
     df_temporal=network.file['df_flujos_ijk'].reset_index().copy()
     df_temporal = df_temporal[df_temporal.tao_ijk != 0]
@@ -925,9 +884,7 @@ def figure_flows_f_ijkjk(network):
     # Creo un mapa de calor con los porcentajes fi_jkjk
     # en las filas van los orígenes jpkp
     # en las columnas van los destinos jk
-    import seaborn as sns
-    from matplotlib import pyplot as plt
-    import os 
+
 
     df_temporal=network.file['df_arcos'].reset_index().copy()
     df_temporal['jk_origen']=df_temporal['nombre_J']+df_temporal['servicio_K']
@@ -954,10 +911,7 @@ def figure_flows_f_jpkpjk(network):
     # Creo un mapa de calor con los flujos fjpkpjk
     # en las filas van los orígenes jpkp
     # en las columnas van los destinos jk
-    import seaborn as sns
-    from matplotlib import pyplot as plt
-    import pandas as pd
-    import os 
+
 
     df_capac=network.file['df_capac'].copy()
     df_arcos=network.file['df_arcos'].reset_index().copy()
@@ -989,12 +943,7 @@ def figure_digraph(network):
  
     # REPRESENTACIÓN DE LA RED
     # Los colores corresponden a las proporciones de pacientes entre cada par de nodos.
-    import pandas as pd
-    import numpy as np
-    import networkx as nx
-    import matplotlib.pyplot as plt
-    import pygraphviz
-    import os
+
     
     df_grafo=network.file['df_grafo']
     
@@ -1020,11 +969,7 @@ def figure_digraph_complete(network):
     # REPRESENTACIÓN DE LA RED
     # Los colores corresponden a LA PROPORCIÓN DE PACIENTES entre cada par de nodos.
     
-    import pandas as pd
-    import numpy as np
-    import networkx as nx
-    import matplotlib.pyplot as plt
-    import os
+
     
     # Build a dataframe with 4 connections
     #df = pd.DataFrame({ 'from':['A', 'B', 'C','A'], 'to':['D', 'A', 'E','C']})
@@ -1054,14 +999,7 @@ def figure_digraph_complete(network):
     plt.show()
     
 def figure_sankey(network):
-    import re
-    import pandas as pd
-    import plotly.graph_objects as go
-    import plotly.io as io
-    io.renderers.default='browser'
-    from plotly.offline import plot
-    import os 
-    import plotly.express as px
+   
     
     # GRAFICO sankey
     # Obtengo los nodos de la red en una lista
@@ -1183,8 +1121,8 @@ if __name__ == "__main__":
     from hcndp import network_data
     from hcndp.read_data import read_file_excel
     from hcndp.network_data import _I,_J,_K,_archivo 
-    from hcndp.figures import figure_network_cartesian
-    import os 
+    #from hcndp.figures import figure_network_cartesian
+    #import os 
     network=network_data.Network(_I,_J,_K,_archivo)
     path=os.path.dirname(os.getcwd())+'/data/'+network.archivo
     path=os.getcwd()+'/data/'+network.archivo

@@ -13,16 +13,17 @@ j10	12	6
 
 # df_niveles
 servicio_K	Servicio	sigma_max	d_o_k
-k01	Consulta general diagnóstico	100	5
-k02	Mamografía y ecografía	90	5
-k03	Consulta especializada	90	5
-k04	Biopsia diagnóstico	90	5
-k05	Patología diagnóstico	80	5
-k06	Quimioterapia	80	5
-k07	Radioterapia	80	5
-k08	Hormonal	80	5
-k09	Cirugía	50	5
-k10	Cuidados paliativos	50	5
+k01	Consulta general diagnóstico	150	5
+k02	Mamografía y ecografía	150	5
+k03	Consulta especializada	150	5
+k04	Biopsia diagnóstico	150	5
+k05	Patología diagnóstico	150	5
+k06	Quimioterapia	150	5
+k07	Radioterapia	150	5
+k08	Hormonal	150	5
+k09	Cirugía	150	5
+k10	Cuidados paliativos	150	5
+
 
 # df_demanda
 nombre_I	servicio_K	ubicacionesI_x	ubicacionesI_y	demanda_i
@@ -44,17 +45,18 @@ i15	k01	10	4	3
 i16	k01	4	14	3
 
 # df_sigma_max
-servicio_K	sigma_max
-k01	100
-k02	90
-k03	90
-k04	90
-k05	80
-k06	80
-k07	80
-k08	80
-k09	50
-k10	50
+servicio_K	sigma_max	sigma_max copia
+k01	150	100
+k02	150	90
+k03	150	90
+k04	150	90
+k05	150	80
+k06	150	80
+k07	150	80
+k08	150	80
+k09	250	50
+k10	250	50
+
 
 # df_capac
 nombre_J	servicio_K	s_jk	sigma_jk	c_jk	s_jk*c_jk

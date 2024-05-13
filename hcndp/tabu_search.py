@@ -8,6 +8,7 @@ Created on Thu Mar 28 07:21:16 2024
 import copy
 import random
 from hcndp import initial_solution
+from itertools import permutations
 import pandas as pd
 from hcndp import kpi
 

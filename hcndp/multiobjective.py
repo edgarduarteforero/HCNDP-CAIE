@@ -5,6 +5,18 @@ Created on Wed Jan  3 11:15:17 2024
 @author: edgar
 """
 
+
+import textwrap
+from hcndp import solutions
+import pyomo.environ as pyo
+import numpy as np
+import time 
+import winsound
+import copy
+import matplotlib.pyplot as plt
+from hcndp import kpi
+
+
 def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
 
     while True:
@@ -136,7 +148,6 @@ class Multiobjective:
         
         
     def select_objectives(self):
-        import textwrap
         if self.approach=="lexicographic":
             _menu_options = self.menu_options_lexicog
         elif self.approach =="Pareto":
@@ -186,9 +197,7 @@ class Multiobjective:
 
     
     def anchor_points(self,matrix_problems_lexi,objective_lexi):
-         from hcndp import solutions
-         import pyomo.environ as pyo
-         
+        
          #problem_lexi es una fila de matrix_problems_lexi
          # Creo el objeto solution
          problem_lexi=matrix_problems_lexi[objective_lexi]
@@ -298,7 +307,6 @@ class Multiobjective:
          print (self.anclas)  
     
     def lexicograf(self,model,_var_obj_anterior,_func_obj_anterior, operador):
-        import pyomo.environ as pyo
         if operador=="<=":
             restriccion = getattr(model, _var_obj_anterior) <= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
         elif operador == ">=":
@@ -374,8 +382,7 @@ class Multiobjective:
             self.anchor_points(matrix_problems_lexi,objective_lexi=1)
         
     def calculate_pareto_front(self):
-        import pandas as pd
-        import numpy as np
+        
 
         # Construyo puntos ancla
         if self.objectives_sequence==1: #Rho --> Alpha 
@@ -385,8 +392,7 @@ class Multiobjective:
             self.anchor_points(matrix_problems_lexi,objective_lexi=1)
         
         # Construyo un objeto model llamado 'principal'
-        from hcndp import solutions
-        import pyomo.environ as pyo
+        
         
         #problem_lexi es una fila de matrix_problems_lexi
         # Creo el objeto solution llamado "principal"
@@ -455,11 +461,7 @@ class Multiobjective:
         self.adaptive_bisection_augmecon(puntos_requeridos)
         
     def adaptive_bisection_augmecon(self,puntos_requeridos):
-        import time 
-        import numpy as np
-        import winsound
-        import time
-        import copy
+        
         from deepdiff import DeepDiff #Importo para poder comparar dos arrays
 
         fila=0
@@ -746,9 +748,7 @@ class Multiobjective:
                 input()
                 
             ### Imprimo gráfico 
-            import numpy as np
-            import math
-            import matplotlib.pyplot as plt
+           
             x=salida_resultados[:,0]
             y=salida_resultados[:,1]
             fig = plt.figure(figsize=(8,6))
@@ -772,13 +772,7 @@ class Multiobjective:
 
     
     def punto_en_frontera(self,val2,val3,problem):
-        import pyomo.environ as pyo
-        import numpy as np
-        import pandas as pd
-        import xlsxwriter
-        import os
-        import openpyxl
-        from hcndp import solutions
+        
         
         #instance = model.create_instance("datos.dat") 
         
@@ -905,7 +899,6 @@ class Multiobjective:
         
     # Función para verificar si un punto_obtenido ya está en salida_resultados:
     def repetido(self,punto_obtenido,salida_resultados):
-        import numpy as np
         #if np.around(punto_obtenido[1:3],1) in np.around(salida_resultados,1):
         #if [punto_obtenido[0],punto_obtenido[2]] in salida_resultados:
         if  np.isin(salida_resultados.tolist(), [punto_obtenido[0],punto_obtenido[2]]).all(axis=1).any():
@@ -916,8 +909,7 @@ class Multiobjective:
         return repetido
     
     def analisis_solucion(self,epsilon):
-        from hcndp import kpi
-        import pandas as pd
+       
         
         # Si hay función objetivo (resultado de optimización)
         _post_optima=True

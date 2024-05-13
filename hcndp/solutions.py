@@ -10,6 +10,25 @@ import textwrap
 import pandas as pd
 import numpy as np
 from hcndp import landscape
+import pyomo.environ as pyo
+import os
+from idaes.core.util.model_statistics import degrees_of_freedom
+from idaes.core.util.model_statistics import report_statistics
+#import xlsxwriter
+#import os
+#import openpyxl
+import xlsxwriter
+import openpyxl
+from hcndp import kpi
+from hcndp import network
+import copy
+from hcndp.data_functions import indices
+from itertools import product
+from hcndp import models
+from hcndp import read_data
+import shutil
+from hcndp import data_functions
+from hcndp import solutions
 
 def menu_solutions(network_original, problems_dict):
     
@@ -45,7 +64,45 @@ def menu_solutions(network_original, problems_dict):
                         if ('Exacta' != descripcion.tecnica
                             and 'Aproximación' != descripcion.tecnica):                    
                             print(f"{i}. {clave}")
+         
+        
+        def mostrar_operadores():
+            while True:
+                # Solicito al usuario la función objetivo que desea utilizar
+                _menu_options = {
+                '1': 'Incremento1_decremento1_exhaust(nodes_k,_k,_solucion)', 
+                '2': 'Incremento1_exhaust (nodes_k,_k,_solucion)', 
+                '3': 'Incremento1_all (nodes_k,_k,_solucion)', 
+                '4': 'Incremento2_decremento1_exhaust(nodes_k,_k,_solucion)', 
+                '5': 'Incremento2_decremento2_exhaust(nodes_k,_k,_solucion)',  
+                '6': 'Incremento3_decremento3_exhaust(nodes_k,_k,_solucion)',  
+                '7': 'Chain_reaction_exhaust_plus_minus(nodes_k,_k,_solucion)', 
+                '8': 'Chain_reaction_exhaust_minus_plus(nodes_k,_k,_solucion)', 
+                '10': 'Salir al menú anterior'
+                }   
             
+                print("\n----------------------------------------------------------")
+                print("Menú operadores de permutación")
+                print("mostrar_operadores@solutions.py")
+                print("----------------------------------------------------------\n")
+                print("Definir operador:")
+                for i,j in _menu_options.items():
+                    print (f"{i}. {j}")            
+                operador = input("Selecciona una opción: \n")
+                if operador == '\n':
+                    print("Opción no válida. Inténtalo de nuevo.")
+                
+                elif operador.isdigit():
+                    if int(operador) < 10:
+                        return str.lower(_menu_options[str(operador)])
+                    
+                    elif operador == 10:
+
+                        break
+                  
+                else:
+                    print("Opción no válida. Inténtalo de nuevo.")
+             
 
         if opcion == "1":
             print("Has seleccionado la Opción 1.")
@@ -107,6 +164,13 @@ def menu_solutions(network_original, problems_dict):
             
             # Se ha escogido Local Search
             if current_solution.optimizar==True and current_solution.tecnica=="Local_Search":
+                
+                print("\nHas seleccionado escogido usar Local Search.")
+                print("\n----------------------------------------------------------")
+
+                print ("Estos son los operadores de permutación:\n")
+                operador=mostrar_operadores() #Escojo el operador de permutación
+                current_solution.local_search_operator=operador # Lo inserto en el objeto
                 current_solution = local_search.local_search(current_solution,network_original)
                 current_solution.set_solution_excel()
                 problems_dict[current_solution.name_problem]=current_solution
@@ -214,7 +278,6 @@ def menu_solutions(network_original, problems_dict):
 
 
 def create_problem_object(network_original, problems_dict, name_problem):
-    import textwrap
 
     # Creamos un objeto solution
     new_name_problem = name_problem
@@ -239,8 +302,6 @@ def create_problem_object(network_original, problems_dict, name_problem):
     
 # %% <codecell> Clase Problem
 
-import os
-import pyomo.environ as pyo
 
 class Problem:
 
@@ -364,11 +425,19 @@ class Problem:
         #valor_fijo = 20
         #instance.sigma.fix(valor_fijo)
 
-
-        # Solución por Gurobi
-
+        # Crear un objeto StringIO para capturar la salida
+        #***captura_salida = io.StringIO()
+        
+        # Guardar la salida estándar original
+        #***old_stdout = sys.stdout
         
         
+        #try:
+        # Redirigir la salida estándar al objeto StringIO
+        #***sys.stdout = captura_salida
+    
+        # Configurar el solucionador con tee=True      
+        # Resolver el modelo con salida detallada
         opt = pyo.SolverFactory('gurobi')
         opt.options['NonConvex'] = 2
         opt.options['TimeLimit'] = 500
@@ -376,8 +445,6 @@ class Problem:
         opt.options['MIPFocus'] = 3
         #opt.options['Heuristics'] = 0
         #opt.options['Presolve']  =2
-    
-        
 
         global out
         out = 0
@@ -391,6 +458,7 @@ class Problem:
                 os.makedirs(_output)
                 
         results = opt.solve(instance, tee=False, warmstart=False)
+        #***salida_tee = captura_salida.getvalue()
             #,logfile=_output+'logfile_name.log')
         #print (f'Función objetivo alcanzada= {pyo.value(instance.obj)}')   
          
@@ -425,19 +493,26 @@ class Problem:
             print("Solver Status: ",  results.solver.status)
         self.out=out
         
+            # Obtener la salida capturada como texto
+            #***salida_tee = captura_salida.getvalue()
+            #***self.salida_tee=salida_tee
+            
+        #finally:
+        #    # Restaurar la salida estándar
+        #    sys.stdout = old_stdout
+        
     def solve_ipopt(self):
-        network = self.network_copy
+        #network = self.network_copy
         model = self.pyo_model
         instance = self.pyo_model.instance
 
         # Solución por ipopt
         # Instalar ipopt así: conda install -c conda-forge ipopt=3.11.1
-        import pyomo.environ as pyo
-        import os
+
 
         opt = pyo.SolverFactory('ipopt')
 
-        _output = os.getcwd()+'/output/'+network.name+'/'
+        #_output = os.getcwd()+'/output/'+network.name+'/'
 
         #results=opt.solve(instance, tee=True, logfile=_output+'logfile_name.log')
 
@@ -459,18 +534,12 @@ class Problem:
     def get_degrees_freedom(self):
         instance = self.pyo_model.instance
         # Todo: import the degrees_of_freedom function from the idaes.core.util.model_statistics package
-        from idaes.core.util.model_statistics import degrees_of_freedom
-        from idaes.core.util.model_statistics import report_statistics
+        
         print("Degrees of Freedom =", degrees_of_freedom(instance))
         print("Statistics =", report_statistics(instance))
     
     def set_solution_in_object_local_search(self):
-        import numpy as np
-        import pyomo.environ as pyo
-        import pandas as pd
-        #import xlsxwriter
-        #import os
-        #import openpyxl
+        
 
         #network = self.network_copy
 
@@ -485,8 +554,8 @@ class Problem:
         self.df_f_ijk=tao_ijk
         self.df_f_ijk['tao_ijk']=self.df_f_ijk['tao_ijk'].astype(float)
         
-        h_ik = np.array([[i, k, pyo.value(instance.h[i, k])]
-                        for i in instance.I for k in instance.K])
+        #h_ik = np.array([[i, k, pyo.value(instance.h[i, k])]
+        #                for i in instance.I for k in instance.K])
         
         l_ijk = np.array([[i, j, k, pyo.value(instance.l_ijk[i, j, k])]
                          for i in instance.I for j in instance.J for k in instance.K])
@@ -496,10 +565,10 @@ class Problem:
         self.df_asignacion['lambda_ijk']=self.df_asignacion['lambda_ijk'].astype(float)
 
         
-        c_jk = np.array([[j, k, pyo.value(instance.c[j, k])]
-                        for j in instance.J for k in instance.K])
-        s_jk = np.array([[j, k, pyo.value(instance.s[j, k])]
-                        for j in instance.J for k in instance.K])
+        #c_jk = np.array([[j, k, pyo.value(instance.c[j, k])]
+        #                for j in instance.J for k in instance.K])
+        #s_jk = np.array([[j, k, pyo.value(instance.s[j, k])]
+        #                for j in instance.J for k in instance.K])
 
         fi_ijkjk = np.array([[i, j, k, jp, kp, pyo.value(instance.fi[i, j, k, jp, kp])]
                             for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
@@ -542,12 +611,12 @@ class Problem:
         self.df_prob_fi_jkjk=prob_fi_jkjk
         self.df_prob_fi_jkjk['Probs']=self.df_prob_fi_jkjk['Probs'].astype(float)
 
-        alpha_ik = np.array([[i, k, pyo.value(instance.alpha_ik[i, k])]
-                            for i in instance.I for k in instance.K])
-        rho_jk = np.array([[j, k, pyo.value(instance.rho_jk[j, k])]
-                          for j in instance.J for k in instance.K])
-        f_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
-                         for i in instance.I for j in instance.J for k in instance.K])
+        # alpha_ik = np.array([[i, k, pyo.value(instance.alpha_ik[i, k])]
+        #                     for i in instance.I for k in instance.K])
+        # rho_jk = np.array([[j, k, pyo.value(instance.rho_jk[j, k])]
+        #                   for j in instance.J for k in instance.K])
+        # f_ijk = np.array([[i, j, k, pyo.value(instance.tao[i, j, k])]
+        #                  for i in instance.I for j in instance.J for k in instance.K])
         l_jk = np.array([[j, k, sum(pyo.value(instance.l_ijk[i, j, k])
                         for i in instance.I)] for j in instance.J for k in instance.K])
         l_jk  = pd.DataFrame(l_jk,columns=['nombre_J', 'servicio_K', 'lambda_jk'])
@@ -562,8 +631,8 @@ class Problem:
         self.df_sigma=sigma_jk
         self.df_sigma['sigma_jk']=self.df_sigma['sigma_jk'].astype(float)
 
-        theta_jk = np.array([[j, k, pyo.value(instance.theta[j, k])]
-                            for j in instance.J for k in instance.K])
+        # theta_jk = np.array([[j, k, pyo.value(instance.theta[j, k])]
+        #                     for j in instance.J for k in instance.K])
     
         # Borro el dataframe df_prob_fi_ijkjk porque no logro actualizarlo
         try: 
@@ -582,14 +651,9 @@ class Problem:
         
     
     def set_solution_excel(self):
-        import numpy as np
-        import pyomo.environ as pyo
-        import pandas as pd
-        import xlsxwriter
-        import os
-        import openpyxl
 
-        network = self.network_copy
+
+        # network = self.network_copy
 
         # Obtengo los valores de las variables según el modelo de optimización
         # Estas líneas se hacen si el método es exacto.
@@ -683,6 +747,7 @@ class Problem:
             fi_ijkjk.columns = ['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_ijkjk']
             fi_ijkjk=fi_ijkjk[fi_ijkjk['servicio_K'] != 'k00']
             
+            
         # Escritura de archivo en Excel
         #output = os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
         if self.name_problem != "pareto_front":
@@ -763,9 +828,8 @@ class Problem:
         ##########################################
         #Imprimir resultados en un achivo ####
         ##########################################
-        import os
 
-        network = self.network_copy
+        # network = self.network_copy
         instance = self.pyo_model.instance
 
         #output = os.getcwd()+'/output/'+network.name+'/modeloysolucion.txt'
@@ -779,7 +843,13 @@ class Problem:
         with open(output, 'w') as output_file:
             # output_file.write(instance.pprint())
             instance.pprint(output_file)
+        
+        # Abrir el archivo en modo de agregación para agregar 'self.salida_tee'
+        with open(output, 'a') as output_file:
+            output_file.write("\n"+"#"*60)  # Agregar un salto de línea para separación
+            output_file.write(self.salida_tee)  # Agregar la salida tee de Gurobi
 
+            
         output = os.getcwd()+'/output/'+self.name_problem+'/solucion.txt'
         if self.name_problem == "pareto_front":
             output = os.getcwd()+'/output/'+'pareto_front_'+str(self.epsilon)+'/solucion.txt'
@@ -793,8 +863,8 @@ class Problem:
         print(f"Se exportó exitosamente el archivo de texto en {output}")
 
     
+    
     def calculate_kpi_before_optim(self,network_copy,_post_optima=False):
-        from hcndp import kpi
         #print ("Calculo los KPI necesarios para la optimización.")
         kpi.set_lambda_jk(self,network_copy,_post_optima=False)
         kpi.set_lambda_ijk(self,network_copy,_post_optima=False)
@@ -817,10 +887,7 @@ class Problem:
 
     def initial_solution(self,network_original):
         #Creo la representación de la red
-        import pandas as pd
-        import numpy as np
-        from hcndp import network
-        import copy
+       
         network_repr=network.Network_representation(network_original.I,
                                                     network_original.J,
                                                     network_original.K,
@@ -892,13 +959,11 @@ class Problem:
         network_repr.obtencion_π(network_repr)
                     
         # Construyo una matriz g con los arribos externos, es decir los ϕi.j.k0jk
-        from hcndp.data_functions import indices
     
         _lista_i=indices("i",network_original.I)
         _lista_j=indices("j",network_original.J)
         _lista_k=indices("k",network_original.K)
         
-        from itertools import product
         _lista = list(product(_lista_i, _lista_j,_lista_k))
         _g=pd.DataFrame(_lista, columns=['nombre_I', 'nombre_J','servicio_K'])
         _g['tao_ijk'] = 0.0
@@ -1069,7 +1134,6 @@ class Problem:
     def fix_initial_solution(self):
         # Corrige la solución inicial existente para evitar que tenga rho > 1
         
-        from hcndp import local_search
         local_search.calcular_kpi_local_search(self)
         
         while self.network_copy.file['df_capac']['rho'].max() > 1: # Mientras que haya algún nodo sobresaturado
@@ -1137,7 +1201,6 @@ class Problem:
         objective = self.objective
 
         # Creo objeto Model_pyomo dentro de solution
-        from hcndp import models
         self.pyo_model = models.Model_pyomo(
             model_abstract=None,
             instance=None,
@@ -1253,7 +1316,6 @@ class Problem:
     
     # %% Exportar solución
     def create_folders_problem(self):
-        import os
         
         if not os.path.exists(os.getcwd()+'/output/'+self.name_problem+'/'):
             # Crea el directorio
@@ -1287,14 +1349,12 @@ class Problem:
 
 
 def update_solution_post_optima(original_network, new_network):
-    from hcndp import read_data
-    import os
+
     print("Ejecutando update_solution_post_optima")
     input()
     new_network.create_folders()
     path = os.getcwd()+'/data/'+original_network.name+'/'+new_network.archivo
 
-    import shutil
 
     # Combinar las rutas para obtener las rutas completas
     ruta_origen = os.getcwd()+'/output/'+original_network.name + \
@@ -1330,12 +1390,10 @@ def update_solution_post_optima(original_network, new_network):
 if __name__ == "__main__":
 
         # Borro carpeta con resultados previos
-        from hcndp import data_functions
-        import os
+        
         data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
         print("\nContenidos borrados. \nContinuando...")
         
-        from hcndp import read_data
         networks_dict={} #Diccionario con las redes utilizadas en el programa
         problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
 
@@ -1343,7 +1401,6 @@ if __name__ == "__main__":
         I,J,K= [6,6,6]
         archivo = r"C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\Códigos Python\HcNDP\Health-Care-Network-Design-Problem\hcndp/data/red_original/datos_i16_j10_k10_base.xlsx"
         # Objeto network
-        from hcndp import network
 
         # Creamos un objeto network
         _name="red_original"
@@ -1363,7 +1420,6 @@ if __name__ == "__main__":
     
 
         # Creo el objeto solucion
-        from hcndp import solutions
 
         solutions.create_problem_object(networks_dict['red_original'], problems_dict, name_problem="temporal")
         current_solution = problems_dict["temporal"]
@@ -1387,7 +1443,6 @@ if __name__ == "__main__":
         
         # Ejecuto initial solution
         current_solution= current_solution.initial_solution(networks_dict['red_original'])
-        from hcndp import local_search
         local_search.calcular_kpi_local_search(current_solution)
         
         current_solution.fix_initial_solution()

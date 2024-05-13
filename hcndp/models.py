@@ -5,6 +5,11 @@ Created on Sat Dec 30 07:32:43 2023
 @author: edgar
 """
 
+import pyomo.environ as pyo
+import re
+import math
+
+
 #  Clase modelo
 class Model_pyomo:
     def __init__(self,model_abstract,instance,data_dat,solution,nombre_modelo):
@@ -18,9 +23,6 @@ class Model_pyomo:
     def set_model_abstract(self,objetivo, nombre_modelo, _menu_options, new_network):
     
         # Cargamos las librerías de Pyomo
-        import pyomo.environ as pyo
-        import re
-        import math
         
     
         # %%  Conjuntos
@@ -358,7 +360,6 @@ class Model_pyomo:
     
     # %%  Cambio de la variable sigma por parámetro sigma 
     def var_sigma_to_param (self,model_abstract):
-        import pyomo.environ as pyo
         
         # Eliminar la variable model.sigma del modelo
         model_abstract.del_component(model_abstract.sigma)

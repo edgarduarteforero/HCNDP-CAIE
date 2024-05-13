@@ -5,10 +5,12 @@ Created on Tue Dec  5 16:04:10 2023
 @author: edgar
 """
 
-import pandas as pd 
+import textwrap
+import os
+import tkinter as tk
+from tkinter import filedialog
 
 def menu_select_file(I):
-    import textwrap
     print ("#" * 60)
     print (textwrap.dedent('''\
                            
@@ -85,8 +87,7 @@ def menu_select_file(I):
     return I,J,K,archivo
 
 def update_parameters():
-    import textwrap
-    import os
+
     I=16
     J=10
     K=10 
@@ -116,8 +117,7 @@ def update_parameters():
     return I,J,K,archivo           
 
 def update_parameters_txt():
-    import textwrap
-    import os
+
     I=16
     J=10
     K=10 
@@ -147,9 +147,7 @@ def update_parameters_txt():
     return I,J,K,archivo     
 
 def select_external_file_explorer():
-    import textwrap
-    import tkinter as tk
-    from tkinter import filedialog
+    
     archivo = ""
     
     def seleccionar_archivo():

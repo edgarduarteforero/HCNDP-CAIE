@@ -1,6 +1,7 @@
 __pycache__/
 hcndp/__pycache__/
 output/
+tests/
 workspace.ini
 
 

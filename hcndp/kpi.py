@@ -11,6 +11,8 @@ from hcndp.data_functions import reshape_matrix
 import pandas as pd
 import copy
 from hcndp.data_functions import indices
+import math
+import sys    
 
 
 #%% Calcular kpi para una solución
@@ -69,7 +71,7 @@ def calculate_kpi(current_solution,_post_optima):
 #########################################
 
 def p_0(sum_y,s,c): #Probabilidad de estado 0
-    import math
+    
     s=int(s)
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
@@ -79,8 +81,7 @@ def p_0(sum_y,s,c): #Probabilidad de estado 0
     return p
 
 def p_f1(p_0,sum_y,s,c,f): #Probabilidad de estado f<=s
-    import math
-    import sys    
+
     s=int(s)
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
@@ -89,8 +90,6 @@ def p_f1(p_0,sum_y,s,c,f): #Probabilidad de estado f<=s
     return p
 
 def p_f2(p_0,sum_y,s,c,f): #Probabilidad de estado f>s
-    import sys 
-    import math
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
     rho = rho -sys.float_info.epsilon #Resto epsilon para no tener rho=1
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
@@ -119,8 +118,7 @@ def p_total(sum_y,s,c,f): #Suma de probabilidades en estado estable hasta un est
 
 def p_wqt(sum_y,s,c,t):
     
-    import sys
-    import math
+    
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
     rho = rho -sys.float_info.epsilon #Resto epsilon para no tener rho=1
     if rho < 1 and (s*c)!=0 : #Valido que se pueda calcular p_total
@@ -136,13 +134,11 @@ def p_wqt(sum_y,s,c,t):
 # 
 
 def L_q(r,rho,s,c,p_o):
-    import math
     s=int(s)
     Lq=(math.factorial(s)*(1-rho)**2) and ((r**s)*rho/(math.factorial(s)*(1-rho)**2))*p_o or 0
     return Lq
 
 def W_q(L_q,lambdas,rho):
-    import pandas as pd
     if pd.isna(L_q) or lambdas==0: #Valido que se pueda calcular p_total
        W_q=float('NaN')
     else:
@@ -474,7 +470,7 @@ def set_e2sfca(network):
     #else:
     #    df_asignacion = network.file['df_asignacion'].reset_index()
     df_asignacion = network.file['df_asignacion'].set_index(['nombre_I','nombre_J','servicio_K'])
-    df_capac=network.file['df_capac'].set_index(['nombre_J','servicio_K'])
+    #df_capac=network.file['df_capac'].set_index(['nombre_J','servicio_K'])
     df_demanda = network.file['df_demanda']
     
     # Calculo los numeradores
@@ -615,7 +611,7 @@ def set_kpi_network(network):
     df_continuidad=network.file['df_continuidad']
     df_accesibilidad=network.file['df_accesibilidad']
     df_demanda=network.file['df_demanda']
-    df_demanda_ik=network.file['df_demanda_ik']
+    #df_demanda_ik=network.file['df_demanda_ik']
            
     df_medidas=pd.DataFrame()
     df_medidas['Wtotal']=[df_capac['L'].sum()/df_capac['Sum_tao_ij'].sum()]

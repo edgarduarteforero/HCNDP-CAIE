@@ -5,8 +5,10 @@ Created on Tue Dec 19 18:29:12 2023
 @author: edgar
 """
 
-
-           
+import openpyxl
+import os
+from openpyxl.styles import NamedStyle, Font, colors
+   
 def export_data(network):
     import pandas as pd
     import os  
@@ -24,13 +26,10 @@ def create_index_sheet(network):
     # Específicamente la variable sheet_ref
     
     #Creo una hoja con índices en el archivo de excel
-    import openpyxl
-    import os
-    from openpyxl import Workbook
-    #from openpyxl.styles import Hyperlink
     
-    from openpyxl.styles import NamedStyle
-    from openpyxl.styles import NamedStyle, Font, colors
+    #from openpyxl import Workbook
+    #from openpyxl.styles import Hyperlink
+
 
     hyperlink_style = NamedStyle(name='Hyperlink', font=Font(color=colors.BLUE, underline='single'))
 
