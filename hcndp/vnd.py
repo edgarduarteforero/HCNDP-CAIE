@@ -14,15 +14,28 @@ from hcndp import kpi
 from hcndp import neighborhood_operator
 
 
-def tabu_search(current_solution,network_original):
-    # Basado en Glover (https://www.researchgate.net/publication/242527226_Tabu_Search_A_Tutorial)
+
+def vnd_search(current_solution,network_original):
+   
+    
+    # Basado en Gendrau y Potvin (2019). Capítulo 3
     # Definiciones:
     # current_solution: Objeto contenedor que agrupa: objetivo, red, datos, resultados, técnica, etc.
     # network_original: Objeto con datos originales de la red. No se modifica durante el código. Permance como referencia.
-    # tabu_list: conjunto de movimientos tabú
+       
+    # operadores VNS
+    operadores = {
+    1:'incremento1_decremento1_exhaust', 
+    2:'incremento1_exhaust',
+    3:'incremento1_all',
+    4:'incremento2_decremento1_exhaust', 
+    5:'incremento2_decremento2_exhaust', 
+    6:'incremento3_decremento3_exhaust', 
+    7:'chain_reaction_exhaust_plus_minus',
+    8:'chain_reaction_exhaust_minus_plus'
+    }
+    num_operador=1
     
-    tabu_list=[]   
-    tennure = 5
     landscape=[] # Vector para guardar la información del landscape construido
     
     # Cálculo de solución inicial
@@ -51,8 +64,6 @@ def tabu_search(current_solution,network_original):
     _best_rho=best_neighbor_codificado["k_rho_max"]
     print (f'Valor función objetivo inicial: {best_neighbor_codificado[_best_rho]["rho_max"][0]}')
 
-
-
     # BUCLE PRINCIPAL
     
     # Condiciones de parada: https://www.sciencedirect.com/science/article/pii/S2214716023000180
@@ -60,17 +71,23 @@ def tabu_search(current_solution,network_original):
     stopping_condition_N_rule = False 
     iterations_to_do= 3 #Iteraciones de la búsqueda local. Criterio de parada.
     contador=1 
-    
+
     # W-rule: maximum number of consecutive iterations without improvement in the value of the incumbent solution 
     stopping_condition_W_rule = False 
     iterations_without_improvement = 0
     max_iterations_without_improve = 3
+
+    # K-rule: maximum number of neighborhood operators
+    stopping_condition_K_rule = False
+    k_max=8
     
     # Solución que ingresa al bucle
     neighbor = copy.deepcopy(best_neighbor)
+        
+    # Defino el primer operador
+    operador=operadores[1]
 
-
-    while stopping_condition_W_rule == False:
+    while stopping_condition_K_rule == False:
         
         print (f'Vecindario número = {contador}')       
         
@@ -79,13 +96,12 @@ def tabu_search(current_solution,network_original):
         # neighbor_codificado es la codificación del objeto neighbor (diccionario)
         # neighborhood es el vecindario de neighbor
         
-        # Defino la solución actual neighor
+        #Construyo lista exhaustiva del vecindario
         neighbor_codificado = codificar_solucion(neighbor,'sigma')
-               
+        
         try: 
             operador=current_solution.local_search_operator
-        except AttributeError :
-            operador="incremento1_exhaust(vector_original_sigmas)"
+        except:
             pass
         
         # Construyo el vecindario. Conjunto de soluciones codificadas según operador seleccionado
@@ -97,89 +113,27 @@ def tabu_search(current_solution,network_original):
         # Si el vecindario factible está vacío
         if len(neighborhood_feasible) == 0:
              best_of_neighborhood = neighbor
-             best_of_neighborhood_cod = neighbor_codificado
+             best_of_neighborhood_cod = codificar_solucion(best_of_neighborhood,'sigma')
              best_of_neighborhood = optimizacion(best_of_neighborhood_cod ,best_of_neighborhood,current_solution)
              qual_best_of_neighborhood=best_of_neighborhood.value_optimal_solution['Func_obj'] 
-
-        # Selecciono la nueva solución del vecindario 
-        # para comparar con best_neighbor
-        new_solution_ready=False
         
-        while new_solution_ready == False and len(neighborhood_feasible) != 0:
-
-            # Encuentro mejor solución del vecindario
-            best_of_neighborhood , qual_best_of_neighborhood , landscape, neighborhood_feasible =\
+        # Encuentro mejor solución del vecindario
+        else: 
+            best_of_neighborhood , qual_best_of_neighborhood , landscape =\
             find_best_of_neighborhood (neighborhood_feasible,
                                        neighbor,
                                        landscape,current_solution)
-            print (f'Mejor solución del vecindario {contador}: {qual_best_of_neighborhood}')
-            
-            # Determino los movimientos realizados     
-            # Movimiento_tabu=[servicioK,nodoJ,sigma_nuevo,sigma_original,tennure]
-            best_of_neighborhood_cod=codificar_solucion(best_of_neighborhood, 'sigma')
-            movimientos_realizados = movimiento_realizado (best_of_neighborhood_cod, neighbor_codificado, tennure)
-            
-            # Actualizo lista tabú
-            if len(tabu_list) != 0:
-                for i in tabu_list:
-                    i[4]-=1 
-                tabu_list = [i for i in tabu_list if i[4] != 0]                  
-            
-            
-            # Verifico si los movimientos son tabú o no
-            solution_has_tabu = False
-
-            for mvto in movimientos_realizados:
-
-                # Comparar mvto con los los miembros de tabu_list
-                # Recorro todo tabu_list para ver si item está allí    
-                for sublista_tabu in tabu_list:
-                    if mvto[:4] == sublista_tabu[:4]:
-                        solution_has_tabu=True
-                        break
-                # Si el movto no es tabú, lo agrego a la lista tabu
-                if solution_has_tabu == False:
-                    tabu_list.append(mvto)
-                    new_solution_ready = True
-
-            # Si al menos uno de los movimientos es tabú verifico nivel de aspiración                     
-            if solution_has_tabu == True:
-                print ("TENGO UNA SOLUCIÓN TABU")
-                if qual_best_of_neighborhood < qual_best:
-                    new_solution_ready = True
-                else: # Actualizo el vecindario factible y repito
-                    # Extraigo los sigmas de best_of_neighborhood
-                    matriz_best_of_neighborhood=extraer_variable_de_solucion_codificada(best_of_neighborhood_cod,'sigmas')
-                    
-                    # Crear una nueva lista de soluciones factibles no tabu
-                    nueva_lista_feasible = []
-                    for solution in neighborhood_feasible:
-                        matriz_soluc_feasible = extraer_variable_de_solucion_codificada(solution, 'sigmas')
-                        if matriz_soluc_feasible != matriz_best_of_neighborhood:
-                            nueva_lista_feasible.append(solution)
-                    
-                    # Reemplazar la lista original con la nueva lista
-                    neighborhood_feasible = nueva_lista_feasible
+        print (f'Mejor solución del vecindario {contador}: {qual_best_of_neighborhood}')
+        
         
         # Comparo la mejor solución del vecindario con la mejor solución obtenida.
-        print ("Comparación de mejor solución de vecindario con mejor solución obtenida")
-        if qual_best_of_neighborhood < qual_best:
-            qual_best=qual_best_of_neighborhood 
-            best_neighbor = copy.deepcopy(best_of_neighborhood)
-            calcular_kpi_local_search(best_neighbor)# Calculo KPIs
-            print (f'Mejor solución obtenida hasta ahora: {qual_best_of_neighborhood}')
-            neighbor = best_of_neighborhood
-            
-            # Hubo mejora, el contador de mejoras se hace cero
-            iterations_without_improvement = 0
-            
-            # Agrego una nueva línea a la lista de adyacencia del landscape
-            agregar_solucion_landscape (landscape,best_neighbor,qual_best)
-            
-        else: #No hubo mejora
-            neighbor = best_of_neighborhood
-            iterations_without_improvement += 1
-        
+        current_neighbor, operador, iterations_without_improvement,landscape,\
+        qual_best, best_neighbor, num_operador = \
+        neighborhood_change(best_neighbor, qual_best , 
+                                best_of_neighborhood , qual_best_of_neighborhood, 
+                                landscape , operador, operadores,num_operador,
+                                iterations_without_improvement)
+        print (f"Operador: {operador}")
         # Actualizo el criterio de parada
         # Criterio de parada es W rule
         if iterations_without_improvement > max_iterations_without_improve:
@@ -189,6 +143,10 @@ def tabu_search(current_solution,network_original):
         if contador == iterations_to_do:
             stopping_condition_N_rule = True
             
+        # Criterio de parada es K rule
+        if num_operador == k_max:
+            stopping_condition_K_rule = True
+        
         contador +=1
     
     print ("Resultado final")
@@ -204,48 +162,43 @@ def tabu_search(current_solution,network_original):
     
     return current_solution
 
-#%% Manipulación de vecindarios
-
-def add_mvto_tabu_list(tabu_list,mvto):
-    # Recorro todo tabu_list para ver si item está allí    
-    for sublista_tabu in tabu_list:
-        if mvto[:4] == sublista_tabu[:4]:
-            solution_is_tabu=True
-            break
-    # Si no son tabú agrego los movimientos a la lista tabú 
-    if solution_is_tabu == False:
-        tabu_list.append(mvto)
-        #new_solution_ready = True
-    return tabu_list,solution_is_tabu
-
-def extraer_variable_de_solucion_codificada(solucion_cod,contenido_variable):
-    # Extraigo los sigmas de best_of_neighborhood
-    matriz_sigmas=[]
-    for key,value in solucion_cod.items():
-        if 'sigmas' in value:
-            matriz_sigmas.append(value[contenido_variable])
-    return matriz_sigmas
-
-
-def movimiento_realizado (best_of_neighborhood_cod, neighbor_codificado, tennure):
-    # Movimiento_tabu=[servicioK,nodoJ,sigma_nuevo,sigma_viejo,tennure]
-    for index,servicio in best_of_neighborhood_cod.items():
-        if 'sigmas' in servicio:
-            lista1 = best_of_neighborhood_cod[index]['sigmas']
-            lista2 = neighbor_codificado[index]['sigmas']
-            # Comparación directa de las listas
-            if lista1 == lista2:
-                #print(f"No hay diferencias en k {index}.")
-                #movimientos_tabu=[]
-                pass
-            else:
-                #print(f"Las listas son diferentes en k {index}.")
-            
-                # Identificar y mostrar las diferencias
-                movimientos_tabu= [[index, i+1, lista1[i], lista2[i],tennure] for i in range(len(lista1)) if lista1[i] != lista2[i]]
-                #print("Elementos diferentes (índice, valor en lista1, valor en lista2):")    
+#%% Funciones de VNS
+def neighborhood_change(best_neighbor, qual_best , 
+                        best_of_neighborhood , qual_best_of_neighborhood, 
+                        landscape , operador, operadores,num_operador,
+                        iterations_without_improvement):
+    # Comparo la mejor solución del vecindario con la mejor solución obtenida.
+    print ("Comparación de mejor solución de vecindario con mejor solución obtenida")
+    if qual_best_of_neighborhood < qual_best:
+        qual_best=qual_best_of_neighborhood 
+        best_neighbor = copy.deepcopy(best_of_neighborhood)
+        calcular_kpi_local_search(best_neighbor)# Calculo KPIs
+        print (f'Mejor solución obtenida hasta ahora: {qual_best_of_neighborhood}')
+        neighbor = best_of_neighborhood
+        
+        # Actualizo el operador de vecindario
+        num_operador = 1
+        operador = operadores[num_operador]
+        
+        # Hubo mejora, el contador de mejoras se hace cero
+        iterations_without_improvement = 1
+        
+        # Agrego una nueva línea a la lista de adyacencia del landscape
+        agregar_solucion_landscape (landscape,best_neighbor,qual_best)
+        
+    else: #No hubo mejora
+        neighbor = best_of_neighborhood    
+        iterations_without_improvement += 1
+        
+        # Actualizo el operador de vecindario
+        num_operador += 1
+        operador = operadores[num_operador]
     
-    return movimientos_tabu
+    return neighbor, operador,\
+            iterations_without_improvement,\
+            landscape, qual_best, best_neighbor, num_operador
+
+#%% Manipulación de vecindario
 
 def neighborhood_exhaustive_codificado (neighbor_codificado,operador): #
     neighborhood=[] # Vecindario de _solucion
@@ -307,10 +260,12 @@ def neighborhood_exhaustive_codificado (neighbor_codificado,operador): #
             
             # Si se ejecuta desde __name__ == "__main__" aplico un operador específico
             if __name__ == "__main__":
-                neighborhood_sigmas_k = neighborhood_operator.incremento1_decremento1_exhaust(vector_original_sigmas)
+                #neighborhood_sigmas_k = globals()[operador](vector_original_sigmas)
+                neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)    
             else: # Aplico operador seleccionado por el usuario
-                neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)                
-        
+                #neighborhood_sigmas_k = globals()[operador](vector_original_sigmas)
+                neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)    
+                
             # Agrego solución permutada al vecindario
             for permutacion in neighborhood_sigmas_k:
                 neighbor_modificado_cod = copy.deepcopy(neighbor_codificado)
@@ -326,7 +281,7 @@ def agregar_solucion_landscape (landscape,best_neighbor,qual_best):
     lista = [_j.capac_instal_sigma for _i, _j in best_neighbor.network_repr.nodes_supply.items() if _j.service != 'k00']
     lista_sigma_y_fo=[lista,qual_best] # Vector de sigmas y su función objetivo 
     landscape.append([lista_sigma_y_fo]) #Guardo primer elemento del landscape
-
+ 
 
 def find_best_of_neighborhood(neighborhood_feasible,neighbor,
                               landscape,current_solution):
@@ -340,10 +295,11 @@ def find_best_of_neighborhood(neighborhood_feasible,neighbor,
     #print ("Optimización para hallar flujos")
     # Actualizo los valores sigma de cada solución factible en nodes supply.capac_instal_sigma
     # DECODIFICACIÓN. Llevo desde diccionario codificado a objeto neighbor       
-    for index_vecino, vecino_codificado in enumerate(neighborhood_feasible): #Para cada solucion del vecindario factible
+    for vecino_codificado in neighborhood_feasible: #Para cada solucion del vecindario factible
         
         # Hago optimización de vecino codificado para tener flujos
         neighbor_copy=optimizacion(vecino_codificado,neighbor,current_solution)
+        
     
         # Guardo neighbor_copy como vecino de best_neighbor en la lista de adyacencia.
         lista = [_j.capac_instal_sigma for _i, _j in neighbor_copy.network_repr.nodes_supply.items() if _j.service != 'k00']
@@ -355,14 +311,8 @@ def find_best_of_neighborhood(neighborhood_feasible,neighbor,
         if neighbor_copy.state=="Optimizado" and neighbor_copy.value_optimal_solution['Func_obj'] < qual_best_of_neighborhood:
             qual_best_of_neighborhood=neighbor_copy.value_optimal_solution['Func_obj']
             best_of_neighborhood=neighbor_copy
-        
-        # Retiro vecino_codificado de neighborhood feasible
-        elemento = neighborhood_feasible.pop(index_vecino)
             
-        # Insertar el vecino_codificado que se retiró, en la posición 0
-        neighborhood_feasible.insert(0, elemento)
-            
-    return best_of_neighborhood , qual_best_of_neighborhood, landscape, neighborhood_feasible
+    return best_of_neighborhood , qual_best_of_neighborhood, landscape
             
 def tamizaje_soluciones(best_neighbor,neighborhood):
     # Las soluciones no pueden tener sigmas negativos o que superen s_jk o cuya suma sea mayor a sigma_max       
@@ -437,8 +387,6 @@ def decodificar_solucion (vecino_codificado,neighbor):
 
 #%% Cálculo de kpi
 
-
-
 def calcular_kpi_local_search(current_solution):
     current_solution
 
@@ -502,6 +450,7 @@ def optimizacion(vecino_codificado,neighbor,current_solution):
     
     return neighbor_copy
     
+    
 # %% <codecell> main
 if __name__ == "__main__":
 
@@ -527,7 +476,7 @@ if __name__ == "__main__":
         problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
 
         # Definimos valores I,J,K
-        I,J,K= [4,4,4]
+        I,J,K= [5,5,5]
         
         
         # Creamos un objeto network
@@ -568,7 +517,7 @@ if __name__ == "__main__":
             problems_dict[_solucion_temporal.name_problem].name_problem
         print (f"Se ha actualizado el objeto {problems_dict[_solucion_temporal.name_problem].name_problem}")
                 
-        # Ejecuto algoritmo
-        current_solution= tabu_search(current_solution,networks_dict['red_original'])
+        # Ejecuto algoritmo 
+        current_solution= vnd_search(current_solution,networks_dict['red_original'])
         
         

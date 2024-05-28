@@ -196,7 +196,8 @@ def set_lambda_jk (current_solution, network,_post_optima):
     # También puedo leer los datos desde df_l_jk pues 
     if _post_optima==True:
         
-        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Aproximación" :
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
+            current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
             data = current_solution.df_l_jk # Puedo leer desde best_neighbor. df_l_ijk
         else:
             data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)     
@@ -222,7 +223,8 @@ def set_lambda_jk (current_solution, network,_post_optima):
         
         #Actualizo los sigma
         
-        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Aproximación":
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
+            current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
             data = current_solution.df_sigma # Puedo leer desde best_neighbor. df_l_ijk
         else:
             data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],

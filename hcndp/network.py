@@ -154,7 +154,8 @@ class Network():
             
             output_file=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
             
-            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+            if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación" or\
+                self.tecnica=="VND" or self.tecnica=="GVNS":
                 data = self.problem.df_sigma 
             else:
                 data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
@@ -217,7 +218,8 @@ class Network():
         if _post_optima == True:
             # Cargo los resultados obtenidos de la optimización
             
-            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+            if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación" or\
+                self.tecnica=="VND" or self.tecnica=="GVNS":
                 self.file['df_flujos_ijk']=self.problem.df_f_ijk
                 self.file['df_fi_ijkjk'] = self.problem.df_fi_ijkjk
             else:
@@ -259,7 +261,8 @@ class Network():
             
             # Actualizo los valores de sigma nuevos
             
-            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+            if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación"\
+                or self.tecnica=="VND" or self.tecnica=="GVNS":
                 data=self.problem.df_sigma
             else:
                 data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
@@ -341,7 +344,8 @@ class Network():
         
         if _post_optima==True:
             
-            if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+            if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación"\
+                or self.tecnica=="VND" or self.tecnica=="GVNS":
                 data=self.problem.df_prob_fi_jkjk
             else:
                 path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'

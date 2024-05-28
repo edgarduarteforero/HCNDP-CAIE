@@ -11,28 +11,27 @@ from hcndp import initial_solution
 from hcndp import data_functions
 import pandas as pd
 from hcndp import kpi
-from hcndp import neighborhood_operator
 
 
-def tabu_search(current_solution,network_original):
-    # Basado en Glover (https://www.researchgate.net/publication/242527226_Tabu_Search_A_Tutorial)
+def local_search(current_solution,network_original):
+   
+    
+    # Basado en Talbi (2009). Algoritmo 2.2
     # Definiciones:
     # current_solution: Objeto contenedor que agrupa: objetivo, red, datos, resultados, técnica, etc.
     # network_original: Objeto con datos originales de la red. No se modifica durante el código. Permance como referencia.
-    # tabu_list: conjunto de movimientos tabú
-    
-    tabu_list=[]   
-    tennure = 5
+        
     landscape=[] # Vector para guardar la información del landscape construido
     
     # Cálculo de solución inicial
-    best_neighbor = initial_solution.initial_solution(current_solution,network_original)
-    calcular_kpi_local_search(best_neighbor) #Mido KPI de solución inicial
+    current_neighbor = initial_solution.initial_solution(current_solution,network_original)
+    calcular_kpi_local_search(current_neighbor) #Mido KPI de solución inicial
     
     # Corrige la solución inicial existente para evitar que tenga rho > 1
-    best_neighbor = initial_solution.fix_initial_solution(best_neighbor)  
+    current_neighbor = initial_solution.fix_initial_solution(current_neighbor)  
     
     # Defino la mejor solución encontrada
+    best_neighbor = copy.deepcopy(current_neighbor)
     calcular_kpi_local_search(best_neighbor)# Calculo KPIs
     qual_best=best_neighbor.network_copy.file['df_medidas']['rho_max'][0] 
     
@@ -41,15 +40,16 @@ def tabu_search(current_solution,network_original):
     
     # CODIFICACIÓN DE SOLUCIÓN
     # Codifico la solución inicial
-    best_neighbor_codificado=codificar_solucion(best_neighbor,'sigma')
+    current_neighbor_codificado=codificar_solucion(best_neighbor,'sigma')
         
     print (f'Solución inicial construida')
     print (f"Vectores sigmas:")
-    for i,j in best_neighbor_codificado.items():
+    for i,j in current_neighbor_codificado.items():
         if 'sigmas' in j:
             print (i,j['sigmas']) 
-    _best_rho=best_neighbor_codificado["k_rho_max"]
-    print (f'Valor función objetivo inicial: {best_neighbor_codificado[_best_rho]["rho_max"][0]}')
+    _best_rho=current_neighbor_codificado["k_rho_max"]
+    print (f'Valor función objetivo inicial: {current_neighbor_codificado[_best_rho]["rho_max"][0]}')
+
 
 
 
@@ -60,15 +60,11 @@ def tabu_search(current_solution,network_original):
     stopping_condition_N_rule = False 
     iterations_to_do= 3 #Iteraciones de la búsqueda local. Criterio de parada.
     contador=1 
-    
+
     # W-rule: maximum number of consecutive iterations without improvement in the value of the incumbent solution 
     stopping_condition_W_rule = False 
     iterations_without_improvement = 0
     max_iterations_without_improve = 3
-    
-    # Solución que ingresa al bucle
-    neighbor = copy.deepcopy(best_neighbor)
-
 
     while stopping_condition_W_rule == False:
         
@@ -79,13 +75,15 @@ def tabu_search(current_solution,network_original):
         # neighbor_codificado es la codificación del objeto neighbor (diccionario)
         # neighborhood es el vecindario de neighbor
         
-        # Defino la solución actual neighor
+        #Construyo lista exhaustiva del vecindario
+        neighbor = copy.deepcopy(current_neighbor) # objeto solución
+        #neighbor_codificado = copy.deepcopy(best_neighbor_codificado)
         neighbor_codificado = codificar_solucion(neighbor,'sigma')
-               
+        
         try: 
             operador=current_solution.local_search_operator
         except AttributeError :
-            operador="incremento1_exhaust(vector_original_sigmas)"
+            operador="incremento1_decremento1_exhaust(vector_original_sigmas)"
             pass
         
         # Construyo el vecindario. Conjunto de soluciones codificadas según operador seleccionado
@@ -97,69 +95,18 @@ def tabu_search(current_solution,network_original):
         # Si el vecindario factible está vacío
         if len(neighborhood_feasible) == 0:
              best_of_neighborhood = neighbor
-             best_of_neighborhood_cod = neighbor_codificado
+             best_of_neighborhood_cod = codificar_solucion(best_of_neighborhood,'sigma')
              best_of_neighborhood = optimizacion(best_of_neighborhood_cod ,best_of_neighborhood,current_solution)
              qual_best_of_neighborhood=best_of_neighborhood.value_optimal_solution['Func_obj'] 
-
-        # Selecciono la nueva solución del vecindario 
-        # para comparar con best_neighbor
-        new_solution_ready=False
         
-        while new_solution_ready == False and len(neighborhood_feasible) != 0:
-
+        else:
             # Encuentro mejor solución del vecindario
-            best_of_neighborhood , qual_best_of_neighborhood , landscape, neighborhood_feasible =\
+            best_of_neighborhood , qual_best_of_neighborhood , landscape =\
             find_best_of_neighborhood (neighborhood_feasible,
                                        neighbor,
                                        landscape,current_solution)
-            print (f'Mejor solución del vecindario {contador}: {qual_best_of_neighborhood}')
-            
-            # Determino los movimientos realizados     
-            # Movimiento_tabu=[servicioK,nodoJ,sigma_nuevo,sigma_original,tennure]
-            best_of_neighborhood_cod=codificar_solucion(best_of_neighborhood, 'sigma')
-            movimientos_realizados = movimiento_realizado (best_of_neighborhood_cod, neighbor_codificado, tennure)
-            
-            # Actualizo lista tabú
-            if len(tabu_list) != 0:
-                for i in tabu_list:
-                    i[4]-=1 
-                tabu_list = [i for i in tabu_list if i[4] != 0]                  
-            
-            
-            # Verifico si los movimientos son tabú o no
-            solution_has_tabu = False
-
-            for mvto in movimientos_realizados:
-
-                # Comparar mvto con los los miembros de tabu_list
-                # Recorro todo tabu_list para ver si item está allí    
-                for sublista_tabu in tabu_list:
-                    if mvto[:4] == sublista_tabu[:4]:
-                        solution_has_tabu=True
-                        break
-                # Si el movto no es tabú, lo agrego a la lista tabu
-                if solution_has_tabu == False:
-                    tabu_list.append(mvto)
-                    new_solution_ready = True
-
-            # Si al menos uno de los movimientos es tabú verifico nivel de aspiración                     
-            if solution_has_tabu == True:
-                print ("TENGO UNA SOLUCIÓN TABU")
-                if qual_best_of_neighborhood < qual_best:
-                    new_solution_ready = True
-                else: # Actualizo el vecindario factible y repito
-                    # Extraigo los sigmas de best_of_neighborhood
-                    matriz_best_of_neighborhood=extraer_variable_de_solucion_codificada(best_of_neighborhood_cod,'sigmas')
-                    
-                    # Crear una nueva lista de soluciones factibles no tabu
-                    nueva_lista_feasible = []
-                    for solution in neighborhood_feasible:
-                        matriz_soluc_feasible = extraer_variable_de_solucion_codificada(solution, 'sigmas')
-                        if matriz_soluc_feasible != matriz_best_of_neighborhood:
-                            nueva_lista_feasible.append(solution)
-                    
-                    # Reemplazar la lista original con la nueva lista
-                    neighborhood_feasible = nueva_lista_feasible
+        print (f'Mejor solución del vecindario {contador}: {qual_best_of_neighborhood}')
+        
         
         # Comparo la mejor solución del vecindario con la mejor solución obtenida.
         print ("Comparación de mejor solución de vecindario con mejor solución obtenida")
@@ -168,7 +115,7 @@ def tabu_search(current_solution,network_original):
             best_neighbor = copy.deepcopy(best_of_neighborhood)
             calcular_kpi_local_search(best_neighbor)# Calculo KPIs
             print (f'Mejor solución obtenida hasta ahora: {qual_best_of_neighborhood}')
-            neighbor = best_of_neighborhood
+            current_neighbor = best_of_neighborhood
             
             # Hubo mejora, el contador de mejoras se hace cero
             iterations_without_improvement = 0
@@ -177,7 +124,7 @@ def tabu_search(current_solution,network_original):
             agregar_solucion_landscape (landscape,best_neighbor,qual_best)
             
         else: #No hubo mejora
-            neighbor = best_of_neighborhood
+            current_neighbor = best_of_neighborhood    
             iterations_without_improvement += 1
         
         # Actualizo el criterio de parada
@@ -204,48 +151,7 @@ def tabu_search(current_solution,network_original):
     
     return current_solution
 
-#%% Manipulación de vecindarios
-
-def add_mvto_tabu_list(tabu_list,mvto):
-    # Recorro todo tabu_list para ver si item está allí    
-    for sublista_tabu in tabu_list:
-        if mvto[:4] == sublista_tabu[:4]:
-            solution_is_tabu=True
-            break
-    # Si no son tabú agrego los movimientos a la lista tabú 
-    if solution_is_tabu == False:
-        tabu_list.append(mvto)
-        #new_solution_ready = True
-    return tabu_list,solution_is_tabu
-
-def extraer_variable_de_solucion_codificada(solucion_cod,contenido_variable):
-    # Extraigo los sigmas de best_of_neighborhood
-    matriz_sigmas=[]
-    for key,value in solucion_cod.items():
-        if 'sigmas' in value:
-            matriz_sigmas.append(value[contenido_variable])
-    return matriz_sigmas
-
-
-def movimiento_realizado (best_of_neighborhood_cod, neighbor_codificado, tennure):
-    # Movimiento_tabu=[servicioK,nodoJ,sigma_nuevo,sigma_viejo,tennure]
-    for index,servicio in best_of_neighborhood_cod.items():
-        if 'sigmas' in servicio:
-            lista1 = best_of_neighborhood_cod[index]['sigmas']
-            lista2 = neighbor_codificado[index]['sigmas']
-            # Comparación directa de las listas
-            if lista1 == lista2:
-                #print(f"No hay diferencias en k {index}.")
-                #movimientos_tabu=[]
-                pass
-            else:
-                #print(f"Las listas son diferentes en k {index}.")
-            
-                # Identificar y mostrar las diferencias
-                movimientos_tabu= [[index, i+1, lista1[i], lista2[i],tennure] for i in range(len(lista1)) if lista1[i] != lista2[i]]
-                #print("Elementos diferentes (índice, valor en lista1, valor en lista2):")    
-    
-    return movimientos_tabu
+#%% Manipulación de vecindario
 
 def neighborhood_exhaustive_codificado (neighbor_codificado,operador): #
     neighborhood=[] # Vecindario de _solucion
@@ -307,9 +213,9 @@ def neighborhood_exhaustive_codificado (neighbor_codificado,operador): #
             
             # Si se ejecuta desde __name__ == "__main__" aplico un operador específico
             if __name__ == "__main__":
-                neighborhood_sigmas_k = neighborhood_operator.incremento1_decremento1_exhaust(vector_original_sigmas)
+                neighborhood_sigmas_k = incremento1_decremento1_exhaust(vector_original_sigmas)
             else: # Aplico operador seleccionado por el usuario
-                neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)                
+                neighborhood_sigmas_k = globals()[operador](vector_original_sigmas)
         
             # Agrego solución permutada al vecindario
             for permutacion in neighborhood_sigmas_k:
@@ -326,6 +232,117 @@ def agregar_solucion_landscape (landscape,best_neighbor,qual_best):
     lista = [_j.capac_instal_sigma for _i, _j in best_neighbor.network_repr.nodes_supply.items() if _j.service != 'k00']
     lista_sigma_y_fo=[lista,qual_best] # Vector de sigmas y su función objetivo 
     landscape.append([lista_sigma_y_fo]) #Guardo primer elemento del landscape
+    
+def neighborhood_exhaustive(_solucion): #_solucion es un objeto
+    neighborhood=[] # Vecindario de _solucion
+    
+    # Determino si obtengo soluciones teniendo en cuenta los valores de rho en cada vector de _k
+    # Solamente hago permutaciones en los vectores de los peores servicio k
+    
+    # Asegúrate de tener el DataFrame que estás manipulando
+    df_capac1 = _solucion.network_copy.file['df_capac']
+
+    # Establece 'servicio_K' como índice
+    #df_capac1.set_index('servicio_K', inplace=True)
+
+    # Asegúrate de que 'rho' esté en el DataFrame
+    if 'rho' not in df_capac1.set_index('servicio_K').columns:
+        raise KeyError("'rho' no se encuentra en el DataFrame")
+
+    # Agrupa por 'servicio_K' y luego obtiene el valor máximo de 'rho' en cada k
+    grouped_max = df_capac1.set_index('servicio_K').groupby('servicio_K')['rho'].max()
+    grouped_max=grouped_max.reset_index()
+       
+    # Verificar el número de cuartiles
+    q = 4  # Intentar dividir en 4 cuartiles
+    
+    # Verificar el número de etiquetas
+    labels = ['Q1', 'Q2', 'Q3', 'Q4']  # 4 etiquetas para 4 cuartiles
+    
+    # Si hay menos valores únicos, ajustar los cuartiles
+    while True: 
+        try:
+            grouped_max['cuartil_b'] = pd.qcut(grouped_max['rho'], q=q, 
+                                               labels=labels, duplicates='drop')
+            break
+        except ValueError as e:
+            print("Error:", e)
+            
+            # Ajustar el número de cuartiles y etiquetas si hay error
+            #q = grouped_max['rho'].nunique()  # Ajustar al número de valores únicos
+            #labels = labels[q-1:]  # Ajustar el número de etiquetas
+        
+            # Intentar de nuevo con el número correcto de cuartiles y etiquetas
+            #grouped_max['cuartil_b'] = pd.qcut(grouped_max['rho'], q=q, labels=labels, duplicates='drop')    
+            #grouped_max['cuartil_b']='Q4'
+            labels.pop(0)
+            q-=1
+        
+    # Para cada servicio k 
+    for _k in _solucion.network_copy.file['df_niveles']['servicio_K']:
+        
+        # Si _k no está en Q4, significa que no está congestionado y por lo tanto no lo agrego al vecindario
+        if (_k in grouped_max[grouped_max['cuartil_b'] == 'Q4']['servicio_K'].values): #or\
+           #(_k in grouped_max[grouped_max['cuartil_b'] == 'Q3']['servicio_K'].values):
+
+            nodes_k = [] # Lista con nodos del servicio _k. Es la lista de los nodos de servicio jk
+            
+            # Crear una lista con nodos del servicio _k 
+            for _i, _j in _solucion.network_repr.nodes_supply.items():
+                if _j.service == _k:
+                    # Agregar los elementos a la lista
+                    nodes_k.append((_j))
+            
+            #print("\n".join(str(obj) for obj in nodes_k))
+    
+            # Aplico el operador de perturbación para generar nuevos vecindarios
+            # nodes_k: lista de objetos nodos en el servicio _k
+            # _k: servicio o vector k
+            # _solución: solución desde la que se construye el vecindario
+            
+            #Posibles operadores:
+            #--------------------
+            #neighborhood_k = incremento1_decremento1_exhaust(nodes_k,_k,_solucion) 
+            #neighborhood_k = incremento1_exhaust (nodes_k,_k,_solucion)
+            #neighborhood_k = incremento1_all (nodes_k,_k,_solucion)
+            #neighborhood_k = incremento2_decremento1_exhaust(nodes_k,_k,_solucion) 
+            #neighborhood_k = incremento2_decremento2_exhaust(nodes_k,_k,_solucion) 
+            #neighborhood_k = incremento3_decremento3_exhaust(nodes_k,_k,_solucion) 
+            #neighborhood_k = chain_reaction_exhaust_plus_minus(nodes_k,_k,_solucion)
+            #neighborhood_k = chain_reaction_exhaust_minus_plus(nodes_k,_k,_solucion)
+            
+            # Codifico el contenido de nodes_k
+            # Codificación. Paso de los objetos nodes a un vector con sigmas. 
+            vector_original_sigmas = [nodo.capac_instal_sigma for nodo in nodes_k]
+            print (f'Servicio del vector sigmas: {nodes_k[0].service}')
+            #print (f'Vector sigmas original: {vector_original_sigmas}')
+            
+            # Si se ejecuta desde __name__ == "__main__"
+            if __name__ == "__main__":
+                neighborhood_sigmas_k = incremento1_decremento1_exhaust(vector_original_sigmas,
+                                                                  _k,_solucion)
+                _solucion.local_search_operator="incremento1_decremento1_exhaust (nodes_k,_k,_solucion)"
+
+            else:
+                neighborhood_sigmas_k = eval(_solucion.local_search_operator)
+                
+            # Decodifico copia_vector_original_sigmas en nodes
+            lista_nodes_perturbados=[]
+            for vector in neighborhood_sigmas_k:                    
+
+                copia_nodes=copy.deepcopy(nodes_k)
+                
+                for index, value in enumerate(copia_nodes):
+                    value.capac_instal_sigma = vector[index]
+                
+                lista_nodes_perturbados.append(copia_nodes)    
+        
+    
+            #Devuelve un listado de soluciones (listas de nodes_K) para cada _k        
+            neighborhood.append(lista_nodes_perturbados)
+        
+    
+    return neighborhood
 
 
 def find_best_of_neighborhood(neighborhood_feasible,neighbor,
@@ -340,10 +357,10 @@ def find_best_of_neighborhood(neighborhood_feasible,neighbor,
     #print ("Optimización para hallar flujos")
     # Actualizo los valores sigma de cada solución factible en nodes supply.capac_instal_sigma
     # DECODIFICACIÓN. Llevo desde diccionario codificado a objeto neighbor       
-    for index_vecino, vecino_codificado in enumerate(neighborhood_feasible): #Para cada solucion del vecindario factible
+    for vecino_codificado in neighborhood_feasible: #Para cada solucion del vecindario factible
         
         # Hago optimización de vecino codificado para tener flujos
-        neighbor_copy=optimizacion(vecino_codificado,neighbor,current_solution)
+        neighbor_copy=optimizacion(vecino_codificado,neighbor)
     
         # Guardo neighbor_copy como vecino de best_neighbor en la lista de adyacencia.
         lista = [_j.capac_instal_sigma for _i, _j in neighbor_copy.network_repr.nodes_supply.items() if _j.service != 'k00']
@@ -355,14 +372,8 @@ def find_best_of_neighborhood(neighborhood_feasible,neighbor,
         if neighbor_copy.state=="Optimizado" and neighbor_copy.value_optimal_solution['Func_obj'] < qual_best_of_neighborhood:
             qual_best_of_neighborhood=neighbor_copy.value_optimal_solution['Func_obj']
             best_of_neighborhood=neighbor_copy
-        
-        # Retiro vecino_codificado de neighborhood feasible
-        elemento = neighborhood_feasible.pop(index_vecino)
             
-        # Insertar el vecino_codificado que se retiró, en la posición 0
-        neighborhood_feasible.insert(0, elemento)
-            
-    return best_of_neighborhood , qual_best_of_neighborhood, landscape, neighborhood_feasible
+    return best_of_neighborhood , qual_best_of_neighborhood, landscape
             
 def tamizaje_soluciones(best_neighbor,neighborhood):
     # Las soluciones no pueden tener sigmas negativos o que superen s_jk o cuya suma sea mayor a sigma_max       
@@ -435,7 +446,220 @@ def decodificar_solucion (vecino_codificado,neighbor):
                 neighbor_copy.network_repr.nodes_supply[indice_nuevo_sigma].capac_instal_sigma=nuevo_sigma
     return neighbor_copy
 
-#%% Cálculo de kpi
+#%% Operadores para generar vecindarios
+
+
+def incremento1_decremento1_exhaust (vector_original_sigmas):
+    # # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    
+    # Aplico operador al vector codificado
+    # Selecciono todas las permutaciones de dos elementos de vector_original.
+    # Cada permutación es de dos elementos sigma_1 y sigma_2.
+    # Sumo 1 a sigma_1 y resto 1 a sigma_2.
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    for i in range(len(vector_original_sigmas)):
+        
+        for j in range(len(vector_original_sigmas)):
+            copia_vector_original_sigmas=vector_original_sigmas.copy()
+            if i != j:
+                copia_vector_original_sigmas[i]= vector_original_sigmas[i]+1
+                copia_vector_original_sigmas[j]= vector_original_sigmas[j]-1
+                #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                
+                lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+    return lista_sigmas_perturbados 
+    #return lista_nodes_perturbados
+
+def incremento1_exhaust (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+
+    
+    # Aplico operador al vector codificado
+    # Selecciono cada elemento de vector_original.
+    # Sumo 1 al sigma de ese elemento.
+    # Este operador SÍ CAMBIA la cantidad total de servidores asignados.
+    # Por lo tanto debo verificar que no supere el sigma_max_k. 
+    # Esta verificación se hace posteriormente en el tamizaje de soluciones.
+    
+    for i in range(len(vector_original_sigmas)):
+        
+            copia_vector_original_sigmas=vector_original_sigmas.copy()
+
+            copia_vector_original_sigmas[i]= vector_original_sigmas[i]+1
+                
+            print (f'Sigma {i} era {vector_original_sigmas[i]}. Nuevo vector es {copia_vector_original_sigmas}')
+            
+            lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+            
+    return lista_sigmas_perturbados
+
+def incremento1_all (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    # Aplico operador al vector codificado
+    # Sumo 1 a todos los sigma del elemento.
+    # Este operador SÍ CAMBIA la cantidad total de servidores asignados.
+    # Por lo tanto debo verificar que no supere el sigma_max_k. 
+    # Esta verificación se hace posteriormente en el tamizaje de soluciones.
+    
+    copia_vector_original_sigmas=vector_original_sigmas.copy()
+
+    copia_vector_original_sigmas = [x+1 for x in copia_vector_original_sigmas]
+                
+    print (f'Vector sigmas original era {vector_original_sigmas}. Nuevo vector sigmas es {copia_vector_original_sigmas}')
+    
+    lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+            
+    return lista_sigmas_perturbados
+
+def incremento2_decremento1_exhaust (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    # Aplico operador al vector codificado
+    # Selecciono todas las permutaciones de dos elementos de vector_original.
+    # Cada permutación es de dos elementos sigma_1 y sigma_2.
+    # Sumo a sigma_1 y resto a sigma_2.
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    for i in range(len(vector_original_sigmas)):
+        
+        for j in range(len(vector_original_sigmas)):
+            copia_vector_original_sigmas=vector_original_sigmas.copy()
+            if i != j:
+                copia_vector_original_sigmas[i]= vector_original_sigmas[i]+2
+                copia_vector_original_sigmas[j]= vector_original_sigmas[j]-1
+                print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                
+                lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+                
+    return lista_sigmas_perturbados
+
+def incremento2_decremento2_exhaust (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+        
+    # Aplico operador al vector codificado
+    # Selecciono todas las permutaciones de dos elementos de vector_original.
+    # Cada permutación es de dos elementos sigma_1 y sigma_2.
+    # Sumo a sigma_1 y resto a sigma_2.
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    for i in range(len(vector_original_sigmas)):
+        
+        for j in range(len(vector_original_sigmas)):
+            copia_vector_original_sigmas=vector_original_sigmas.copy()
+            if i != j:
+                copia_vector_original_sigmas[i]= vector_original_sigmas[i]+2
+                copia_vector_original_sigmas[j]= vector_original_sigmas[j]-2
+                print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                
+                lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+                
+    return lista_sigmas_perturbados
+
+def incremento3_decremento3_exhaust (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    # Aplico operador al vector codificado
+    # Selecciono todas las permutaciones de dos elementos de vector_original.
+    # Cada permutación es de dos elementos sigma_1 y sigma_2.
+    # Sumo a sigma_1 y resto a sigma_2.
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    for i in range(len(vector_original_sigmas)):
+        
+        for j in range(len(vector_original_sigmas)):
+            copia_vector_original_sigmas=vector_original_sigmas.copy()
+            if i != j:
+                copia_vector_original_sigmas[i]= vector_original_sigmas[i]+3
+                copia_vector_original_sigmas[j]= vector_original_sigmas[j]-3
+                print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                
+                lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+                
+    return lista_sigmas_perturbados
+
+def chain_reaction_exhaust_plus_minus (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    # Aplico operador al vector codificado
+    # Creo un vectorcadena  +1 -1 +1 -1 ... del mismo tamaño de vector sigmas
+    # Sumo vector sigmas a vectorcadena
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    vectorcadena = [1 if i % 2 == 0 else -1 for i in range(len(vector_original_sigmas))]
+
+    copia_vector_original_sigmas=vector_original_sigmas.copy()
+    copia_vector_original_sigmas = [x + y for x, y in zip(copia_vector_original_sigmas, vectorcadena)]
+    
+    print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
+    
+    lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+            
+    return lista_sigmas_perturbados
+
+def chain_reaction_exhaust_minus_plus (vector_original_sigmas):
+    # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    # Aplico operador al vector codificado
+    # Creo un vectorcadena  +1 -1 +1 -1 ... del mismo tamaño de vector sigmas
+    # Sumo vector sigmas a vectorcadena
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    vectorcadena = [-1 if i % 2 == 0 else 1 for i in range(len(vector_original_sigmas))]
+
+    copia_vector_original_sigmas=vector_original_sigmas.copy()
+    copia_vector_original_sigmas = [x + y for x, y in zip(copia_vector_original_sigmas, vectorcadena)]
+    
+    print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
+    
+    lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+            
+    return lista_sigmas_perturbados
+
+
+
+def incremento_decremento_prob (vector_original, vector_constraint,selected_service,_solucion):
+    # Recorro el vector y para cada posición con un valor no cero 
+    # calculo una probabilidad. Si se supera un valor base 
+    # se decide aumentarlo o disminuirlo en una unidad. 
+    #Se basa en el algoritmo Random Walk Mutation del libro de Luke (Algoritmo 42).     
+    
+    #p = 1/len(vector_original) # Probabilidad de perturbar un sigma
+    p = 0.4
+    #b = 0.5 # Probabilidad lanzar moneda
+        
+    copia_vector_original=vector_original.copy()
+    
+    # Repito perturbación hasta que la suma del vector sea menor a sigma_max del servicio "selected_service"
+    sum_copia_vector=100000000
+    while sum_copia_vector > _solucion.network_copy.file['df_s_jk_max'].set_index('servicio_K').loc[selected_service,'s_jk_total']:
+        for i in range (len(copia_vector_original)):
+            if p >= random.random() and vector_constraint[i]!=0: # Decido si perturbo sigma_i
+            #if p >= random.random() and copia_vector_original[i]!=0: # Decido si perturbo sigma_i
+                n = random.choice([1, -1]) 
+                if copia_vector_original[i] + n <= vector_constraint[i]:
+                    copia_vector_original[i]=copia_vector_original[i]+n
+                elif copia_vector_original[i] - n >= vector_constraint[i]:
+                    copia_vector_original[i]=copia_vector_original[i]-n
+        sum_copia_vector = sum(copia_vector_original)
+            
+    return copia_vector_original
 
 
 
@@ -501,6 +725,7 @@ def optimizacion(vecino_codificado,neighbor,current_solution):
     neighbor_copy.execute_solver() # Ejecuto pyomo Gurobi
     
     return neighbor_copy
+    
     
 # %% <codecell> main
 if __name__ == "__main__":
@@ -568,7 +793,7 @@ if __name__ == "__main__":
             problems_dict[_solucion_temporal.name_problem].name_problem
         print (f"Se ha actualizado el objeto {problems_dict[_solucion_temporal.name_problem].name_problem}")
                 
-        # Ejecuto algoritmo
-        current_solution= tabu_search(current_solution,networks_dict['red_original'])
+        # Ejecuto local search
+        current_solution= local_search(current_solution,networks_dict['red_original'])
         
         

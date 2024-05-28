@@ -23,7 +23,7 @@ def initial_solution(current_solution,network_original):
                                           network_original.file)
     
     # Asignación de recurso σ_k para cada nodo de oferta j 
-    print ("Inicio construcción de solución inicial con la asignación de recursos sigma")
+    print ("Construcción de solución inicial")
     for _k in path_repr.nodes_services.keys():
         if _k !=  'k00':
             #print ("Asignación de recursos para: ", _k)

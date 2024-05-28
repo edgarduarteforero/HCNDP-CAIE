@@ -17,23 +17,13 @@ El código tiene dos partes fundamentales:
 1. Problemas mono_objetivo
 2. Problemas multi_objetivo
 
-Para las metaheurísticas me voy a basar  en Talbi
-Estoy leyendo "Metaheuristcs: from design to implementation", de Talbi, 2009. Hay aspectos MUY IMPORTANTES. Están en el archivo de notas de Zotero.
+En Gendrau 2010 p. 42, explican muy bien la diferencia entre espacio de búsqueda y estructura de vecindario (operadores). Mi espacio de búsqueda está definido por la asignación de servidores a los nodos de servicio (los flujos son hallados por PL). De allí se desprenden los operadores o estructuras de vecindario que he usado.
 
-Voy a implementar varios métodos de única solución. Inicio por Local search en su versión básica.
-¿Qué quiero explorar usando el Local Search?
-Quiero establecer la calidad de la metaheurística para resolver distintos problemas HCFNDP. 
-También quiero explorar el Landscape para caracterizar la dificultad de los problemas.
-
-Puedo hacer el experimento para una misma metaheurística con una misma instancia. Los factores podrían ser: operadores y los factores propios de cada metaheurística (temperatura, tamaño de lista tabú, tamaño del vecindario). La idea es asegurar la robustez de la metaheurística para resolver varias instancias. 
-Medidas de desempeño: diferencia entre solución y solución óptima, diferencia entre solución y cotas inferiores o superiores que pueda generar. Una cota inferior es un valor inalcanzable de referencia en minimización. Tiempo CPU y Wall Clock time.
-Statistycal analysis: t-test, Wilcoxon, Friedman, ANOVA. otros. Calcular intervalos de confianza. Ordinal data analysis.
+Debería exportar también: 
+Landscape: Me dice cuántas soluciones factibles se evaluaron. Tengo que incluir landscape en network.file para que al generar salida_medicion, quede dentro de la información exportada.
 
 También deseo explorar el fitness landscape. El libro de Talbi tiene indicadores de distribución de locales en el espacio de búsqueda, entropía, distribución en el espacio objetivo, longitud de caminos, función de autocorrelación, correlación de la distancia de fitness.  Las medidas que se proponen pueden ser calculadas tomando cada solución como un nodo de la red. Un arco existe si hay una permutación que lleva de una solución a otra. Puedo usar NetworkX para explorar el Landscape como un grafo con medidas de distribución y correlación. 
 
-En cada iteración determino un vecindario compuesto por soluciones cercanas a neighbor. En el tamizaje elimino las soluciones no factibles. ¿Cómo puedo eliminar más soluciones?
-Una solución de k=3 tiene tres vectores sigma [3,5,6,4], [5,8,7,9], [2,7,6,0]
-Cada vector tiene un valor de rho k1=[0.8], k2=[0.6], k3=[0.9]. Vale la pena aplicar el operador de perturbación al primero y al tercer vector, al segundo no porque no se espera que mejora el rho máximo (que está en el tercero). 
 
 A tener en cuenta:
 La relación entre sigma_max y los s_jk es muy importante.
@@ -41,17 +31,47 @@ Si sigma_max es más grande que la suma de los s_jk significa que tengo más ser
 Si sigma_max es menor a la suma de los s_jk, significa que tengo menos servidores que capacidad. Ahí el problema se complejiza porque debo tomar decisiones de dónde asignar.
 Un cuello de botella se forma cuando un lambda es mayor a s_jk y el nodo se congestiona con un rho mayor a 1. En ese caso, el problema es infactible. En tal caso habría que aumentar las capacidades de los nodos de servicio.
 
+Para una sola heurística.
+Estudio de las medidas de desempeño:
+Hay estas medidas: 
+1. Q: Calidad de la solución - Desviación porcentual óptimo(%)
+2. E: Esfuerzo computacional relativo - Tiempo por nodo (s/nodo)
+3. R: Robustez del algoritmo - Variabilidad de desviación porcentual (%)
+4. F: Frecuencia de veces que se alcanzó el óptimo. (Veces)
+
+Gráficas:
+Q vs K vs Operador (Calidad por profundidad)
+Q vs J vs Operador (Calidad por amplitud)
+Q vs I*J*K vs Operador (Calidad por tamaño de instancia)
+Q vs J/K vs Operador (Calidad por razón de aspecto)
+
+E vs K vs Operador (Esfuerzo por profundidad)
+E vs J vs Operador (Esfuerzo por amplitud)
+E vs IJK vs Operador (Esfuerzo por tamaño de instancia)
+E vs J/K vs Operador (Esfuerzo por razón de aspecto)
+
+R _ K
+R _ J
+R _ IJK
+R _ Operador
+
+Mostrar la trayectoria de las soluciones. Un gráfico de F.O. vs tiempo que vaya descendiendo. 
+
+Hoy voy a:
+Corregir el flujograma en VUE
+Construir flujo de metaheurísticas en VUE
+Examinar la posibilidad de generar los tau y phi con modelo de transporte
+Introducir la accesibilidad en las metaheurísticas
 
 
-Voy a implementar varias metaheurísticas:
-* Local Search
-* Simulated annealing
-* Tabu Search
-* VNS
-* LNS
-* ILS
-* GRASP
-* Ant Colony
+Una solución es un objeto que encapsula su información completa (congestión, accesibilidad y continuidad) VERIFICAR INTEGRIDAD DE DATOS
+Una solución se codifica en un vecino que tiene estructura de diccionario así:
+vecino1 = 	{ k1: 	  [ [sigma j1k1, sigma j2k1, sigma j3k1] , [rho_max , sigma_rho_max] ] }
+		{ k2: 	  [ [sigma j1k2, sigma j2k2, sigma j3k2} , [rho_max , sigma_rho_max] ] }
+		{ k3: 	  [ [sigma j1k3, sigma j2k3, sigma j3k3} , [rho_max , sigma_rho_max] ] }
+		{ rho_max:[ [rho_max, sigma_rho_max, k_rho_max]}
+
+
 
 
 

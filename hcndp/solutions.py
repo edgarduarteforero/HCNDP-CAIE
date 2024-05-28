@@ -4,6 +4,9 @@ Created on Wed Dec 20 17:58:33 2023
 @author: edgar
 """
 from hcndp import local_search
+from hcndp import tabu_search
+from hcndp import vnd
+from hcndp import gvns
 from hcndp import initial_solution
 
 import textwrap
@@ -70,14 +73,14 @@ def menu_solutions(network_original, problems_dict):
             while True:
                 # Solicito al usuario la función objetivo que desea utilizar
                 _menu_options = {
-                '1': 'Incremento1_decremento1_exhaust(nodes_k,_k,_solucion)', 
-                '2': 'Incremento1_exhaust (nodes_k,_k,_solucion)', 
-                '3': 'Incremento1_all (nodes_k,_k,_solucion)', 
-                '4': 'Incremento2_decremento1_exhaust(nodes_k,_k,_solucion)', 
-                '5': 'Incremento2_decremento2_exhaust(nodes_k,_k,_solucion)',  
-                '6': 'Incremento3_decremento3_exhaust(nodes_k,_k,_solucion)',  
-                '7': 'Chain_reaction_exhaust_plus_minus(nodes_k,_k,_solucion)', 
-                '8': 'Chain_reaction_exhaust_minus_plus(nodes_k,_k,_solucion)', 
+                '1': 'Incremento1_decremento1_exhaust', 
+                '2': 'Incremento1_exhaust', 
+                '3': 'Incremento1_all', 
+                '4': 'Incremento2_decremento1_exhaust', 
+                '5': 'Incremento2_decremento2_exhaust',  
+                '6': 'Incremento3_decremento3_exhaust',  
+                '7': 'Chain_reaction_exhaust_plus_minus', 
+                '8': 'Chain_reaction_exhaust_minus_plus', 
                 '10': 'Salir al menú anterior'
                 }   
             
@@ -175,6 +178,46 @@ def menu_solutions(network_original, problems_dict):
                 current_solution.set_solution_excel()
                 problems_dict[current_solution.name_problem]=current_solution
 
+            # Se ha escogido Tabu Search
+            if current_solution.optimizar==True and current_solution.tecnica=="Tabu_Search":
+                
+                print("\nHas seleccionado escogido usar Tabu Search.")
+                print("\n----------------------------------------------------------")
+            
+                print ("Estos son los operadores de permutación:\n")
+                operador=mostrar_operadores() #Escojo el operador de permutación
+                current_solution.local_search_operator=operador # Lo inserto en el objeto
+                current_solution = tabu_search.tabu_search(current_solution,network_original)
+                current_solution.set_solution_excel()
+                problems_dict[current_solution.name_problem]=current_solution
+
+
+            # Se ha escogido VND
+            if current_solution.optimizar==True and current_solution.tecnica=="VND":
+                
+                print("\nHas seleccionado escogido usar VND.")
+                print("\n----------------------------------------------------------")
+            
+                print ("No hay necesidad de seleccionar operadores de permutación:\n")
+                #operador=mostrar_operadores() #Escojo el operador de permutación
+                #current_solution.local_search_operator=operador # Lo inserto en el objeto
+                current_solution = vnd.vnd_search(current_solution,network_original)
+                current_solution.set_solution_excel()
+                problems_dict[current_solution.name_problem]=current_solution
+                
+            
+            # Se ha escogido GVNS
+            if current_solution.optimizar==True and current_solution.tecnica=="GVNS":
+                
+                print("\nHas seleccionado escogido usar GVNS.")
+                print("\n----------------------------------------------------------")
+            
+                print ("No hay necesidad de seleccionar operadores de permutación:\n")
+                #operador=mostrar_operadores() #Escojo el operador de permutación
+                #current_solution.local_search_operator=operador # Lo inserto en el objeto
+                current_solution = gvns.gvns_search(current_solution,network_original)
+                current_solution.set_solution_excel()
+                problems_dict[current_solution.name_problem]=current_solution
 
             print ("Los resultados de la optimización se guardaron en salida_optimizacion.xlsx.")               
             input("Pulsa una tecla para continuar.")
@@ -325,8 +368,9 @@ class Problem:
             print("1. Solución exacta (Optimización)")
             print("2. Solución inicial (Aproximación)")
             print("3. Solución por búsqueda local (Local Search)")
-            print("4. Solución por búsqueda local iterada (Iterated Local Search)")
-            print("5. Solución por búsqueda con vecindario variable (VNS)")
+            print("4. Solución por búsqueda tabú (Tabu Search)")
+            print("5. Solución por búsqueda con vecindario variable descendente(VND)")
+            print("6. Solución por búsqueda con vecindario variable general(BVNS)")
             
             print("10. Regresar al menú anterior")
 
@@ -378,6 +422,29 @@ class Problem:
                 # Presento menú de funciones objetivo disponibles
                 objective_and_description = new_network.get_objective_function()
                 
+            elif opcion1 == "4":
+                 print("Has seleccionado la Opción 4.")
+                 print ("Búsqueda tabú.")
+                 self.optimizar=True
+                 self.tecnica="Tabu_Search"
+                 # Presento menú de funciones objetivo disponibles
+                 objective_and_description = new_network.get_objective_function()
+            
+            elif opcion1 == "5":
+                 print("Has seleccionado la Opción 5.")
+                 print ("VND.")
+                 self.optimizar=True
+                 self.tecnica="VND"
+                 # Presento menú de funciones objetivo disponibles
+                 objective_and_description = new_network.get_objective_function()
+            
+            elif opcion1 == "6":
+                 print("Has seleccionado la Opción 6.")
+                 print ("GVNS.")
+                 self.optimizar=True
+                 self.tecnica="GVNS"
+                 # Presento menú de funciones objetivo disponibles
+                 objective_and_description = new_network.get_objective_function()
             
             elif opcion1 == "10":
                 print("Has seleccionado la Opción 10.")
@@ -847,7 +914,7 @@ class Problem:
         # Abrir el archivo en modo de agregación para agregar 'self.salida_tee'
         with open(output, 'a') as output_file:
             output_file.write("\n"+"#"*60)  # Agregar un salto de línea para separación
-            output_file.write(self.salida_tee)  # Agregar la salida tee de Gurobi
+            #output_file.write(self.salida_tee)  # Agregar la salida tee de Gurobi
 
             
         output = os.getcwd()+'/output/'+self.name_problem+'/solucion.txt'
@@ -1255,33 +1322,11 @@ class Problem:
             self.pyo_model.instance.obj = pyo.Objective(expr=obj_expr, sense=pyo.maximize)
 
 
-
-        # if self.objective== 4:
-        #     self.pyo_model.instance.obj = \
-        #         pyo.Objective(expr=sum(self.pyo_model.instance.alpha_ik[i, k] *
-        #                                sum(self.pyo_model.instance.h[i, kp]
-        #                                    for kp in self.pyo_model.instance.K) for i in self.pyo_model.instance.I for k in self.pyo_model.instance.K)
-        #                       / sum(sum(self.pyo_model.instance.h[i, kp] for kp in self.pyo_model.instance.K)
-        #                             for i in self.pyo_model.instance.I for k in self.pyo_model.instance.K), sense=pyo.maximize)
-        # if self.objective == 5:
-        #     for j in self.pyo_model.instance.J:
-        #         for k in self.pyo_model.instance.K:
-        #             self.pyo_model.instance.rho_jk[j, k].setlb(
-        #                 0.000000000000001)
-        #             self.pyo_model.instance.rho_jk[j,
-        #                                            k].value = 0.000000000000001
-
-        # if self.objective == 6:
-        #     self.pyo_model.instance.obj = pyo.Objective(expr=sum(self.pyo_model.instance.delta_i[i] *
-        #                                                 sum(self.pyo_model.instance.h[i, k] for k in self.pyo_model.instance.K) for i in self.pyo_model.instance.I) /
-        #                                                 sum(self.pyo_model.instance.h[i, k]
-        #                                                     for i in self.pyo_model.instance.I for k in self.pyo_model.instance.K),
-        #                                                 sense=pyo.maximize)
-
     # %% Resolver
     
     def execute_solver(self):
-        if self.tecnica=="Local_Search" or self.tecnica=="Aproximación":
+        if self.tecnica=="Local_Search" or self.tecnica=="Tabu_Search" or self.tecnica=="Aproximación" or\
+            self.tecnica=="VND" or self.tecnica=="GVNS":
             if self.objective == 5:
                 self.solve_ipopt()
             else:
@@ -1325,27 +1370,6 @@ class Problem:
             #print(f"El directorio /output/'{self.name_problem}' ya existe.")
             pass
         
-        # %% Exportar solución
-
-        # Imprimir contenidos de una variable #####
-        # for v in instance.component_objects(Var):
-        #    for index in instance.v:
-        #        print('{0} = {1}'.format(instance.v[index], value(instance.v[index])))
-
-        #########################################
-
-        # optima.set_solution_excel(network, model.instance)
-        # optima.set_solution_txt(network, model.instance)
-
-        # # Actualizo la red original con una nueva red
-        # optima.update_solution_post_optima(original_network=network,
-        #                                     new_network=networks[_name])
-
-        # Creo objeto network dentro de networks
-        # _copia = copy.deepcopy(networks[str(network.name)])
-        # networks[nombre_modelo] = _copia
-        # networks[nombre_modelo].models=None
-        # networks[nombre_modelo].name=nombre_modelo
 
 
 def update_solution_post_optima(original_network, new_network):
@@ -1447,6 +1471,4 @@ if __name__ == "__main__":
         
         current_solution.fix_initial_solution()
                     
-        
-        
-            #import os
+    

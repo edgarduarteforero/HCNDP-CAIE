@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+
 Created on Tue Mar 19 17:57:21 2024
 
 @author: edgar
@@ -31,7 +32,7 @@ for K in range (min_K , max_K+1):
     for nodos in range (min_I , max_I+1):    
         I=nodos
         J=nodos
-        for operador in range (1,8+1): # Número de operadores
+        for operador in range (1,1+1): # Número de operadores
             
             # Definir las entradas simuladas
             
@@ -45,9 +46,9 @@ for K in range (min_K , max_K+1):
                 "\n"  # Salto de línea vacío
                 "1\n"  # Problema mono-objetivo
                 "2\n"  # Obtener soluciones mono-objetivo
-                "3\n"  # Local Search
+                "6\n"  # 3:Local Search 4:Tabu Search 5: VND
                 "1\n"  # Minimizar congestión máxima (rho)
-                f"{operador}\n"  # Operador de permutación (agregado como f-string)
+                #f"{operador}\n"  # Operador de permutación (agregado como f-string)
                 "\n" # Tecla para continuar
                 #"4\n"  # KPI
                 #"1\n"  # Escojo solución obtenida
@@ -80,7 +81,7 @@ for K in range (min_K , max_K+1):
             
             # Rutas de origen y destino
             ruta_origen = os.path.join(ruta_actual, "output")
-            ruta_destino = os.path.join(ruta_actual, "tests", "20240512 Experimento")
+            ruta_destino = os.path.join(ruta_actual, "tests", "20240522 Experimento GVNS")
             
             # Asegurarte de que el destino existe
             if not os.path.exists(ruta_destino):
