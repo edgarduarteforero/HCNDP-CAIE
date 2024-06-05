@@ -146,7 +146,7 @@ class Network():
         self.file['df_sigma_max']=self.file['df_sigma_max'].query('servicio_K in @items')
     
     
-    def merge_niveles_capac(self,_post_optima):
+    def merge_niveles_capac(self,_post_optima,current_solution=None):
         #Agrego las columna nivel de atención y ubicaciones
 
         
@@ -156,7 +156,9 @@ class Network():
             
             if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación" or\
                 self.tecnica=="VND" or self.tecnica=="GVNS":
-                data = self.problem.df_sigma 
+                data = current_solution.df_sigma 
+                
+                
             else:
                 data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
@@ -186,7 +188,7 @@ class Network():
                        """)
                 raise SystemExit("Stop right there!")
             
-    def create_df_asignacion(self,_post_optima):
+    def create_df_asignacion(self,_post_optima,current_solution=None):
 
     
         if _post_optima == False:
@@ -220,8 +222,8 @@ class Network():
             
             if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación" or\
                 self.tecnica=="VND" or self.tecnica=="GVNS":
-                self.file['df_flujos_ijk']=self.problem.df_f_ijk
-                self.file['df_fi_ijkjk'] = self.problem.df_fi_ijkjk
+                self.file['df_flujos_ijk']=current_solution.df_f_ijk
+                self.file['df_fi_ijkjk'] = current_solution.df_fi_ijkjk
             else:
                 path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
                 archivo_salida_optim = pd.read_excel(path, sheet_name=None)
@@ -263,7 +265,7 @@ class Network():
             
             if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación"\
                 or self.tecnica=="VND" or self.tecnica=="GVNS":
-                data=self.problem.df_sigma
+                data=current_solution.df_sigma
             else:
                 data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
@@ -324,7 +326,7 @@ class Network():
                                     rename(columns={"index": "nombre_J", "variable": "nombre_Jp","value":"x_jjp"})
     
     
-    def create_df_arcos(self,_post_optima): 
+    def create_df_arcos(self,_post_optima,current_solution=None): 
         # Creo df_arcos con los índices de j y de k. Es un df con [j j' k k']
         # Explicación en p- 9B Notas del doctorado
 
@@ -346,7 +348,7 @@ class Network():
             
             if self.tecnica=="Local_Search" or self.tecnica == "Tabu_Search" or self.tecnica=="Aproximación"\
                 or self.tecnica=="VND" or self.tecnica=="GVNS":
-                data=self.problem.df_prob_fi_jkjk
+                data=current_solution.df_prob_fi_jkjk
             else:
                 path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
                 archivo_salida_optim = pd.read_excel(path, sheet_name=None)
@@ -436,7 +438,7 @@ class Network():
             _menu_options = {
             '1': 'Minimizar congestión máxima (rho)',
             '2': 'Maximizar accesibilidad mínima (alpha)',
-            '3': 'Maximizar continuidad mínimia (delta)',
+            '3': 'Maximizar continuidad mínima (delta)',
             '4': 'Maximizar accesibilidad total (alpha)',
             '5': 'Minimizar usuarios en espera total (Lq_total)',
             '6': 'Maximizar continuidad total (delta total)',       
@@ -888,16 +890,6 @@ class Network_representation(Network):
                 _i.distance_origin_target_covered=_i.distance_origin_target
             else:
                 _i.distance_origin_target_covered=math.nan
-                
-        #Valido que s_max sea menor a la suma de los s_jk
-        # if _x < path.nodes_services[_k].service_capacity:
-        #     #print ("Hay más recursos que capacidad disponible")
-        #     print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
-        #     print ("Suma de capacidades: ", _x)
-        # else:
-        #     #print ("Hay más capacidad disponible que recursos")
-        #     print ("Suma de recursos: ", path.nodes_services[_k].service_capacity)
-        #     print ("Suma de capacidades: ", _x)
         
         while suma_asignacion < path.nodes_services[_k].service_capacity:
             df_matriz=construir_matriz(_k)
@@ -1029,7 +1021,7 @@ class Network_representation(Network):
 
     
     # Función para solucionar el problema de transporte entre k y kp
-    def solucion_entre_k_kp(self,network,_k,_kp,archivo):
+    def solucion_entre_k_kp(self,network,_k,_kp,archivo,current_solution):
         #print ("Inicio solución del problema de transporte entre ",_k, " y ",_kp)
     
         global network_x
@@ -1048,10 +1040,20 @@ class Network_representation(Network):
                     if _l.δ_ijkkp != 0 and _l.servicio_Kp == _kp: #Si hay arco con _kp
                         network_x.add_node(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],
                                            tipo="demanda",source=_j.node_id,demand=round(-_l['δ_ijkkp']*100))
-                        for _m in _j.neighbors: # Creo arcos
+                        # Creo arcos entre nodos de oferta y demanda
+                        for _m in _j.neighbors: 
                             if _m[-3:]==_kp:
-                                _distancia=df_dist_ij.loc[(df_dist_ij['nombre_I'] == _l["nombre_I"]) & (df_dist_ij['nombre_J'] == _m[:3]), 'dist_IJ'].values[0]
+                                # Decido qué función de costo utilizar para definir los flujos
+                                if current_solution.objective == "1": # 1 Significa congestión rho
+                                    _distancia = df_dist_ij.loc[(df_dist_ij['nombre_I'] == _l["nombre_I"]) & (df_dist_ij['nombre_J'] == _m[:3]), 'dist_IJ'].values[0]
+                                elif current_solution.objective == "2": # 2 Significa accesibilidad alpha
+                                    _distancia = df_dist_ij.loc[(df_dist_ij['nombre_I'] == _l["nombre_I"]) & (df_dist_ij['nombre_J'] == _m[:3]), 'dist_IJ'].values[0]
+                                    if _distancia == 0: # Corrijo posibles divisiones por cero
+                                        _distancia = 0.001
+                                    _distancia = round(network.nodes_supply[_m].capac_instal_sigma / (_l.δ_ijkkp*_distancia))
                                 #print (f"Distancia entre {_l['nombre_I']} y {_m[:3]}: {_distancia}")
+                                elif current_solution.objective == "3": # 3 Significa continuidad delta
+                                    _distancia = df_dist_ij.loc[(df_dist_ij['nombre_I'] == _l["nombre_I"]) & (df_dist_ij['nombre_J'] == _m[:3]), 'dist_IJ'].values[0]
                                 network_x.add_edge(_l["nombre_I"]+_l["nombre_J"]+_l["servicio_K"]+_l["servicio_Kp"],_m,weight=_distancia)
         
         # Nodos tipo demanda             Nodos tipo oferta 
@@ -1085,8 +1087,20 @@ class Network_representation(Network):
         #    if 'weight' in data:
         #        data['weight'] = round(data['weight'])
         
-        # Resuelvo el problema
-        flowCost, flowDict = nx.network_simplex(network_x)
+        
+        if current_solution.objective in {"1","3"}: 
+            # 1 Significa congestión rho y 3 significa continuidad delta
+            # Resuelvo el problema de minimización del costo
+            flowCost, flowDict = nx.network_simplex(network_x)
+        elif current_solution.objective == "2": # 2 Significa accesibilidad alpha
+            # Invertir los costos
+            for u, v, data in network_x.edges(data=True):
+                data['weight'] = -data['weight']
+            flowCost, flowDict = nx.network_simplex(network_x)
+            flowCost = -flowCost
+        #elif current_solution.objective == "3": # 3 Significa continuidad delta
+             # Resuelvo el problema de árbol de expansión
+
     
         # Como escalé las ofertas y demandas *100, actualizo sus valores
         # Itera sobre cada diccionario dentro del diccionario principal

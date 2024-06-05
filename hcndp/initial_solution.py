@@ -9,6 +9,7 @@ import numpy as np
 from hcndp import network
 import copy
 from hcndp import local_search
+from hcndp import kpi
 
     
 def initial_solution(current_solution,network_original):
@@ -69,13 +70,13 @@ def initial_solution(current_solution,network_original):
         kp=_i.target
     
             # Obtengo los delta ijkk
-
         network_repr.asignacion_flujos_δ(network_repr,path_repr,k,kp) 
         
             # Solución entre k y kp* obtengo los phi ijkjk
         network_repr.solucion_entre_k_kp(network=network_repr,_k=k,
                                              _kp=kp,
-                                             archivo=network_original.file)
+                                             archivo=network_original.file,
+                                             current_solution=current_solution)
             
             # Obtengo las aproximaciones de lambda
         network_repr.construyo_λ(network_repr,kp)
@@ -255,8 +256,6 @@ def initial_solution(current_solution,network_original):
     
     local_search.calcular_kpi_local_search(current_solution)
 
-
-
     return current_solution
 
 def fix_initial_solution(current_solution):
@@ -385,6 +384,8 @@ if __name__ == "__main__":
         # Borro carpeta con resultados previos
         from hcndp import data_functions
         import os
+
+
         data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
         print("\nContenidos borrados. \nContinuando...")
         
@@ -393,10 +394,10 @@ if __name__ == "__main__":
         problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
 
         # Indicamos origen de datos y definimos valores I,J,K
-        I,J,K= [6,6,6]
+        I,J,K= [4,4,4]
         archivo = r"C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\Códigos Python\HcNDP\Health-Care-Network-Design-Problem\hcndp/data/red_original/datos_i16_j10_k10_base.xlsx"
         # Objeto network
-        from hcndp import network
+
 
         # Creamos un objeto network
         _name="red_original"
@@ -425,7 +426,9 @@ if __name__ == "__main__":
         # Defino objetivo y método
         current_solution.optimizar=True
         current_solution.tecnica="Aproximación"
-        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        #_objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
+        _objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
         current_solution.objective = _objective_and_description[0]
         current_solution.description_objective = _objective_and_description[1]
         current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica

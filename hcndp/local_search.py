@@ -11,6 +11,7 @@ from hcndp import data_functions
 import pandas as pd
 from hcndp import kpi
 from hcndp import neighborhood_operator
+import operator
 
 
 def local_search(current_solution,network_original):
@@ -32,8 +33,12 @@ def local_search(current_solution,network_original):
     
     # Defino la mejor solución encontrada
     calcular_kpi_local_search(best_neighbor)# Calculo KPIs
-    qual_best=best_neighbor.network_copy.file['df_medidas']['rho_max'][0] 
-    
+    if current_solution.objective == "1": # 1 Significa congestión rho
+        qual_best=best_neighbor.network_copy.file['df_medidas']['rho_max'][0] 
+    elif current_solution.objective == "2": # 1 Significa accesibilidad alpha
+        qual_best=best_neighbor.network_copy.file['df_medidas']['alpha_min'][0] 
+    elif current_solution.objective == "3": # 3 Significa continuidad delta
+        qual_best=best_neighbor.network_copy.file['df_medidas']['delta_min'][0] 
     # Agrego solución a landscape
     agregar_solucion_landscape (landscape,best_neighbor,qual_best)
     
@@ -46,8 +51,17 @@ def local_search(current_solution,network_original):
     for i,j in best_neighbor_codificado.items():
         if 'sigmas' in j:
             print (i,j['sigmas']) 
-    _best_rho=best_neighbor_codificado["k_rho_max"]
-    print (f'Valor función objetivo inicial: {best_neighbor_codificado[_best_rho]["rho_max"][0]}')
+    
+    if current_solution.objective == "1": # 1 Significa congestión rho
+        _best_rho=best_neighbor_codificado["k_rho_max"]
+        print (f'Valor función objetivo inicial: {best_neighbor_codificado[_best_rho]["rho_max"][0]}')
+    elif current_solution.objective == "2": # 2 Significa accesibilidad alpha
+        _best_alpha=best_neighbor_codificado["k_alpha_min"]
+        print (f'Valor función objetivo inicial: {best_neighbor_codificado[_best_alpha]["alpha_min"][0]}')
+    elif current_solution.objective == "3": # 3 Significa continuidad delta
+        _best_delta=best_neighbor_codificado["k_delta_min"]
+        print (f'Valor función objetivo inicial: {best_neighbor_codificado[_best_delta]["delta_min"][0]}')
+
 
     # BUCLE PRINCIPAL
     
@@ -84,7 +98,7 @@ def local_search(current_solution,network_original):
             pass
         
         # Construyo el vecindario. Conjunto de soluciones codificadas según operador seleccionado
-        neighborhood = neighborhood_exhaustive_codificado(neighbor_codificado,operador) 
+        neighborhood = neighborhood_exhaustive_codificado(neighbor_codificado,operador,current_solution) 
                 
         # Tamizaje de soluciones
         neighborhood_feasible=tamizaje_soluciones(best_neighbor,neighborhood)
@@ -108,13 +122,18 @@ def local_search(current_solution,network_original):
         
         # Comparo la mejor solución del vecindario con la mejor solución obtenida.
         print ("Comparación de mejor solución de vecindario con mejor solución obtenida")
-        if qual_best_of_neighborhood < qual_best:
+        
+        # Seleccionar el operador basado en la variable (1 o 3 usan <, 2 usa >)
+        comparacion = operator.lt if current_solution.objective in {"1"} else operator.gt
+
+        # Si uso rho, comparacion es <, de lo contrario es > (Para accesibilidad y continuidad)
+        if comparacion (qual_best_of_neighborhood , qual_best): # Comparo las dos qual
             qual_best=qual_best_of_neighborhood 
             best_neighbor = copy.deepcopy(best_of_neighborhood)
             calcular_kpi_local_search(best_neighbor)# Calculo KPIs
             print (f'Mejor solución obtenida hasta ahora: {qual_best_of_neighborhood}')
             neighbor = best_of_neighborhood
-            
+
             # Hubo mejora, el contador de mejoras se hace cero
             iterations_without_improvement = 0
             
@@ -140,8 +159,16 @@ def local_search(current_solution,network_original):
     
     print (f"Operador: {operador}")
     print ("Mejor solución alcanzada: ")
+    calcular_kpi_local_search(best_neighbor) #Mido KPI de solución inicial
     print (best_neighbor.df_sigma.to_string())
-    print (f"Valor función objetivo: {best_neighbor.network_copy.file['df_medidas']['rho_max'][0] }")
+    if current_solution.objective == "1": # 1 Significa congestión rho
+        print (f"Valor función objetivo: {best_neighbor.value_optimal_solution['rho_max'] }")
+    elif current_solution.objective == "2": # 2 Significa accesibilidad alpha
+        print (f"Valor función objetivo: {best_neighbor.value_optimal_solution['alpha_min'] }")
+    elif current_solution.objective == "3": # 3 Significa continuidad delta
+        print (f"Valor función objetivo: {best_neighbor.value_optimal_solution['delta_min'] }")
+
+
     print (f"Vecindario final número: {contador-1}")   
     
     best_neighbor.landscape=landscape
@@ -151,22 +178,35 @@ def local_search(current_solution,network_original):
 
 #%% Manipulación de vecindario
 
-def neighborhood_exhaustive_codificado (neighbor_codificado,operador): #
+def neighborhood_exhaustive_codificado (neighbor_codificado,operador,current_solution): #
     neighborhood=[] # Vecindario de _solucion
     
     # Incluyo soluciones con los peores rho en cada vector de _k
     # Cálculo de cuartiles
     claves = []
     rho_max_contenido = []
+    alpha_min_contenido = []
+    delta_min_contenido= []
+
     
-    # Iterar sobre el diccionario y extraer las claves y los contenidos de 'rho_max'
+    # Iterar sobre el diccionario y extraer las claves y contenidos de 'rho_max' o 'alpha_min' o 'delta_max'
     for clave, contenido in neighbor_codificado.items():
         if 'sigmas' in contenido:
             claves.append(clave)
-            rho_max_contenido.append(contenido['rho_max'][0])
+            if current_solution.objective == "1": # 1 Significa congestión rho
+                rho_max_contenido.append(contenido['rho_max'][0])
+            elif current_solution.objective == "2": # 2 Significa accesibilidad alpha:
+                alpha_min_contenido.append(contenido['alpha_min'][0])
+            elif current_solution.objective == "3": # 3 Significa continuidad delta:
+                delta_min_contenido.append(contenido['delta_min'][0])
     
     # Crear un DataFrame de pandas
-    grouped_max = pd.DataFrame({'servicio_K': claves, 'rho': rho_max_contenido})
+    if current_solution.objective == "1": # 1 Significa congestión rho
+        grouped_max = pd.DataFrame({'servicio_K': claves, 'rho': rho_max_contenido})
+    elif current_solution.objective == "2": # 2 Significa accesibilidad alpha:
+        grouped_max = pd.DataFrame({'servicio_K': claves, 'alpha': alpha_min_contenido})
+    elif current_solution.objective == "3": # 3 Significa continuidad delta:
+        grouped_max = pd.DataFrame({'servicio_K': claves, 'delta': delta_min_contenido})
     
     # Verificar el número de cuartiles
     q = 4  # Intentar dividir en 4 cuartiles
@@ -176,68 +216,141 @@ def neighborhood_exhaustive_codificado (neighbor_codificado,operador): #
     
     # Si hay menos valores únicos, ajustar los cuartiles
     while True: 
-        try:
-            grouped_max['cuartil_b'] = pd.qcut(grouped_max['rho'], q=q, 
-                                               labels=labels, duplicates='drop')
-            break
-        except ValueError as e:
-            print("Error:", e)
-            # Ajustar el número de cuartiles y etiquetas si hay error
-            labels.pop(0)
-            q-=1
+        if current_solution.objective in {"1"}: 
+            # 1 Significa congestión rho
+            try:
+                grouped_max['cuartil_b'] = pd.qcut(grouped_max['rho'], q=q, 
+                                                   labels=labels, duplicates='drop')
+                break
+            except ValueError as e:
+                print("Error:", e)
+                # Ajustar el número de cuartiles y etiquetas si hay error
+                labels.pop(0)
+                q-=1
         
+        elif current_solution.objective in {"2"}: 
+            # 2 Significa accesibilidad alpha 
+            try:
+                grouped_max['cuartil_b'] = pd.qcut(grouped_max['alpha'], q=q, 
+                                                   labels=labels, duplicates='drop')
+                break
+            except ValueError as e:
+                print("Error:", e)
+                # Ajustar el número de cuartiles y etiquetas si hay error
+                labels.pop(-1)
+                q-=1
+        
+        elif current_solution.objective in {"3"}: 
+            # 3 significa continuidad delta
+            try:
+                grouped_max['cuartil_b'] = pd.qcut(grouped_max['delta'], q=q, 
+                                                   labels=labels, duplicates='drop')
+                break
+            except ValueError as e:
+                print("Error:", e)
+                # Ajustar el número de cuartiles y etiquetas si hay error
+                labels.pop(-1)
+                q-=1
+        
+            
     # Para cada servicio k procedo a aplicar operador
     for key in neighbor_codificado:
+        # Aplico el operador de perturbación para generar nuevos vecindarios
+        #Posibles operadores:
+        #--------------------
+        #neighborhood_k = incremento1_decremento1_exhaust(vector_original_sigmas) 
+        #neighborhood_k = incremento1_exhaust (vector_original_sigmas)
+        #neighborhood_k = incremento1_all (vector_original_sigmas)
+        #neighborhood_k = incremento2_decremento1_exhaust(vector_original_sigmas) 
+        #neighborhood_k = incremento2_decremento2_exhaust(vector_original_sigmas) 
+        #neighborhood_k = incremento3_decremento3_exhaust(vector_original_sigmas) 
+        #neighborhood_k = chain_reaction_exhaust_plus_minus(vector_original_sigmas)
+        #neighborhood_k = chain_reaction_exhaust_minus_plus(vector_original_sigmas)
         
-        # Si _k no está en Q4, significa que no está congestionado y por lo tanto no lo agrego al vecindario
-        if (key in grouped_max[grouped_max['cuartil_b'] == 'Q4']['servicio_K'].values): #or\
-           #(_k in grouped_max[grouped_max['cuartil_b'] == 'Q3']['servicio_K'].values):
-    
-            # Aplico el operador de perturbación para generar nuevos vecindarios
-            #Posibles operadores:
-            #--------------------
-            #neighborhood_k = incremento1_decremento1_exhaust(vector_original_sigmas) 
-            #neighborhood_k = incremento1_exhaust (vector_original_sigmas)
-            #neighborhood_k = incremento1_all (vector_original_sigmas)
-            #neighborhood_k = incremento2_decremento1_exhaust(vector_original_sigmas) 
-            #neighborhood_k = incremento2_decremento2_exhaust(vector_original_sigmas) 
-            #neighborhood_k = incremento3_decremento3_exhaust(vector_original_sigmas) 
-            #neighborhood_k = chain_reaction_exhaust_plus_minus(vector_original_sigmas)
-            #neighborhood_k = chain_reaction_exhaust_minus_plus(vector_original_sigmas)
-            
-            vector_original_sigmas = neighbor_codificado[key]['sigmas']
-            #print (f'Servicio del vector sigmas: {key}')
-            #print (f'Vector sigmas original: {vector_original_sigmas}')
-            
-            # Si se ejecuta desde __name__ == "__main__" aplico un operador específico
-            if __name__ == "__main__":
-                neighborhood_sigmas_k = neighborhood_operator.incremento1_decremento1_exhaust(vector_original_sigmas)
-            else: # Aplico operador seleccionado por el usuario
-                # Ejecuta la función con el argumento necesario
-                neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)                
-        
-            # Agrego solución permutada al vecindario
-            for permutacion in neighborhood_sigmas_k:
-                neighbor_modificado_cod = copy.deepcopy(neighbor_codificado)
-                neighbor_modificado_cod[key]['sigmas']=permutacion
+        if current_solution.objective in {"1"} : 
+            # 1 Significa congestión rho
+            # Si _k no está en Q4, significa que no está congestionado y por lo tanto no lo agrego al vecindario
+            if (key in grouped_max[grouped_max['cuartil_b'] == 'Q4']['servicio_K'].values): #or\
+               #(_k in grouped_max[grouped_max['cuartil_b'] == 'Q3']['servicio_K'].values):
+                    
+                vector_original_sigmas = neighbor_codificado[key]['sigmas']
+                #print (f'Servicio del vector sigmas: {key}')
+                #print (f'Vector sigmas original: {vector_original_sigmas}')
                 
-                #Devuelve un listado de soluciones (listas de nodes_K) para cada _k        
-                neighborhood.append(neighbor_modificado_cod)
+                # Si se ejecuta desde __name__ == "__main__" aplico un operador específico
+                if __name__ == "__main__":
+                    neighborhood_sigmas_k = neighborhood_operator.incremento1_decremento1_exhaust(vector_original_sigmas)
+                else: # Aplico operador seleccionado por el usuario
+                    # Ejecuta la función con el argumento necesario
+                    neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)                
+            
+                # Agrego solución permutada al vecindario
+                for permutacion in neighborhood_sigmas_k:
+                    neighbor_modificado_cod = copy.deepcopy(neighbor_codificado)
+                    neighbor_modificado_cod[key]['sigmas']=permutacion
+                    
+                    #Devuelve un listado de soluciones (listas de nodes_K) para cada _k        
+                    neighborhood.append(neighbor_modificado_cod)
+            
+                # Si logro permutar una solución, me salgo del bucle
+                break
         
+        elif current_solution.objective in {"2","3"}: 
+            # 2 Significa accesibilidad alpha , 3 significa continuidad delta
+            # Si _k no está en Q1, significa que no está congestionado y por lo tanto no lo agrego al vecindario
+            if (key in grouped_max[grouped_max['cuartil_b'] == 'Q1']['servicio_K'].values): #or\
+               #(_k in grouped_max[grouped_max['cuartil_b'] == 'Q2']['servicio_K'].values):
+                    
+                vector_original_sigmas = neighbor_codificado[key]['sigmas']
+                #print (f'Servicio del vector sigmas: {key}')
+                #print (f'Vector sigmas original: {vector_original_sigmas}')
+                
+                # Si se ejecuta desde __name__ == "__main__" aplico un operador específico
+                if __name__ == "__main__":
+                    neighborhood_sigmas_k = neighborhood_operator.incremento1_decremento1_exhaust(vector_original_sigmas)
+                else: # Aplico operador seleccionado por el usuario
+                    # Ejecuta la función con el argumento necesario
+                    neighborhood_sigmas_k = getattr(neighborhood_operator, operador)(vector_original_sigmas)                
+            
+                # Agrego solución permutada al vecindario
+                for permutacion in neighborhood_sigmas_k:
+                    neighbor_modificado_cod = copy.deepcopy(neighbor_codificado)
+                    neighbor_modificado_cod[key]['sigmas']=permutacion
+                    
+                    #Devuelve un listado de soluciones (listas de nodes_K) para cada _k        
+                    neighborhood.append(neighbor_modificado_cod)
+                
+                # Si logro permutar una solución, me salgo del bucle
+                break
     
     return neighborhood
 
 def agregar_solucion_landscape (landscape,best_neighbor,qual_best):
+    
+    # best_neighbor_codificado=codificar_solucion(best_neighbor, 'sigma')
+    
+    # for i,j in best_neighbor_codificado.items():
+    #     alpha_min_menor=0
+    #     if 'sigmas' in j:
+    #         if j['alpha_min'][0] > alpha_min_menor:
+    #             clave_alpha_min_menor=i
+    # print (clave_alpha_min_menor,"i",best_neighbor_codificado[clave_alpha_min_menor]['alpha_min'][1][-2:])
+    
     lista = [_j.capac_instal_sigma for _i, _j in best_neighbor.network_repr.nodes_supply.items() if _j.service != 'k00']
-    lista_sigma_y_fo=[lista,qual_best] # Vector de sigmas y su función objetivo 
+    lista_sigma_y_fo=[lista,qual_best,] # Vector de sigmas y su función objetivo 
     landscape.append([lista_sigma_y_fo]) #Guardo primer elemento del landscape
     
 def find_best_of_neighborhood(neighborhood_feasible,neighbor,
                               landscape,current_solution):
     # Inicio valor extremo de la mejor solución del vecindario    
-    best_of_neighborhood=neighbor    
-    qual_best_of_neighborhood=10.0
-    
+    best_of_neighborhood=neighbor
+    if current_solution.objective in {"1"} : 
+        # 1 Significa congestión rho, 
+        qual_best_of_neighborhood=1000.0
+    elif current_solution.objective in {"2","3"}: 
+        # 2 Significa accesibilidad alpha 3 significa continuidad delta
+        qual_best_of_neighborhood=0.0
+        
     # Para los vecinos factibles, construyo un modelo de optimización
     # Que genere las variables adicionales tao y phi (flujos). Sigma es un parámetro y no una variable
     
@@ -252,11 +365,21 @@ def find_best_of_neighborhood(neighborhood_feasible,neighbor,
         # Guardo neighbor_copy como vecino de best_neighbor en la lista de adyacencia.
         lista = [_j.capac_instal_sigma for _i, _j in neighbor_copy.network_repr.nodes_supply.items() if _j.service != 'k00']
         calcular_kpi_local_search(neighbor_copy) # Actualizo KPI
-        func_obj = neighbor_copy.network_copy.file['df_capac']['rho'].max() #Obtengo el rho max
+        if current_solution.objective == "1": # 1 Significa congestión rho
+            func_obj = neighbor_copy.network_copy.file['df_capac']['rho'].max() #Obtengo el rho max
+        elif current_solution.objective == "2": # 2 Significa accesibilidad alpha
+            func_obj = neighbor_copy.network_copy.file['df_accesibilidad']['R'].min() #Obtengo el alpha min
+        elif current_solution.objective == "3": # 3 Significa continuidad delta
+            func_obj = neighbor_copy.network_copy.file['df_continuidad']['delta_i'].min() #Obtengo el delta min
+        
         landscape[-1].append([lista,func_obj]) ##Guardo vecinos de best_neighbor
     
         # Busco la mejor solución en neighborhood_feasible
-        if neighbor_copy.state=="Optimizado" and neighbor_copy.value_optimal_solution['Func_obj'] < qual_best_of_neighborhood:
+        # Seleccionar el operador basado en la variable
+        comparacion = operator.lt if current_solution.objective in {"1"} else operator.gt
+        # Si uso rho, comparacion es <, de lo contrario es > (Para accesibilidad)    
+        #if neighbor_copy.state=="Optimizado" and neighbor_copy.value_optimal_solution['Func_obj'] < qual_best_of_neighborhood:
+        if neighbor_copy.state=="Optimizado" and comparacion (neighbor_copy.value_optimal_solution['Func_obj'] , qual_best_of_neighborhood): # Comparo las dos qual
             qual_best_of_neighborhood=neighbor_copy.value_optimal_solution['Func_obj']
             best_of_neighborhood=neighbor_copy
             
@@ -291,32 +414,85 @@ def tamizaje_soluciones(best_neighbor,neighborhood):
 
 #%% Operadores para codificación y decodificación
 
-
-
-
 def codificar_solucion (neighbor,contenido_variable):
     # Convierte un objeto solucion en una solución codificada
     # Es un diccionario con los sigmas de cada k
     solucion_codificada={}
     _lista_k=data_functions.indices('k',neighbor.network_copy.K) 
-    for key in _lista_k:
-        if contenido_variable == "sigma":
-            lista_sigmas=[_j.capac_instal_sigma for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
-            maximo_par = max([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key], 
-                             key=lambda x: x[0]) 
-            solucion_codificada[key]={'sigmas':lista_sigmas,
-                                      'rho_max':maximo_par}
-        elif contenido_variable == "s_jk":
-            lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
-            maximo_par = max([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key], 
-                             key=lambda x: x[0]) 
-            solucion_codificada[key]={'sigmas':lista_sigmas,
-                                      'rho_max':maximo_par}
-    # Encontrar la clave con el valor de 'rho_max' más alto
-    clave_max_rho = max(solucion_codificada, key=lambda x: solucion_codificada[x]['rho_max'][0])
+    current_solution=neighbor
+
+    if current_solution.objective == "1": # 1 Significa congestión rho
+        for key in _lista_k:
+            if contenido_variable == "sigma":
+                lista_sigmas=[_j.capac_instal_sigma for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
+                maximo_par = max([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key], 
+                                 key=lambda x: x[0]) 
+                solucion_codificada[key]={'sigmas':lista_sigmas,
+                                          'rho_max':maximo_par}
+            elif contenido_variable == "s_jk":
+                lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
+                maximo_par = max([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key], 
+                                 key=lambda x: x[0]) 
+                solucion_codificada[key]={'sigmas':lista_sigmas,
+                                          'rho_max':maximo_par}
+        # Encontrar la clave con el valor de 'rho_max' más alto
+        clave_max_rho = max(solucion_codificada, key=lambda x: solucion_codificada[x]['rho_max'][0])
+        
+        # Crear una nueva clave 'rho_max' en el diccionario
+        solucion_codificada['k_rho_max'] = clave_max_rho  #solucion_codificada['rho_max'] = [elemento if not isinstance(elemento, list) else subelemento for elemento in solucion_codificada['rho_max'] for subelemento in (elemento if isinstance(elemento, list) else [elemento])]
+
+    if current_solution.objective == "2": # 2 Significa accesibilidad lambda
+        for key in _lista_k:
+            if contenido_variable == "sigma":
+                lista_sigmas=[_j.capac_instal_sigma for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
+                
+                minimo_par = min([[_node_i.access_ik,_node_i.place] for _index, 
+                                  _node_i in neighbor.network_repr.nodes_supply.items() if _node_i.service == key], 
+                                 key=lambda x: x[0])
+                solucion_codificada[key]={'sigmas':lista_sigmas,
+                                          'alpha_min':minimo_par}
+            
+            elif contenido_variable == "s_jk":
+                lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
+                
+                minimo_par = min([[_node_i.access_ik,_node_i.place] for _index, 
+                                  _node_i in neighbor.network_repr.nodes_supply.items() if _node_i.service == key], 
+                                 key=lambda x: x[0])
+                solucion_codificada[key]={'sigmas':lista_sigmas,
+                                          'alpha_min':minimo_par}
+        # Encontrar la clave con el valor de 'alpha_min' más bajo
+        clave_min_alpha = min(solucion_codificada, key=lambda x: solucion_codificada[x]['alpha_min'][0])
+        
+        # Crear una nueva clave 'alpha_min' en el diccionario
+        solucion_codificada['k_alpha_min'] = clave_min_alpha  #solucion_codificada['rho_max'] = [elemento if not isinstance(elemento, list) else subelemento for elemento in solucion_codificada['rho_max'] for subelemento in (elemento if isinstance(elemento, list) else [elemento])]
     
-    # Crear una nueva clave 'rho_max' en el diccionario
-    solucion_codificada['k_rho_max'] = clave_max_rho  #solucion_codificada['rho_max'] = [elemento if not isinstance(elemento, list) else subelemento for elemento in solucion_codificada['rho_max'] for subelemento in (elemento if isinstance(elemento, list) else [elemento])]
+    if current_solution.objective == "3": # 3 Significa continuidad delta
+        for key in _lista_k:
+            if contenido_variable == "sigma":
+                lista_sigmas=[_j.capac_instal_sigma for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
+                
+                minimo_par = min([[_node_i.continuidad,_node_i.node_id] for _index, 
+                                  _node_i in neighbor.network_repr.nodes_demand.items() ], 
+                                 key=lambda x: x[0])
+                solucion_codificada[key]={'sigmas':lista_sigmas,
+                                          'delta_min':minimo_par}
+            
+            elif contenido_variable == "s_jk":
+                lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
+                
+                minimo_par = min([[_node_i.continuidad,_node_i.node_id] for _index, 
+                                  _node_i in neighbor.network_repr.nodes_demand.items() ], 
+                                 key=lambda x: x[0])
+                solucion_codificada[key]={'sigmas':lista_sigmas,
+                                          'delta_min':minimo_par}
+        
+        # Encontrar la clave con el valor de 'delta_min' más bajo
+        clave_min_delta = min(solucion_codificada, key=lambda x: solucion_codificada[x]['delta_min'][0])
+        
+        # Crear una nueva clave 'rho_max' en el diccionario
+        solucion_codificada['k_delta_min'] = clave_min_delta #solucion_codificada['rho_max'] = [elemento if not isinstance(elemento, list) else subelemento for elemento in solucion_codificada['rho_max'] for subelemento in (elemento if isinstance(elemento, list) else [elemento])]
+
+
 
     return solucion_codificada   
 
@@ -345,12 +521,12 @@ def calcular_kpi_local_search(current_solution):
     # Si hay función objetivo (resultado de optimización)
     # Actualizo las matrices de solution.network_copy
     current_solution.network_copy.tecnica=current_solution.tecnica
-    current_solution.network_copy.problem=current_solution #Creo una referencia al objeto padre Problem
+    #current_solution.network_copy.problem=current_solution #Creo una referencia al objeto padre Problem
     
-    current_solution.network_copy.merge_niveles_capac(_post_optima=True)
-    current_solution.network_copy.create_df_asignacion(_post_optima=True)
+    current_solution.network_copy.merge_niveles_capac(_post_optima=True,current_solution=current_solution)
+    current_solution.network_copy.create_df_asignacion(_post_optima=True,current_solution=current_solution)
     current_solution.network_copy.create_df_probs_kk()
-    current_solution.network_copy.create_df_arcos(_post_optima=True)
+    current_solution.network_copy.create_df_arcos(_post_optima=True,current_solution=current_solution)
                      
     kpi.calculate_kpi(current_solution,_post_optima=True)
     #print (f"Se calcularon los KPI para la solución {current_solution.description_objective}.")
@@ -358,11 +534,35 @@ def calcular_kpi_local_search(current_solution):
     # Calculo los rho para cada nodo jk y lo almaceno en nodes_supply
     for _i,_j in current_solution.network_repr.nodes_supply.items():
         if _j.service != 'k00':
-            if _j.matriz_λ['λ_ijk'].sum() == 0:
+            if _j.matriz_λ['λ_ijk'].sum() == 0 or _j.capac_instal_sigma == 0:
                 _j.rho=0
             else: 
                 _j.rho = _j.matriz_λ['λ_ijk'].sum()/(_j.capac_instal_sigma*_j.rate)
 
+    # Calculo los alpha para cada nodo ik y lo almaceno en nodes_demand
+    for _i,_j in current_solution.network_repr.nodes_demand.items():
+        lista_access=current_solution.network_copy.file['df_accesibilidad'][current_solution.network_copy.file['df_accesibilidad']['nombre_I']==_i]
+        lista_access=lista_access[['servicio_K','R']]
+        _j.lista_accesibilidad= lista_access.set_index('servicio_K')['R'].to_dict()
+
+           
+    # Cargo los alpha para cada nodo ik y lo almaceno en nodes_supply
+    for i,j in current_solution.network_repr.nodes_demand.items():
+        for k,acc in j.lista_accesibilidad.items():
+            current_solution.network_repr.nodes_supply['j'+i[-2:]+k].access_ik=acc
+            
+    # Calculo los delta para cada nodo i y lo almaceno en nodes_demand
+    for _i,_j in current_solution.network_repr.nodes_demand.items():
+        lista_contin=current_solution.network_copy.file['df_continuidad'][current_solution.network_copy.file['df_continuidad']['nombre_I']==_i]
+        lista_contin=lista_contin[['nombre_I','delta_i']]
+        _j.continuidad= lista_contin.iloc[0]['delta_i']
+        
+    # Cargo los delta para cada nodo i y lo almaceno en nodes_demand
+    # for i,j in current_solution.network_repr.nodes_demand.items():
+    #     for _i,cont in j.lista_continuidad.items():
+    #         current_solution.network_repr.nodes_demand['i'+i[-2:]+k].cont_i=cont
+    
+    
 
 # %% Optimización
 
@@ -404,8 +604,8 @@ def optimizacion(vecino_codificado,neighbor,current_solution):
 # %% <codecell> main
 if __name__ == "__main__":
 
-        from hcndp import data_functions
         import os
+
         
         # Obtener el directorio de trabajo actual
         directorio_actual = os.getcwd()
@@ -454,7 +654,9 @@ if __name__ == "__main__":
         # Defino objetivo y método
         current_solution.optimizar=True
         current_solution.tecnica="Local_Search"
-        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        _objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
+        #_objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
         current_solution.objective = _objective_and_description[0]
         current_solution.description_objective = _objective_and_description[1]
         current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica

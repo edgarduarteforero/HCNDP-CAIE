@@ -493,6 +493,7 @@ def set_e2sfca(network):
     df_asignacion.replace([np.inf, -np.inf], 0, inplace=True)
     
     # Agrupo las accesibilidades por cada cliente y servicio K
+    # Los valores de R en df_accesibilidad son las accesibilidades alpha_jk
     df_accesibilidad=df_asignacion.groupby(['nombre_I','servicio_K']).R.sum()
     
     #df_demanda=pd.merge(df_demanda,df_accesibilidad,on=['nombre_I','servicio_K'],how='left',suffixes=('_old', ''))
@@ -624,7 +625,7 @@ def set_kpi_network(network):
     df_medidas['Delta_total']= [np.average(a=df_continuidad['delta_i'], weights=df_continuidad['demanda_i'])]
     
     df_medidas['rho_max']= [df_capac['rho'].max()]
-    df_medidas['alpha_min']= [df_accesibilidad['R'].min()]
+    df_medidas['alpha_min']= [df_accesibilidad['R'].min()] # Ver arriba que los R son las accesibilidades por cada k
     df_medidas['delta_min']=[df_continuidad['delta_i'].min()]
 
     #df_demanda['h_ik'] = df_demanda['h_ik'].astype(int)
