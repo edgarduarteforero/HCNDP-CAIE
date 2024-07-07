@@ -110,9 +110,9 @@ class Model_pyomo:
     
         model.delta_i = pyo.Var(
             model.I, domain=pyo.NonNegativeIntegers, initialize=0, bounds=(0, 10))
-        # Continuidad: Suma de lugares j visitados desde i
+        # Continuidad: Suma de lugares j NO visitados desde i
     
-        model.delta_min = pyo.Var(domain=pyo.NonNegativeReals, initialize=0)
+        model.delta_min = pyo.Var(domain=pyo.NonNegativeIntegers, initialize=0)
         # Continuidad mínima en la red
     
         model.Lq_jk = pyo.Var(

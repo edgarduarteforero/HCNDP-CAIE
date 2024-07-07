@@ -121,7 +121,8 @@ def show_menu_figures(solution):
                 figures.figure_heatmap_accessibility(network)
                 figures.figure_accessibility_per_node(network)
                 figures.figure_accessibility_per_service(network)
-                
+                figures.figure_continuity_per_node(network)    
+
             except AssertionError as error:
                 print(error)
                 print ("No puedo imprimir las imágenes.")
@@ -184,14 +185,14 @@ def figure_network_cartesian(network):
                     right_on=['nombre_I','nombre_J'], how='left')
     prueba=prueba[(prueba['w_ij']>0)]
     # Dibujo una flecha para cada arco posible existente en prueba.
-    # prueba.apply(lambda row: ax.arrow(row['ubicacionesI_x'],row['ubicacionesI_y'],
-    #                                   row['ubicacionesJ_x']-row['ubicacionesI_x'],
-    #                                   row['ubicacionesJ_y']-row['ubicacionesI_y'],
-    #                                   width=0.0001,alpha=0.5,color='orangered',                            
-    #                                   fill=True,length_includes_head=True,
-    #                                   head_width=0.055,
-    #                                   ),
-    #                                   axis=1)
+    prueba.apply(lambda row: ax.arrow(row['ubicacionesI_x'],row['ubicacionesI_y'],
+                                      row['ubicacionesJ_x']-row['ubicacionesI_x'],
+                                      row['ubicacionesJ_y']-row['ubicacionesI_y'],
+                                      width=0.0001,alpha=0.5,color='orangered',                            
+                                      fill=True,length_includes_head=True,
+                                      head_width=0.055,
+                                      ),
+                                      axis=1)
 
     # prueba2 contiene los flujos entre j y j'
     prueba2=pd.merge(network.file['df_arcos'].reset_index(),
@@ -201,9 +202,9 @@ def figure_network_cartesian(network):
 
     # Los grises son los flujos entre j para cualquier k.
     # Consultar detalles de anotaciones en: https://matplotlib.org/stable/tutorials/text/annotations.html
-    # for _, row in prueba2.iterrows():
-    #     ax.annotate("", xy=(row.iloc[5], row.iloc[6]), xytext=(row.iloc[7], row.iloc[8]),
-    #                 arrowprops=dict(color="grey", linewidth=0.9, arrowstyle="->", connectionstyle="arc3,rad=0.3"))
+    for _, row in prueba2.iterrows():
+        ax.annotate("", xy=(row.iloc[5], row.iloc[6]), xytext=(row.iloc[7], row.iloc[8]),
+                    arrowprops=dict(color="grey", linewidth=0.9, arrowstyle="->", connectionstyle="arc3,rad=0.3"))
 
 
     # Agrego los nombres de nodos de demanda
@@ -451,13 +452,14 @@ def figure_Wq_per_node (network):
 def figure_service_rate_per_node(network):
     # Construyo gráficos de calor para analizar los recursos disponibles en cada par j k
    
-    
+    fig, ax = plt.subplots()
+
     df_capac=network.file['df_capac'] 
     df_temporal = df_capac.pivot_table( index='nombre_J', columns='servicio_K', values='cap_total')
     
-    sns.set(rc = {'figure.figsize':(5,5)})
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,annot=True,annot_kws={"size": 7},cbar_kws={'label': 'Number of servers'})
-    ax.set(xlabel='Services (k)', ylabel='Facilities (j)')
+    sns.set(rc = {'figure.figsize':(5,5)}) # Creo un gráfico de seaborn de 5x5 pulgadas
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,annot=False,annot_kws={"size": 10},cbar_kws={'label': 'Servidores asignados'})
+    ax.set(xlabel='Servicios (k)', ylabel='Nodos de oferta (j)')
     #path=os.getcwd()+'/output/'+network.name+'/service_rate_per_node.png'
     
     #if network.name_problem == "solución_subóptima":
@@ -471,28 +473,28 @@ def figure_service_rate_per_node(network):
     
 def figure_rho_per_node(network):
     # Construyo gráficos de calor para analizar la congestión para cada par j k
-   
-    
+    fig, ax1 = plt.subplots()
+
     df_capac=network.file['df_capac'] 
     df_temporal = df_capac.pivot_table( index='nombre_J', columns='servicio_K', values='rho')
     sns.set(rc = {'figure.figsize':(6,6)})
-    ax1=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,vmin=0, vmax=1,annot=True,annot_kws={"size": 7},cbar_kws={'label': 'Rho'})
-    ax1.set(xlabel='Services (k)', ylabel='Facilities (j)')
+    ax1=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,vmin=0, vmax=1,annot=False,annot_kws={"size": 10},cbar_kws={'label': 'Congestión'})
+
+    ax1.set(xlabel='Servicios (k)', ylabel='Nodos de oferta (j)')
     #path=os.getcwd()+'/output/'+network.name+'/rho_per_node.png'
     
     #if network.name_problem == "solución_subóptima":
     #    path=os.getcwd()+'/output/'+'red_original'+'/rho_per_node.png'
     #else:
     path=os.getcwd()+'/output/'+network.name_problem+'/rho_per_node.png'
-  
-    
+      
     ax1.figure.savefig(path,dpi=300)
     print (ax1)
 
 def figure_rho_weighted(network):
     # Calculo utilización para cada nodo de servicio j
-    
-    
+    fig, ax = plt.subplots()
+
     df_capac=network.file['df_capac'] 
     prueba=df_capac[df_capac['rho']!=0].groupby('nombre_J')['rho'].mean()
 
@@ -734,15 +736,16 @@ def figure_accessibility(network):
     
 def figure_heatmap_accessibility(network):
    
-    
+    fig, ax = plt.subplots()
     # Construyo gráficos de calor para analizar la accesibilidad para cada par i k
     df_accesibilidad=network.file['df_accesibilidad']
-    df_temporal = df_accesibilidad.pivot_table( index='nombre_I', columns='servicio_K', values='Acc_ponderado')
+    #df_temporal = df_accesibilidad.pivot_table( index='nombre_I', columns='servicio_K', values='Acc_ponderado')
+    df_temporal = df_accesibilidad.pivot_table( index='nombre_I', columns='servicio_K', values='acces_H2SFCA')
     df_temporal=df_temporal.fillna(0)
     sns.set(rc = {'figure.figsize':(5.5,5.5)})
     
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,annot=True,annot_kws={"size": 7})#,vmin=0, vmax=5000)
-    ax.set(xlabel='Services (k)', ylabel='Demand nodes (i)')
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,annot=False,annot_kws={"size": 7},cbar_kws={'label': 'Accesibilidad'})#,vmin=0, vmax=5000)
+    ax.set(xlabel='Servicios (k)', ylabel='Nodos de demanda (i)')
     
     #path=os.getcwd()+'/output/'+network.name+'/figure_heatmap_accessibility.png'
     
@@ -820,6 +823,43 @@ def figure_accessibility_per_service(network):
 
     ax.figure.savefig(path,dpi=300)  
     plt.show()
+
+#%% <codecell> Continuidad
+
+def figure_continuity_per_node(network):    
+    # Construyo gráficos para representar las continuidades de cada nodo
+ 
+    
+    df_continuidad=network.file['df_continuidad']
+    df_continuidad=df_continuidad.reset_index()
+    df_contin_node=network.file['df_continuidad']
+    df_contin_node=df_contin_node.reset_index()
+    df_contin_node=df_contin_node.set_index('nombre_I')
+    df_contin_node=df_contin_node['delta_i']
+    labels = df_contin_node.index
+    serie1 = df_contin_node
+    x = np.arange(len(serie1))
+    fig, ax = plt.subplots(figsize=(6,6))
+    #ax.set(ylim=(0, 1.1))
+
+    ax.bar(labels,serie1, ) #label='Continuidad')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_xlabel('Nodos de demanda')
+    #ax.set_title('Continudiad por nodo ')
+    ax.set_xticks(x,labels)
+    ax.legend()
+    fig.tight_layout()
+
+    #path=os.getcwd()+'/output/'+network.name+'/figure_accessibility_per_node.png'
+    
+    #if network.name_problem == "solución_subóptima":
+    #    path=os.getcwd()+'/output/'+'red_original'+'/figure_accessibility_per_node.png'
+    #else:
+    path=os.getcwd()+'/output/'+network.name_problem+'/figure_continuity_per_node.png'
+ 
+    ax.figure.savefig(path,dpi=300)    
+    plt.show()
     
 #%% <codecell> Flows
     
@@ -829,7 +869,7 @@ def figure_flows_f_ijk(network):
     # en las filas van los orígenes ik
     # en las columnas van los destinos jk
 
-    
+    fig, ax = plt.subplots()
     df_temporal=network.file['df_flujos_ijk'].reset_index().copy()
     df_temporal['ik']=df_temporal['nombre_I']+df_temporal['servicio_K']
     df_temporal['jk']=df_temporal['nombre_J']+df_temporal['servicio_K']
@@ -837,8 +877,8 @@ def figure_flows_f_ijk(network):
 
     df_temporal=df_temporal.fillna(0).round(decimals=0)
     sns.set(rc = {'figure.figsize':(8,8)})
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=20,annot=True,annot_kws={"size": 7})
-    ax.set(xlabel='Destinations (jk)', ylabel='Origins (ik)',title='Patient flow between demand and supply nodes')
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=20,annot=False,annot_kws={"size": 7})
+    ax.set(xlabel='Nodos oferta (jk)', ylabel='Nodos demanda (ik)',title='Patient flow between demand and supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk.png'
@@ -857,7 +897,7 @@ def figure_flows_f_ijk_k1(network):
     # en las columnas van los destinos jk
 
  
-
+    fig, ax = plt.subplots()
     df_temporal=network.file['df_flujos_ijk'].reset_index().copy()
     df_temporal = df_temporal[df_temporal.tao_ijk != 0]
     df_temporal['ik']=df_temporal['nombre_I']+df_temporal['servicio_K']
@@ -866,8 +906,8 @@ def figure_flows_f_ijk_k1(network):
 
     df_temporal=df_temporal.fillna(0).round(decimals=0)
     sns.set(rc = {'figure.figsize':(8,8)})
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=20, annot=True,annot_kws={"size": 12}) # vmax=df_temporal.to_numpy().max(),
-    ax.set(xlabel='Destinations (jk)', ylabel='Origins (ik)',title='Patient flow between demand and supply nodes')
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=20, annot=False,annot_kws={"size": 12}) # vmax=df_temporal.to_numpy().max(),
+    ax.set(xlabel='Nodos oferta (jk)', ylabel='Nodos demanda (ik)',title='Patient flow between demand and supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijk_k1.png'
@@ -885,7 +925,7 @@ def figure_flows_f_ijkjk(network):
     # en las filas van los orígenes jpkp
     # en las columnas van los destinos jk
 
-
+    fig, ax = plt.subplots()
     df_temporal=network.file['df_arcos'].reset_index().copy()
     df_temporal['jk_origen']=df_temporal['nombre_J']+df_temporal['servicio_K']
     df_temporal['jk_destino']=df_temporal['nombre_Jp']+df_temporal['servicio_Kp']
@@ -893,8 +933,8 @@ def figure_flows_f_ijkjk(network):
 
     df_temporal=df_temporal.fillna(0).round(decimals=2)
     sns.set(rc = {'figure.figsize':(8,8)})
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=1,annot=True,annot_kws={"size": 7})
-    ax.set(xlabel='Destinations (jk)', ylabel='Origins (jk)',title='Proportions of patients between supply nodes')
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=1,annot=False,annot_kws={"size": 7})
+    ax.set(xlabel='Nodos destino (jk)', ylabel='Nodos origen (jk)',title='Proportions of patients between supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_ijkjk.png'
@@ -912,7 +952,7 @@ def figure_flows_f_jpkpjk(network):
     # en las filas van los orígenes jpkp
     # en las columnas van los destinos jk
 
-
+    fig, ax = plt.subplots()
     df_capac=network.file['df_capac'].copy()
     df_arcos=network.file['df_arcos'].reset_index().copy()
     #df_temporal=pd.merge(df_capac['lambdas'],df_arcos,on=["nombre_J",'servicio_K'],how="left")
@@ -925,8 +965,8 @@ def figure_flows_f_jpkpjk(network):
 
     df_temporal=df_temporal.fillna(0).round(decimals=2)
     sns.set(rc = {'figure.figsize':(8,8)})
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=10,annot=True,annot_kws={"size": 7})
-    ax.set(xlabel='Destinations (jk)', ylabel='Origins (jk)',title='Patient flow between supply nodes')
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5, robust=True,vmin=0, vmax=10,annot=False,annot_kws={"size": 7})
+    ax.set(xlabel='Destinos (jk)', ylabel='Orígenes (jk)',title='Patient flow between supply nodes')
     #ax.figure.savefig("figura_2SFCA.png",dpi=300)
 
     #path=os.getcwd()+'/output/'+network.name+'/figure_flows_f_jpkpjk.png'
@@ -944,7 +984,7 @@ def figure_digraph(network):
     # REPRESENTACIÓN DE LA RED
     # Los colores corresponden a las proporciones de pacientes entre cada par de nodos.
 
-    
+    fig, ax = plt.subplots()    
     df_grafo=network.file['df_grafo']
     
     # Build your graph
@@ -970,7 +1010,7 @@ def figure_digraph_complete(network):
     # Los colores corresponden a LA PROPORCIÓN DE PACIENTES entre cada par de nodos.
     
 
-    
+    fig, ax = plt.subplots()    
     # Build a dataframe with 4 connections
     #df = pd.DataFrame({ 'from':['A', 'B', 'C','A'], 'to':['D', 'A', 'E','C']})
     
@@ -1117,25 +1157,98 @@ def figure_sankey(network):
 
 
 if __name__ == "__main__":
-    import hcndp
-    from hcndp import network_data
-    from hcndp.read_data import read_file_excel
-    from hcndp.network_data import _I,_J,_K,_archivo 
-    #from hcndp.figures import figure_network_cartesian
-    #import os 
-    network=network_data.Network(_I,_J,_K,_archivo)
-    path=os.path.dirname(os.getcwd())+'/data/'+network.archivo
-    path=os.getcwd()+'/data/'+network.archivo
-    read_file_excel(network,path)
-    #read_data.read_parameters(network)
-    read_file_excel(network,path)
-    hcndp.read_data.delete_surplus_data(network)
-    hcndp.read_data.merge_niveles_capac(network)
-    hcndp.read_data.create_df_asignacion(network)
-    hcndp.read_data.create_df_probs_kk(network)
-    hcndp.read_data.create_df_arcos(network)
+    import copy
+    from hcndp import initial_solution
+    from hcndp import data_functions
+    import pandas as pd
+    from hcndp import kpi
+    from hcndp import neighborhood_operator
+    import operator
+    import os
+
     
-    figure_network_cartesian(network)
+    # Obtener el directorio de trabajo actual
+    directorio_actual = os.getcwd()
+    
+    # Obtener el directorio padre (un nivel más arriba)
+    directorio_padre = os.path.dirname(directorio_actual)
+    
+    archivo=directorio_padre+'/data/red_original/'+"datos_i16_j10_k10_base.txt"
+    #archivo = r"C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\Códigos Python\HcNDP\Health-Care-Network-Design-Problem\hcndp/data/red_original/datos_i16_j10_k10_base.xlsx"
+    
+    # Borro carpeta con resultados de ejecuciones previas 
+    data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
+    #print("\nContenidos borrados. \nContinuando...")
+    
+    # Creo los diccionarios de trabajo
+    from hcndp import read_data
+    networks_dict={} #Diccionario con las redes utilizadas en el programa
+    problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
+
+    # Definimos valores I,J,K
+    I,J,K= [4,4,4]
+    
+    
+    # Creamos un objeto network
+    from hcndp import network
+    _name="red_original"
+    networks_dict[_name] = network.Network(I,J,K,archivo,_name)
+    networks_dict[_name].create_folders()
+    #print (f"\nSe ha creado exitosamente el objeto {_name}.")
+
+
+    # Llenar objeto con datos (En este caso, datos .txt)
+    networks_dict[_name].read_file_txt(archivo)
+    networks_dict[_name].delete_surplus_data() #Borro los datos que sobren
+    networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name) #Corrijo errores en sigma_max
+
+    #print ("#" * 60)
+    #print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
+
+
+    # Creo el objeto solucion
+    from hcndp import solutions
+    solutions.create_problem_object(networks_dict['red_original'], problems_dict, name_problem="temporal")
+    current_solution = problems_dict["temporal"]
+
+    # Defino objetivo y método
+    #current_solution.optimizar=True
+    #current_solution.tecnica="Local_Search"
+    #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+    #_objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
+    #_objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
+    #current_solution.objective = _objective_and_description[0]
+    #current_solution.description_objective = _objective_and_description[1]
+    #current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica
+    
+    # Actualizo nombre de la solución en solution_dict (Ya no es "temporal")
+    _clave_temporal = 'temporal'
+    _solucion_temporal = problems_dict[_clave_temporal]
+    problems_dict[_solucion_temporal.name_problem] = problems_dict.pop(_clave_temporal)
+    problems_dict[_solucion_temporal.name_problem].network_copy.name_problem = \
+        problems_dict[_solucion_temporal.name_problem].name_problem
+    #print (f"Se ha actualizado el objeto {problems_dict[_solucion_temporal.name_problem].name_problem}")
+            
+
+    # from hcndp import network
+    # from hcndp.read_data import read_file_excel
+    # from hcndp.network import _I,_J,_K,_archivo 
+    # #from hcndp.figures import figure_network_cartesian
+    # #import os 
+    # network_grafico=network.Network(_I,_J,_K,_archivo)
+    # path=os.path.dirname(os.getcwd())+'/data/'+network_grafico.archivo
+    # path=os.getcwd()+'/data/'+network_grafico.archivo
+    # read_file_excel(network_grafico,path)
+    # #read_data.read_parameters(network)
+    # read_file_excel(network_grafico,path)
+    # hcndp.read_data.delete_surplus_data(network_grafico)
+    # hcndp.read_data.merge_niveles_capac(network_grafico)
+    # hcndp.read_data.create_df_asignacion(network_grafico)
+    # hcndp.read_data.create_df_probs_kk(network_grafico)
+    # hcndp.read_data.create_df_arcos(network_grafico)
+    
+    network_grafico=current_solution
+    figure_network_cartesian(network_grafico)
     #figure_chord_diagram(network)
-    figure_Lq_per_node(network)
-    figure_rho_per_node(network)
+    #figure_Lq_per_node(network)
+    #figure_rho_per_node(network)

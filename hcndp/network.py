@@ -51,12 +51,12 @@ class Network():
             pass
         
     def read_file_excel(self,path):
-        print ("Leyendo datos del archivo de Excel.")
+        #print ("Leyendo datos del archivo de Excel.")
         
         self.file = pd.read_excel(path, sheet_name=None)
     
     def read_file_txt(self,path):
-        print ("Leyendo datos del archivo de text.")
+        #print ("Leyendo datos del archivo de text.")
         
         
         
@@ -148,7 +148,6 @@ class Network():
     
     def merge_niveles_capac(self,_post_optima,current_solution=None):
         #Agrego las columna nivel de atención y ubicaciones
-
         
         if _post_optima==True:
             

@@ -32,6 +32,8 @@ from hcndp import read_data
 import shutil
 from hcndp import data_functions
 from hcndp import solutions
+import time
+
 
 def menu_solutions(network_original, problems_dict):
     
@@ -340,7 +342,7 @@ def create_problem_object(network_original, problems_dict, name_problem):
     
     # Actualizar nombre de solution.network_copy
     problem.network_copy.name_problem=problem.name_problem
-    print ("Se ha creado un objeto tipo 'problema' y se cargó en el diccionario de problemas.")
+    #print ("Se ha creado un objeto tipo 'problema' y se cargó en el diccionario de problemas.")
     
     
 # %% <codecell> Clase Problem
@@ -493,7 +495,7 @@ class Problem:
         #instance.sigma.fix(valor_fijo)
 
         # Crear un objeto StringIO para capturar la salida
-        #***captura_salida = io.StringIO()
+        #captura_salida = io.StringIO()
         
         # Guardar la salida estándar original
         #***old_stdout = sys.stdout
@@ -501,17 +503,21 @@ class Problem:
         
         #try:
         # Redirigir la salida estándar al objeto StringIO
-        #***sys.stdout = captura_salida
+        #sys.stdout = captura_salida
     
         # Configurar el solucionador con tee=True      
         # Resolver el modelo con salida detallada
         opt = pyo.SolverFactory('gurobi')
         opt.options['NonConvex'] = 2
-        opt.options['TimeLimit'] = 500
+        opt.options['TimeLimit'] = 3600
         
-        opt.options['MIPFocus'] = 3
-        #opt.options['Heuristics'] = 0
-        #opt.options['Presolve']  =2
+        opt.options['MIPFocus'] = 1
+        opt.options['Heuristics'] = 0
+        opt.options['Presolve']  =2
+        opt.options['MIPGap'] = 0.01  # Establecer una tolerancia de optimalidad
+        opt.options['Threads'] = 4  # Usar 4 threads
+        opt.options['Presolve'] = 2  # Nivel de presolve
+        opt.options['Heuristics'] = 0.5  # Intensidad de heurística
 
         global out
         out = 0
@@ -523,12 +529,27 @@ class Problem:
             if not os.path.exists(_output):
                 # Crea el directorio
                 os.makedirs(_output)
-                
-        results = opt.solve(instance, tee=False, warmstart=False)
-        #***salida_tee = captura_salida.getvalue()
+        
+        # Capturar el tiempo antes de resolver
+        start_time = time.process_time()
+
+        results = opt.solve(instance, tee=False, warmstart=False)#, report_timing=False)
+        #salida_tee = captura_salida.getvalue()
             #,logfile=_output+'logfile_name.log')
         #print (f'Función objetivo alcanzada= {pyo.value(instance.obj)}')   
-         
+        
+        # Capturar el tiempo después de resolver
+        end_time = time.process_time()
+
+        # Calcular el tiempo de CPU utilizado
+        cpu_time = end_time - start_time
+
+        # Guardar el tiempo de CPU en una variable
+        tiempo_cpu = cpu_time
+        
+        print ("Tiempo solución Gurobi:", tiempo_cpu)
+        
+        
         # Accessing solver status: http://www.pyomo.org/blog/2015/1/8/accessing-solver
         if (results.solver.status == pyo.SolverStatus.ok) and (results.solver.termination_condition == pyo.TerminationCondition.optimal):
             out = "optimal and feasible"
@@ -546,6 +567,8 @@ class Problem:
             model.solution['alpha_min'] = pyo.value(instance.alpha_min)
             model.solution['delta_min'] = pyo.value(instance.delta_min)
             model.solution['Func_obj'] = pyo.value(instance.obj)
+            model.solution['Tiempo'] = tiempo_cpu
+            
             self.value_optimal_solution=model.solution
             # Export to LP
             #instance.write(_output+"model.lp", format='lp')
@@ -561,12 +584,13 @@ class Problem:
         self.out=out
         
             # Obtener la salida capturada como texto
-            #***salida_tee = captura_salida.getvalue()
-            #***self.salida_tee=salida_tee
+            #salida_tee = captura_salida.getvalue()
+            #self.salida_tee=salida_tee
             
         #finally:
         #    # Restaurar la salida estándar
         #    sys.stdout = old_stdout
+        return results
         
     def solve_ipopt(self):
         #network = self.network_copy
@@ -719,7 +743,6 @@ class Problem:
     
     def set_solution_excel(self):
 
-
         # network = self.network_copy
 
         # Obtengo los valores de las variables según el modelo de optimización
@@ -789,8 +812,7 @@ class Problem:
             l_jk=l_jk.drop(columns=['0']).reset_index()
             #l_jk = self.df_l_jk.reset_index()
             l_jk.columns = ['0', '1', '2']
-            
-            
+                    
             f_ijk=self.df_f_ijk
             f_ijk.columns = ['nombre_I','nombre_J','servicio_K','tao_ijk']
             
@@ -813,8 +835,7 @@ class Problem:
             fi_ijkjk = fi_ijkjk[['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','ϕ']]
             fi_ijkjk.columns = ['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp','fi_ijkjk']
             fi_ijkjk=fi_ijkjk[fi_ijkjk['servicio_K'] != 'k00']
-            
-            
+                       
         # Escritura de archivo en Excel
         #output = os.getcwd()+'/output/'+network.name+'/salida_optimizacion.xlsx'
         if self.name_problem != "pareto_front":
@@ -854,7 +875,10 @@ class Problem:
                 pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
                 pd.DataFrame(fi_ijkjk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
                              'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
-        
+                
+                # Crear una nueva hoja para el tiempo
+                tiempo_data = pd.DataFrame({'Tiempo': [self.pyo_model.solution['Tiempo']]})
+                tiempo_data.to_excel(writer, sheet_name='Tiempo')
        
         if self.tecnica != "Exacta":
             with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
@@ -888,7 +912,8 @@ class Problem:
                                     'f_ijk':f_ijk,
                                     'l_jk':l_jk,
                                     'sigma_jk':sigma_jk,
-                                    'theta_jk':theta_jk
+                                    'theta_jk':theta_jk,
+                                    'tiempo':tiempo_data
                                 }
     def set_solution_txt(self):
 
@@ -909,13 +934,15 @@ class Problem:
 
         with open(output, 'w') as output_file:
             # output_file.write(instance.pprint())
+            output_file.write("Tiempo de ejecución: "+str(self.pyo_model.solution['Tiempo']))
+            output_file.write("\n"+"#"*60+"\n")
             instance.pprint(output_file)
         
         # Abrir el archivo en modo de agregación para agregar 'self.salida_tee'
-        with open(output, 'a') as output_file:
-            output_file.write("\n"+"#"*60)  # Agregar un salto de línea para separación
+        #with open(output, 'a') as output_file:
+            #output_file.write("\n"+"#"*60)  # Agregar un salto de línea para separación
             #output_file.write(self.salida_tee)  # Agregar la salida tee de Gurobi
-
+            #output_file.write("\n"+str(self.pyo_model.solution['Tiempo']))
             
         output = os.getcwd()+'/output/'+self.name_problem+'/solucion.txt'
         if self.name_problem == "pareto_front":
@@ -1341,8 +1368,7 @@ class Problem:
                 #self.set_solution_excel()
                 #self.set_solution_txt()
                 self.state="Optimizado"
-            
-            
+                
             
 
         else:
@@ -1350,6 +1376,8 @@ class Problem:
                 self.solve_ipopt()
             else:
                 self.solve_gurobi()
+                
+                print ("Valor función objetivo:",self.value_optimal_solution['Func_obj'])
             #self.get_degrees_freedom()
     
             # Exportar resultados
@@ -1416,7 +1444,7 @@ if __name__ == "__main__":
         # Borro carpeta con resultados previos
         
         data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
-        print("\nContenidos borrados. \nContinuando...")
+        #print("\nContenidos borrados. \nContinuando...")
         
         networks_dict={} #Diccionario con las redes utilizadas en el programa
         problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
@@ -1431,7 +1459,7 @@ if __name__ == "__main__":
 
         networks_dict[_name] = network.Network(I,J,K,archivo,_name)
         networks_dict[_name].create_folders()
-        print (f"\nSe ha creado exitosamente el objeto {_name}.")
+        #print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 
         # Llenar objeto con datos de Excel
@@ -1439,8 +1467,8 @@ if __name__ == "__main__":
         networks_dict[_name].read_file_excel('C:/Users/edgar/OneDrive - Universidad Libre/Doctorado/Códigos Python/HcNDP/Health-Care-Network-Design-Problem/data/red_original/datos_i16_j10_k10_base.xlsx')
         networks_dict[_name].delete_surplus_data()
 
-        print ("#" * 60)
-        print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
+        #print ("#" * 60)
+        #print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
     
 
         # Creo el objeto solucion

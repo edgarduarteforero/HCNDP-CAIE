@@ -50,7 +50,7 @@ def incremento1_exhaust (vector_original_sigmas):
 
             copia_vector_original_sigmas[i]= vector_original_sigmas[i]+1
                 
-            print (f'Sigma {i} era {vector_original_sigmas[i]}. Nuevo vector es {copia_vector_original_sigmas}')
+            #print (f'Sigma {i} era {vector_original_sigmas[i]}. Nuevo vector es {copia_vector_original_sigmas}')
             
             lista_sigmas_perturbados.append(copia_vector_original_sigmas)
             
@@ -70,7 +70,7 @@ def incremento1_all (vector_original_sigmas):
 
     copia_vector_original_sigmas = [x+1 for x in copia_vector_original_sigmas]
                 
-    print (f'Vector sigmas original era {vector_original_sigmas}. Nuevo vector sigmas es {copia_vector_original_sigmas}')
+    #print (f'Vector sigmas original era {vector_original_sigmas}. Nuevo vector sigmas es {copia_vector_original_sigmas}')
     
     lista_sigmas_perturbados.append(copia_vector_original_sigmas)
             
@@ -94,7 +94,7 @@ def incremento2_decremento1_exhaust (vector_original_sigmas):
             if i != j:
                 copia_vector_original_sigmas[i]= vector_original_sigmas[i]+2
                 copia_vector_original_sigmas[j]= vector_original_sigmas[j]-1
-                print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
                 
                 lista_sigmas_perturbados.append(copia_vector_original_sigmas)
                 
@@ -118,7 +118,7 @@ def incremento2_decremento2_exhaust (vector_original_sigmas):
             if i != j:
                 copia_vector_original_sigmas[i]= vector_original_sigmas[i]+2
                 copia_vector_original_sigmas[j]= vector_original_sigmas[j]-2
-                print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
                 
                 lista_sigmas_perturbados.append(copia_vector_original_sigmas)
                 
@@ -142,7 +142,7 @@ def incremento3_decremento3_exhaust (vector_original_sigmas):
             if i != j:
                 copia_vector_original_sigmas[i]= vector_original_sigmas[i]+3
                 copia_vector_original_sigmas[j]= vector_original_sigmas[j]-3
-                print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
                 
                 lista_sigmas_perturbados.append(copia_vector_original_sigmas)
                 
@@ -163,7 +163,7 @@ def chain_reaction_exhaust_plus_minus (vector_original_sigmas):
     copia_vector_original_sigmas=vector_original_sigmas.copy()
     copia_vector_original_sigmas = [x + y for x, y in zip(copia_vector_original_sigmas, vectorcadena)]
     
-    print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
+    #print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
     
     lista_sigmas_perturbados.append(copia_vector_original_sigmas)
             
@@ -184,7 +184,7 @@ def chain_reaction_exhaust_minus_plus (vector_original_sigmas):
     copia_vector_original_sigmas=vector_original_sigmas.copy()
     copia_vector_original_sigmas = [x + y for x, y in zip(copia_vector_original_sigmas, vectorcadena)]
     
-    print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
+    #print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
     
     lista_sigmas_perturbados.append(copia_vector_original_sigmas)
             

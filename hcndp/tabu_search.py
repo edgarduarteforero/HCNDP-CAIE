@@ -23,7 +23,7 @@ def tabu_search(current_solution,network_original):
     # tabu_list: conjunto de movimientos tabú
     
     tabu_list=[]   
-    tennure = 5
+    tennure = 13
     landscape=[] # Vector para guardar la información del landscape construido
     
     # Cálculo de solución inicial
@@ -76,7 +76,7 @@ def tabu_search(current_solution,network_original):
     # W-rule: maximum number of consecutive iterations without improvement in the value of the incumbent solution 
     stopping_condition_W_rule = False 
     iterations_without_improvement = 0
-    max_iterations_without_improve = 3
+    max_iterations_without_improve = 13
     
     # Solución que ingresa al bucle
     neighbor = copy.deepcopy(best_neighbor)
@@ -97,7 +97,8 @@ def tabu_search(current_solution,network_original):
         try: 
             operador=current_solution.local_search_operator
         except AttributeError :
-            operador="incremento1_exhaust(vector_original_sigmas)"
+            operador="incremento1_decremento1_exhaust(vector_original_sigmas)"
+            #operador="incremento1_exhaust(vector_original_sigmas)"
             pass
         
         # Construyo el vecindario. Conjunto de soluciones codificadas según operador seleccionado
@@ -105,6 +106,16 @@ def tabu_search(current_solution,network_original):
                 
         # Tamizaje de soluciones
         neighborhood_feasible=tamizaje_soluciones(best_neighbor,neighborhood)
+        
+        # Calculo la solución crítica. sigma jk que genera el peor valor de la función objetivo
+        critical_node_in_solution1 = find_critical_node(neighbor_codificado,neighbor,0)
+        critical_node_in_solution2 = find_critical_node(neighbor_codificado,neighbor,1)
+        critical_node_in_solution3 = find_critical_node(neighbor_codificado,neighbor,2)
+        list_critical_nodes=[critical_node_in_solution1 ,critical_node_in_solution2 ,critical_node_in_solution3 ]
+        
+        # Depuracón de soluciones 
+        # Se dejan solamente los vecinos que hagan cambios en la solución crítica
+        neighborhood_feasible=pruning_neighborhood_feasible(neighborhood_feasible,list_critical_nodes)
         
         # Si el vecindario factible está vacío
         if len(neighborhood_feasible) == 0:
@@ -122,7 +133,7 @@ def tabu_search(current_solution,network_original):
             # Encuentro mejor solución del vecindario
             best_of_neighborhood , qual_best_of_neighborhood , landscape, neighborhood_feasible =\
             find_best_of_neighborhood (neighborhood_feasible,
-                                       neighbor,
+                                       current_solution, #neighbor
                                        landscape,current_solution)
             print (f'Mejor solución del vecindario {contador}: {qual_best_of_neighborhood}')
             
@@ -131,13 +142,12 @@ def tabu_search(current_solution,network_original):
             best_of_neighborhood_cod=codificar_solucion(best_of_neighborhood, 'sigma')
             movimientos_realizados = movimiento_realizado (best_of_neighborhood_cod, neighbor_codificado, tennure)
             
-            # Actualizo lista tabú
+            # Actualizo el tennure de los elementos existentes en lista tabú
             if len(tabu_list) != 0:
                 for i in tabu_list:
                     i[4]-=1 
                 tabu_list = [i for i in tabu_list if i[4] != 0]                  
-            
-            
+                      
             # Verifico si los movimientos son tabú o no
             solution_has_tabu = False
 
@@ -156,7 +166,7 @@ def tabu_search(current_solution,network_original):
 
             # Si al menos uno de los movimientos es tabú verifico nivel de aspiración                     
             if solution_has_tabu == True:
-                print ("TENGO UNA SOLUCIÓN TABU")
+                print ("TENGO UN MOVIMIENTO TABU")
                 # Seleccionar el operador basado en la variable (1 o 3 usan <, 2 usa >)
                 comparacion = operator.lt if current_solution.objective in {"1"} else operator.gt                
                 if comparacion (qual_best_of_neighborhood , qual_best): # Comparo las dos qual
@@ -174,10 +184,11 @@ def tabu_search(current_solution,network_original):
                     
                     # Reemplazar la lista original con la nueva lista
                     neighborhood_feasible = nueva_lista_feasible
-        
+                    
+                    # Actualizo el best_of_neighborhood por current solution para asegurar divesificación
+                    # Pendiente de implementar        
         # Comparo la mejor solución del vecindario con la mejor solución obtenida.
-        print ("Comparación de mejor solución de vecindario con mejor solución obtenida")
-        
+        #print ("Comparación de mejor solución de vecindario con mejor solución obtenida")        
         # Seleccionar el operador basado en la variable (1 o 3 usan <, 2 usa >)
         comparacion = operator.lt if current_solution.objective in {"1"} else operator.gt
 
@@ -220,7 +231,10 @@ def tabu_search(current_solution,network_original):
     elif  current_solution.objective == "2": # 2 Significa accesibilidad alpha
         print (f"Valor función objetivo: {best_neighbor.value_optimal_solution['alpha_min'] }")
     elif current_solution.objective == "3": # 3 Significa continuidad delta
-        print (f"Valor función objetivo: {best_neighbor.value_optimal_solution['delta_min'] }")
+        try:     
+            print (f"Valor función objetivo: {best_neighbor.value_optimal_solution['delta_min'] }")
+        except:
+            print ("No encontré mejora sobre la solución inicial")
     
     print (f"Vecindario final número: {contador-1}")
     
@@ -316,7 +330,7 @@ def neighborhood_exhaustive_codificado (neighbor_codificado,operador,current_sol
                                                    labels=labels, duplicates='drop')
                 break
             except ValueError as e:
-                print("Error:", e)
+                #print("Error:", e)
                 # Ajustar el número de cuartiles y etiquetas si hay error
                 labels.pop(0)
                 q-=1
@@ -328,7 +342,7 @@ def neighborhood_exhaustive_codificado (neighbor_codificado,operador,current_sol
                                                    labels=labels, duplicates='drop')
                 break
             except ValueError as e:
-                print("Error:", e)
+                #print("Error:", e)
                 # Ajustar el número de cuartiles y etiquetas si hay error
                 labels.pop(-1)
                 q-=1
@@ -340,7 +354,7 @@ def neighborhood_exhaustive_codificado (neighbor_codificado,operador,current_sol
                                                    labels=labels, duplicates='drop')
                 break
             except ValueError as e:
-                print("Error:", e)
+                #print("Error:", e)
                 # Ajustar el número de cuartiles y etiquetas si hay error
                 labels.pop(-1)
                 q-=1
@@ -500,6 +514,40 @@ def tamizaje_soluciones(best_neighbor,neighborhood):
     
     return neighborhood_feasible
 
+def find_critical_node(neighbor_codificado,neighbor,position):
+    # Recupera el nodo crítico de la solución actual
+    # El nodo crítico tien el sigma (con su jk) que está generando las peores soluciones posibles
+    if neighbor.objective == "1": 
+        critical_node=neighbor_codificado['k_rho_max']
+        critical_node=[neighbor_codificado[critical_node]['lista_ordenada'][position][1],critical_node]
+        critical_node.append(neighbor.network_repr.nodes_supply[critical_node[0]+critical_node[1]].rho)
+        critical_node.append(neighbor.network_repr.nodes_supply[critical_node[0]+critical_node[1]].capac_instal_sigma)
+    elif neighbor.objective == "2":
+        critical_node=neighbor_codificado['k_alpha_min']
+        critical_node=[neighbor_codificado[critical_node]['lista_ordenada'][position][1],critical_node]
+        critical_node.append(neighbor.network_repr.nodes_supply[critical_node[0]+critical_node[1]].access_ik)
+        critical_node.append(neighbor.network_repr.nodes_supply[critical_node[0]+critical_node[1]].capac_instal_sigma)
+    elif neighbor.objective == "3":
+        critical_node=neighbor_codificado['k_delta_min']
+        critical_node=[neighbor_codificado[critical_node]['lista_ordenada'][position][1],critical_node]
+        critical_node[0] = critical_node[0].replace('i', 'j')
+        critical_node.append(neighbor.network_repr.nodes_supply[critical_node[0]+critical_node[1]].cont_i)
+        critical_node.append(neighbor.network_repr.nodes_supply[critical_node[0]+critical_node[1]].capac_instal_sigma)
+    return critical_node
+
+def pruning_neighborhood_feasible(neighborhood_feasible,list_critical_nodes):
+    lista_temporal=[]
+    for critical_node in list_critical_nodes: #Comparo nodos críticos con los que están en el vecindario factible
+        for _j in neighborhood_feasible:
+            critical_k=_j[critical_node[1]]['sigmas'] #k donde está el sigma jk crítico
+            position_j=int(critical_node[0][-2:])-1 # j donde está el sigma jk crítico
+            critical_sigma_jk=critical_k[position_j] # sigma jk 
+            #print (position_j,critical_sigma_jk)
+            if critical_sigma_jk != critical_node[3] and _j not in lista_temporal: # Si sigma_jk es igual al crítico
+                lista_temporal.append(_j) # Lo agrego al nuevo vecindario factible
+    return lista_temporal
+
+
 
 #%% Operadores para codificación y decodificación
 
@@ -520,8 +568,12 @@ def codificar_solucion (neighbor,contenido_variable):
                 lista_sigmas=[_j.capac_instal_sigma for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
                 maximo_par = max([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key], 
                                  key=lambda x: x[0]) 
+                lista_ordenada = sorted([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key],
+                                        key=lambda x: x[0], reverse=True)
+                 
                 solucion_codificada[key]={'sigmas':lista_sigmas,
-                                          'rho_max':maximo_par}
+                                          'rho_max':maximo_par,
+                                          'lista_ordenada':lista_ordenada}
             elif contenido_variable == "s_jk":
                 lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
                 maximo_par = max([[_j.rho,_j.place] for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key], 
@@ -542,8 +594,13 @@ def codificar_solucion (neighbor,contenido_variable):
                 minimo_par = min([[_node_i.access_ik,_node_i.place] for _index, 
                                   _node_i in neighbor.network_repr.nodes_supply.items() if _node_i.service == key], 
                                  key=lambda x: x[0])
+                lista_ordenada = sorted([[_node_i.access_ik,_node_i.place] for _index,
+                                    _node_i in neighbor.network_repr.nodes_supply.items() if _node_i.service == key],
+                                        key=lambda x: x[0], reverse=False)
+                 
                 solucion_codificada[key]={'sigmas':lista_sigmas,
-                                          'alpha_min':minimo_par}
+                                          'alpha_min':minimo_par,
+                                          'lista_ordenada':lista_ordenada} 
             
             elif contenido_variable == "s_jk":
                 lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
@@ -567,8 +624,14 @@ def codificar_solucion (neighbor,contenido_variable):
                 minimo_par = min([[_node_i.continuidad,_node_i.node_id] for _index, 
                                   _node_i in neighbor.network_repr.nodes_demand.items() ], 
                                  key=lambda x: x[0])
+            
+                lista_ordenada = sorted([[_node_i.continuidad,_node_i.node_id] for _index,
+                                    _node_i in neighbor.network_repr.nodes_demand.items()],
+                                        key=lambda x: x[0], reverse=False)
+                                          
                 solucion_codificada[key]={'sigmas':lista_sigmas,
-                                          'delta_min':minimo_par}
+                                          'delta_min':minimo_par,
+                                          'lista_ordenada':lista_ordenada}
             
             elif contenido_variable == "s_jk":
                 lista_sigmas=[_j.capac_instal_max for _i, _j in neighbor.network_repr.nodes_supply.items() if _j.service == key]
@@ -625,37 +688,40 @@ def calcular_kpi_local_search(current_solution):
     kpi.calculate_kpi(current_solution,_post_optima=True)
     #print (f"Se calcularon los KPI para la solución {current_solution.description_objective}.")
 
-    # Calculo los rho para cada nodo jk y lo almaceno en nodes_supply
-    for _i,_j in current_solution.network_repr.nodes_supply.items():
-        if _j.service != 'k00':
-            if _j.matriz_λ['λ_ijk'].sum() == 0 or _j.capac_instal_sigma == 0:
-                _j.rho=0
-            else: 
-                _j.rho = _j.matriz_λ['λ_ijk'].sum()/(_j.capac_instal_sigma*_j.rate)
+    if current_solution.objective == "1": 
+        # Calculo los rho para cada nodo jk y lo almaceno en nodes_supply
+        for _i,_j in current_solution.network_repr.nodes_supply.items():
+            if _j.service != 'k00':
+                if _j.matriz_λ['λ_ijk'].sum() == 0 or _j.capac_instal_sigma == 0:
+                    _j.rho=0
+                else: 
+                    _j.rho = _j.matriz_λ['λ_ijk'].sum()/(_j.capac_instal_sigma*_j.rate)
+    
+    elif current_solution.objective =="2":
+        # Calculo los alpha para cada nodo ik y lo almaceno en nodes_demand
+        for _i,_j in current_solution.network_repr.nodes_demand.items():
+            lista_access=current_solution.network_copy.file['df_accesibilidad'][current_solution.network_copy.file['df_accesibilidad']['nombre_I']==_i]
+            lista_access=lista_access[['servicio_K','R']]
+            _j.lista_accesibilidad= lista_access.set_index('servicio_K')['R'].to_dict()
 
-   
-    # Calculo los alpha para cada nodo ik y lo almaceno en nodes_demand
-    for _i,_j in current_solution.network_repr.nodes_demand.items():
-        lista_access=current_solution.network_copy.file['df_accesibilidad'][current_solution.network_copy.file['df_accesibilidad']['nombre_I']==_i]
-        lista_access=lista_access[['servicio_K','R']]
-        _j.lista_accesibilidad= lista_access.set_index('servicio_K')['R'].to_dict()
-   
            
-    # Cargo los alpha para cada nodo ik y lo almaceno en nodes_supply
-    for i,j in current_solution.network_repr.nodes_demand.items():
-        for k,acc in j.lista_accesibilidad.items():
-            current_solution.network_repr.nodes_supply['j'+i[-2:]+k].access_ik=acc
+        # Cargo los alpha para cada nodo ik y lo almaceno en nodes_supply
+        for i,j in current_solution.network_repr.nodes_demand.items():
+            for k,acc in j.lista_accesibilidad.items():
+                current_solution.network_repr.nodes_supply['j'+i[-2:]+k].access_ik=acc
+    
+    elif current_solution.objective == "3":
+        # Calculo los delta para cada nodo i y lo almaceno en nodes_demand
+        for _i,_j in current_solution.network_repr.nodes_demand.items():
+            lista_contin=current_solution.network_copy.file['df_continuidad'][current_solution.network_copy.file['df_continuidad']['nombre_I']==_i]
+            lista_contin=lista_contin[['nombre_I','delta_i']]
+            _j.continuidad= lista_contin.iloc[0]['delta_i']
             
-    # Calculo los delta para cada nodo i y lo almaceno en nodes_demand
-    for _i,_j in current_solution.network_repr.nodes_demand.items():
-        lista_contin=current_solution.network_copy.file['df_continuidad'][current_solution.network_copy.file['df_continuidad']['nombre_I']==_i]
-        lista_contin=lista_contin[['nombre_I','delta_i']]
-        _j.continuidad= lista_contin.iloc[0]['delta_i']
-        
     # Cargo los delta para cada nodo i y lo almaceno en nodes_demand
     # for i,j in current_solution.network_repr.nodes_demand.items():
     #     for _i,cont in j.lista_continuidad.items():
     #         current_solution.network_repr.nodes_demand['i'+i[-2:]+k].cont_i=cont
+    
 
 # %% Optimización
 
@@ -709,7 +775,7 @@ if __name__ == "__main__":
         
         # Borro carpeta con resultados de ejecuciones previas 
         data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
-        print("\nContenidos borrados. \nContinuando...")
+        #print("\nContenidos borrados. \nContinuando...")
         
         # Creo los diccionarios de trabajo
         from hcndp import read_data
@@ -725,7 +791,7 @@ if __name__ == "__main__":
         _name="red_original"
         networks_dict[_name] = network.Network(I,J,K,archivo,_name)
         networks_dict[_name].create_folders()
-        print (f"\nSe ha creado exitosamente el objeto {_name}.")
+        #print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 
         # Llenar objeto con datos (En este caso, datos .txt)
@@ -733,8 +799,8 @@ if __name__ == "__main__":
         networks_dict[_name].delete_surplus_data() #Borro los datos que sobren
         networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name) #Corrijo errores en sigma_max
 
-        print ("#" * 60)
-        print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
+        #print ("#" * 60)
+        #print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
     
 
         # Creo el objeto solucion
@@ -744,10 +810,10 @@ if __name__ == "__main__":
 
         # Defino objetivo y método
         current_solution.optimizar=True
-        current_solution.tecnica="Local_Search"
-        #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        current_solution.tecnica="Tabu_Search"
+        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
         #_objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
-        _objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
+        #_objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
         current_solution.objective = _objective_and_description[0]
         current_solution.description_objective = _objective_and_description[1]
         current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica
@@ -758,7 +824,7 @@ if __name__ == "__main__":
         problems_dict[_solucion_temporal.name_problem] = problems_dict.pop(_clave_temporal)
         problems_dict[_solucion_temporal.name_problem].network_copy.name_problem = \
             problems_dict[_solucion_temporal.name_problem].name_problem
-        print (f"Se ha actualizado el objeto {problems_dict[_solucion_temporal.name_problem].name_problem}")
+        #print (f"Se ha actualizado el objeto {problems_dict[_solucion_temporal.name_problem].name_problem}")
                 
         # Ejecuto algoritmo
         current_solution= tabu_search(current_solution,networks_dict['red_original'])

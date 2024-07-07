@@ -387,7 +387,7 @@ if __name__ == "__main__":
 
 
         data_functions.borrar_contenido_carpeta(os.getcwd()+'/output/')
-        print("\nContenidos borrados. \nContinuando...")
+        #print("\nContenidos borrados. \nContinuando...")
         
         from hcndp import read_data
         networks_dict={} #Diccionario con las redes utilizadas en el programa
@@ -404,7 +404,7 @@ if __name__ == "__main__":
 
         networks_dict[_name] = network.Network(I,J,K,archivo,_name)
         networks_dict[_name].create_folders()
-        print (f"\nSe ha creado exitosamente el objeto {_name}.")
+        #print (f"\nSe ha creado exitosamente el objeto {_name}.")
 
 
         # Llenar objeto con datos de Excel
@@ -413,8 +413,8 @@ if __name__ == "__main__":
         networks_dict[_name].delete_surplus_data()
         networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name)
 
-        print ("#" * 60)
-        print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
+        #print ("#" * 60)
+        #print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
     
 
         # Creo el objeto solucion
@@ -426,9 +426,9 @@ if __name__ == "__main__":
         # Defino objetivo y método
         current_solution.optimizar=True
         current_solution.tecnica="Aproximación"
-        #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
         #_objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
-        _objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
+        #_objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
         current_solution.objective = _objective_and_description[0]
         current_solution.description_objective = _objective_and_description[1]
         current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica
