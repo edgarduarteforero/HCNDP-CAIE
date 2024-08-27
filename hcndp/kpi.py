@@ -488,7 +488,8 @@ def set_e2sfca(network):
     
     # Calculo las accesibilidades R de cada combinación i j k
     
-    df_asignacion['R']=df_asignacion['Sff']*(df_asignacion['lambda_ijk']!=0)*100/df_asignacion['Pf_grup']
+    #df_asignacion['R']=df_asignacion['Sff']*(df_asignacion['lambda_ijk']!=0)*100/df_asignacion['Pf_grup']
+    df_asignacion['R']=df_asignacion['Sff']*(df_asignacion['lambda_ijk']!=0)/df_asignacion['Pf_grup']
     df_asignacion.fillna(0,inplace=True)
     df_asignacion.replace([np.inf, -np.inf], 0, inplace=True)
     
@@ -497,8 +498,15 @@ def set_e2sfca(network):
     df_accesibilidad=df_asignacion.groupby(['nombre_I','servicio_K']).R.sum()
     
     #df_demanda=pd.merge(df_demanda,df_accesibilidad,on=['nombre_I','servicio_K'],how='left',suffixes=('_old', ''))
-    df_demanda['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum') 
-    network.file['df_demanda_ik']['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum')
+    df_demanda=pd.merge(df_demanda.set_index(['nombre_I','servicio_K']),df_accesibilidad,left_index=True, right_index=True).reset_index()
+    df_demanda=df_demanda.rename(columns={"R":"acces_H2SFCA"})
+    
+    network.file['df_demanda_ik']=pd.merge(network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K']),df_accesibilidad,left_index=True, right_index=True).reset_index()
+    network.file['df_demanda_ik']=    network.file['df_demanda_ik'].rename(columns={"R":"acces_H2SFCA"})
+    
+    
+    #df_demanda['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum') 
+    #network.file['df_demanda_ik']['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum')
     #Agrego las demandas a df_accesibildiad
     df_accesibilidad = pd.merge(df_accesibilidad,network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K']),left_index=True, right_index=True)
     #df_accesibilidad = pd.merge(df_accesibilidad.reset_index().set_index('nombre_I'),

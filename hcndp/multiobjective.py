@@ -145,8 +145,7 @@ class Multiobjective:
             '3': ' No disponible Rho--> Delta',
             '4': ' No disponible Delta --> Alpha',
             }
-        
-        
+          
     def select_objectives(self):
         if self.approach=="lexicographic":
             _menu_options = self.menu_options_lexicog
@@ -188,23 +187,23 @@ class Multiobjective:
             opcion1 = int(input("Selecciona una opción: \n"))
             if opcion1 == 1:
                 self.method_multiobj= _menu_options[str(opcion1)]
+                self.tecnica="Exacta"
                 break
             elif opcion1 == 2:
                 self.method_multiobj= _menu_options[str(opcion1)]
                 break
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
-
-    
+  
     def anchor_points(self,matrix_problems_lexi,objective_lexi):
         
          #problem_lexi es una fila de matrix_problems_lexi
          # Creo el objeto solution
          problem_lexi=matrix_problems_lexi[objective_lexi]
-         solutions.create_solution_object(
+         solutions.create_problem_object(
                  network_original=self.network, 
                  problems_dict=self.problems_multi_dict, 
-                 name_solution=problem_lexi[1])
+                 name_problem=problem_lexi[1])
          
          current_solution = self.problems_multi_dict[problem_lexi[1]]
          
@@ -212,18 +211,19 @@ class Multiobjective:
          current_solution.objective = problem_lexi[0]
          current_solution.description_objective = problem_lexi
          current_solution.name_solution = problem_lexi[1]
+         current_solution.tecnica=self.tecnica
          
          # Obtener solución para cada objetivo
-         if problem_lexi[0]==1:
-             current_solution.construct_model()
+         if problem_lexi[0]==1: #El Primer objetivo 
+             current_solution.construct_model() 
              model=current_solution.pyo_model.model_abstract
              _var_obj_actual=problem_lexi[4]
-             _sense=problem_lexi[5]
+             _sense=problem_lexi[5] #Minimize=1, maximize=-1
              model.del_component(model.obj)
              model.obj = pyo.Objective(expr=getattr(model, _var_obj_actual),sense=_sense)
          
-         elif problem_lexi[0]==2:
-            current_solution.construct_model()
+         elif problem_lexi[0]==2: #El segundo objetivo
+            current_solution.construct_model() 
             model=current_solution.pyo_model.model_abstract
             
             _var_obj_actual=problem_lexi[4]
@@ -284,7 +284,7 @@ class Multiobjective:
             model.del_component(model.obj)
             model.obj = pyo.Objective(expr=getattr(model, _var_obj_actual),sense=_sense) 
             del current_solution.pyo_model.instance
-
+         current_solution.network_copy.create_data_dat()
          current_solution.construct_instance()
          current_solution.execute_solver()
          _rho_max=pyo.value(current_solution.pyo_model.instance.rho_max)
@@ -298,11 +298,18 @@ class Multiobjective:
                             )
          
          # Convertir anclas en diccionario
-         self.diccionario_anclas = {}
-         for i in self.anclas:
-            clave = i[0]
-            valores = i[1:]
-            self.diccionario_anclas[clave] = valores
+         if hasattr(self, 'diccionario_anclas'):
+             for i in self.anclas:
+                clave = i[0]
+                valores = i[1:]
+                self.diccionario_anclas[clave] = valores
+         else:
+             self.diccionario_anclas = {}   
+             for i in self.anclas:
+                clave = i[0]
+                valores = i[1:]
+                self.diccionario_anclas[clave] = valores
+         
          
          print (self.anclas)  
     
@@ -310,7 +317,7 @@ class Multiobjective:
         if operador=="<=":
             restriccion = getattr(model, _var_obj_anterior) <= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
         elif operador == ">=":
-            restriccion = getattr(model, _var_obj_anterior) <= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
+            restriccion = getattr(model, _var_obj_anterior) >= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
         elif operador == "==":
             restriccion = getattr(model, _var_obj_anterior) == pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
         
@@ -383,32 +390,43 @@ class Multiobjective:
         
     def calculate_pareto_front(self):
         
-
         # Construyo puntos ancla
+        # [Orden, Objetivo, model.objetivo, sentido alfanumérico, objetivo, sentido numérico]
         if self.objectives_sequence==1: #Rho --> Alpha 
             matrix_problems_lexi=[[1,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1],
                                   [2,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],]
+            
+            
+            self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
+            self.anchor_points(matrix_problems_lexi,objective_lexi=1)
+        
+            matrix_problems_lexi=[[1,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],
+                                  [2,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1]]
+            
+            
             self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
             self.anchor_points(matrix_problems_lexi,objective_lexi=1)
         
         # Construyo un objeto model llamado 'principal'
-        
-        
+            
         #problem_lexi es una fila de matrix_problems_lexi
         # Creo el objeto solution llamado "principal"
-        objective_lexi=1
+        objective_lexi=0
         problem_lexi=matrix_problems_lexi[objective_lexi]
-        solutions.create_solution_object(
+        solutions.create_problem_object(
                 network_original=self.network, 
                 problems_dict=self.problems_multi_dict, 
-                name_solution="principal")
-        
+                name_problem="principal")
+       
+        # Ingreso el objetivo y construyo el modelo
         principal_problem = self.problems_multi_dict["principal"]
-        principal_problem.construct_model()
-        model=principal_problem.pyo_model.model_abstract
         principal_problem.objective = problem_lexi[0]
         principal_problem.description_objective = problem_lexi
         principal_problem.name_solution = 'pareto_front'
+        principal_problem.construct_model()
+        principal_problem.tecnica="Exacta"
+
+        model=principal_problem.pyo_model.model_abstract
 
         # Variable para aplicar el e-constraint        
         model.s2=pyo.Var(within=pyo.NonNegativeReals,initialize=0)
@@ -427,8 +445,8 @@ class Multiobjective:
 
         #La constante 'denominador_s' es el rango de la i-ésima función objetivo 
         #(accesibilidad) en el payoff table
-        _alpha_min_0=self.anclas[0][2]
-        _alpha_min_1=self.anclas[1][2]
+        _alpha_min_0=self.anclas[0][3]
+        _alpha_min_1=self.anclas[3][3]
         denominador_s2=abs(_alpha_min_0-_alpha_min_1)
         
         model.obj = pyo.Objective(expr=model.rho_max * 100 + (10**-6) * (model.s2)/denominador_s2
@@ -442,12 +460,15 @@ class Multiobjective:
         global df_soluciones_fi_jkjk,df_soluciones_sigma,df_soluciones_fi_ijkjk
 
         # Número de puntos a obtener
-        puntos_requeridos= int(input("\nIngresa el número de puntos para la frontera:")) 
+        #puntos_requeridos= int(input("\nIngresa el número de puntos para la frontera:")) 
+        puntos_requeridos=10
         
         # Soluciones del lexicográfico
-        rho_opt=self.diccionario_anclas['Min_Rho_Max'][1:3]
+        #rho_opt=self.diccionario_anclas['Min_Rho_Max'][1:3]
+        rho_opt=self.anclas[3][2:4]
         rho_opt[0]*=100
-        acc_opt=self.diccionario_anclas['Max_Alpha_Min'][1:3]
+        #acc_opt=self.diccionario_anclas['Max_Alpha_Min'][1:3]
+        acc_opt=self.anclas[1][2:4]
         acc_opt[0]*=100
         
         # Construir estructura de datos: salida_resultados, points_used, 
@@ -458,8 +479,9 @@ class Multiobjective:
         self.puntos_revisados = np.vstack((np.array([rho_opt]), acc_opt))
         self.soluciones=[] #Lista con las estadísticas de cada solución encontrada
         
-        self.adaptive_bisection_augmecon(puntos_requeridos)
-        
+        self.pareto_front=self.adaptive_bisection_augmecon(puntos_requeridos)
+        print (self.pareto_front)
+    
     def adaptive_bisection_augmecon(self,puntos_requeridos):
         
         from deepdiff import DeepDiff #Importo para poder comparar dos arrays
@@ -761,7 +783,8 @@ class Multiobjective:
             print ("termino iteración con",len(salida_resultados), " puntos.")
             #input("Press Enter to analyze the obtained solution...")
             #input()    
-    
+        return salida_resultados, points_used, puntos_revisados
+        
     # Fórmula adaptada para asegurar mejores resultados
     def calculo_i2 (self,fila,factor,points_used):
         bisec=self.funcion_bisec(factor)
@@ -776,7 +799,7 @@ class Multiobjective:
         
         #instance = model.create_instance("datos.dat") 
         
-        
+        problem.network_copy.create_data_dat()
         problem.construct_instance()
         
         instance=problem.pyo_model.instance

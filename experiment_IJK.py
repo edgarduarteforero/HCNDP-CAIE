@@ -28,11 +28,11 @@ En la variable inputs se almacena la secuencia de caracteres.
 
 lista_completa={}
 lista_resultados=[]
-min_I=3
-max_I=6 #6
-max_J=6 #6
+min_I=7
+max_I=8 #6
+max_J=8 #6
 min_K=3
-max_K=6 #6
+max_K=5 #6
 operadores=[1,2,3,4,5,6,7,8]
 meta=[6] # 3:Local Search 4:Tabu Search 5: VND 6:GVND
 obj=[1,2,3]
@@ -49,7 +49,7 @@ for K in range (min_K , max_K+1):
                     
                     inputs = (
                         "y\n"  # Borro resultados anteriores
-                        "1\n"  # Escojo archivo .txt
+                        "1\n"   # 1 archivo xls y 2 Escojo archivo .txt
                         f"{I}\n"  # I
                         f"{J}\n"  # J
                         f"{K}\n"  # K

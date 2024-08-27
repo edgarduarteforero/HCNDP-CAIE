@@ -51,7 +51,7 @@ for K in range (min_K , max_K+1):
                 "2\n"  # Obtener soluciones mono-objetivo
                 "1\n"  # 1: Exacta (Optimización)
                 #f"{metaheuristica}\n"  # 3:Local Search 4:Tabu Search 5: VND 6:GVND
-                "3\n"  # 1 rho, 2 alpha 3 delta
+                "1\n"  # 1 rho, 2 alpha 3 delta
                 #f"{objetivo}\n" # Minimizar congestión máxima (rho)
                 #f"{operador}\n"  # Operador de permutación (agregado como f-string)
                 "\n" # Tecla para continuar
@@ -169,4 +169,5 @@ df_lista_completa = pd.DataFrame(lista_completa)
 nombre_archivo = 'archivo_transpuesto.xlsx'
 df_lista_completa.transpose().to_excel(nombre_archivo)
 
-
+# Nota: El archivo transpuesto.xlsx contiene la información resumida de todas las 
+# optimizaciones.

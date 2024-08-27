@@ -740,7 +740,7 @@ if __name__ == "__main__":
         problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
 
         # Definimos valores I,J,K
-        I,J,K= [5,5,5]
+        I,J,K= [4,4,4]
         
         
         # Creamos un objeto network
@@ -768,9 +768,9 @@ if __name__ == "__main__":
         # Defino objetivo y método
         current_solution.optimizar=True
         current_solution.tecnica="VND"
-        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
         #_objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
-        #_objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
+        _objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
         current_solution.objective = _objective_and_description[0]
         current_solution.description_objective = _objective_and_description[1]
         current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica

@@ -15,8 +15,8 @@ import numpy as np
 from hcndp import landscape
 import pyomo.environ as pyo
 import os
-from idaes.core.util.model_statistics import degrees_of_freedom
-from idaes.core.util.model_statistics import report_statistics
+#from idaes.core.util.model_statistics import degrees_of_freedom
+#from idaes.core.util.model_statistics import report_statistics
 #import xlsxwriter
 #import os
 #import openpyxl
@@ -268,17 +268,17 @@ def menu_solutions(network_original, problems_dict):
                     # ACtualizo los sigma, los phi y y los pi_ijkjk
                     # Actualizo las matrices de solution.network_copy
                     current_solution.network_copy.tecnica=current_solution.tecnica
-                    current_solution.network_copy.merge_niveles_capac(_post_optima=True)
-                    current_solution.network_copy.create_df_asignacion(_post_optima=True)
+                    current_solution.network_copy.merge_niveles_capac(_post_optima=True, current_solution=problems_dict[solucion_elegida])
+                    current_solution.network_copy.create_df_asignacion(_post_optima=True, current_solution=problems_dict[solucion_elegida])
                     current_solution.network_copy.create_df_probs_kk()
-                    current_solution.network_copy.create_df_arcos(_post_optima=True)
+                    current_solution.network_copy.create_df_arcos(_post_optima=True, current_solution=problems_dict[solucion_elegida])
                     
-                    kpi.calculate_kpi(current_solution,_post_optima=True)
+                    kpi.calculate_kpi(problems_dict[solucion_elegida],_post_optima=True)
                     print (f"Se calcularon los KPI para la solución {solucion_elegida}.")
                     print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
-                    figures.show_menu_figures(current_solution)
-                    export.export_data(current_solution.network_copy)
-                    export.create_index_sheet(current_solution.network_copy)
+                    figures.show_menu_figures(problems_dict[solucion_elegida])
+                    export.export_data(problems_dict[solucion_elegida].network_copy)
+                    export.create_index_sheet(problems_dict[solucion_elegida].network_copy)
                     print (f"\Gráficos y archivo de datos exportados a la carpeta de la soución {solucion_elegida}")
             
             except (ValueError, IndexError) as e:
@@ -500,6 +500,48 @@ class Problem:
         # Guardar la salida estándar original
         #***old_stdout = sys.stdout
         
+        # Las líneas siguientes ayudan a acelerar Gurobi. 
+        # Fijan valores de variables antes de iniciar la solución.
+        #Si s_jk es cero, entonces sigma_sjk es cero
+        for j in instance.J:
+            for k in instance.K:
+                for i in instance.I:
+                    if instance.s[j,k]==0:
+                        instance.sigma[j,k].fix(0)
+                        instance.rho_jk[j,k].fix(0)
+                        instance.l_ijk[i,j,k].fix(0)
+                        instance.beta_jk[j,k].fix(0)
+                        instance.theta[j,k].fix(0)
+                    
+        #Si w_ij es cero, entonces tao_ijk es cero
+        for i in instance.I:
+            for j in instance.J:
+                for k in instance.K:
+                    if instance.w[i,j]==0:
+                        instance.tao[i,j,k].fix(0)
+                             
+        
+        # Si x_jj es cero, entonces phi_ijkjk es cero
+        for i in instance.I:
+            for j in instance.J:
+                for k in instance.K:
+                    for jp in instance.J:
+                        for kp in instance.K:
+                            if instance.x[j,jp]==0:
+                                instance.fi[i,j,k,jp,kp].fix(0)
+                                
+        
+        # Si r_kk es cero, entonces phi_ijkjk es cero
+        for i in instance.I:
+            for j in instance.J:
+                for k in instance.K:
+                    for jp in instance.J:
+                        for kp in instance.K:
+                            if instance.r_q[k,kp]==0:
+                                instance.fi[i,j,k,jp,kp].fix(0)
+                                
+                                
+        
         
         #try:
         # Redirigir la salida estándar al objeto StringIO
@@ -511,13 +553,26 @@ class Problem:
         opt.options['NonConvex'] = 2
         opt.options['TimeLimit'] = 3600
         
-        opt.options['MIPFocus'] = 1
-        opt.options['Heuristics'] = 0
-        opt.options['Presolve']  =2
-        opt.options['MIPGap'] = 0.01  # Establecer una tolerancia de optimalidad
-        opt.options['Threads'] = 4  # Usar 4 threads
-        opt.options['Presolve'] = 2  # Nivel de presolve
-        opt.options['Heuristics'] = 0.5  # Intensidad de heurística
+        opt.options['MIPFocus'] = 3 #1 Find feasible, 2 prove optimality, 3 very slow
+        # opt.options['Heuristics'] = 0.20  #Tiempo usado en heurísticas
+        # opt.options['BarConvTol']=1 ### Genera cambbio paulatino
+        # opt.options['BarQCPConvTol'] = 1  ### Genera cambbio paulatino
+        # opt.options['FeasibilityTol']=0.01 # Primal feasibility tolerance 
+        # opt.options['IntFeasTol']=0.1 # Integer feasibility tolerance   ##### Generó cambio importante
+        # opt.options['Method']=-1 # Default -1 Algoritmo para modelos continuos 4
+        # opt.options['MarkowitzTol']=0.9 # Threshold pivoting tolerance 
+        # opt.options['MIQCPMethod']= 1 # 1 outer approx, 0 continuous qcp relax -1 chooses automatically ###################
+        # opt.options["NumericFocus"]=0
+        # opt.options['OptimalityTol']=0.01 # Dual feasibility tolerance ###### Este generó un cambio importante
+        opt.options['MIPGap']=0.01
+        # opt.options['SimplexPricing']=-1
+        # opt.options['PreQLinearize']=1 # 1 produce a MILP reformulation with strong LP relaxation
+        # opt.options['GomoryPasses']= 1 #-1 Default
+        # opt.options['PrePasses']= 5 # -1 Default
+        # opt.options['Presolve']= 2 #2 agresive #1 conservative Generó cambio importnte con nivel 2
+        # opt.options['ScaleFlag']=2 #,1,2,3
+        # opt.options['Threads'] = 4  # Usa 4 núcleos
+        opt.options['LogFile'] = 'gurobi_log.log'
 
         global out
         out = 0
@@ -547,9 +602,8 @@ class Problem:
         # Guardar el tiempo de CPU en una variable
         tiempo_cpu = cpu_time
         
-        print ("Tiempo solución Gurobi:", tiempo_cpu)
-        
-        
+        #print ("Tiempo solución Gurobi:", tiempo_cpu)
+               
         # Accessing solver status: http://www.pyomo.org/blog/2015/1/8/accessing-solver
         if (results.solver.status == pyo.SolverStatus.ok) and (results.solver.termination_condition == pyo.TerminationCondition.optimal):
             out = "optimal and feasible"
@@ -573,20 +627,24 @@ class Problem:
             # Export to LP
             #instance.write(_output+"model.lp", format='lp')
                 
-        elif (results.solver.termination_condition == pyo.TerminationCondition.infeasible):
+            
+        if results.solver.termination_condition == pyo.TerminationCondition.infeasible:
             out = "infeasible"
-        elif (results.solver.termination_condition == pyo.TerminationCondition.maxTimeLimit):
+            print("infeasible")
+        if results.solver.termination_condition == pyo.TerminationCondition.infeasibleOrUnbounded:
+            out = "infeasible"
+            print("Infeasible or Unbounded")
+        if results.solver.termination_condition == pyo.TerminationCondition.maxTimeLimit:
             out = "MaxTimeLimit"
             print("MaxTimeLimit")
-        else:
-            out = "error"
-            print("Solver Status: ",  results.solver.status)
+        #else:
+        #    out = "error"
+        print("Solver Status: ",  results.solver.status)
         self.out=out
         
             # Obtener la salida capturada como texto
             #salida_tee = captura_salida.getvalue()
-            #self.salida_tee=salida_tee
-            
+            #self.salida_tee=salida_tee        
         #finally:
         #    # Restaurar la salida estándar
         #    sys.stdout = old_stdout
@@ -622,12 +680,12 @@ class Problem:
         model.solution['alpha_min'] = pyo.value(instance.alpha_min)
         model.solution['delta_min'] = pyo.value(instance.delta_min)
         
-    def get_degrees_freedom(self):
-        instance = self.pyo_model.instance
+    #def get_degrees_freedom(self):
+    #    instance = self.pyo_model.instance
         # Todo: import the degrees_of_freedom function from the idaes.core.util.model_statistics package
         
-        print("Degrees of Freedom =", degrees_of_freedom(instance))
-        print("Statistics =", report_statistics(instance))
+    #    print("Degrees of Freedom =", degrees_of_freedom(instance))
+    #    print("Statistics =", report_statistics(instance))
     
     def set_solution_in_object_local_search(self):
         

@@ -131,6 +131,7 @@ class Network():
         self.file['df_dist_ij']=self.file['df_dist_ij'].query('nombre_I in @items')
         self.file['df_w_ij']=self.file['df_w_ij'].query('nombre_I in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('nombre_I in @items')
+        
     
         items=indices("j",self.J)
         self.file['df_oferta']=self.file['df_oferta'].query('nombre_J in @items')
@@ -138,13 +139,19 @@ class Network():
         self.file['df_dist_ij']=self.file['df_dist_ij'].query('nombre_J in @items')
         self.file['df_w_ij']=self.file['df_w_ij'].query('nombre_J in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('nombre_J in @items')
-    
+        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('nombre_J in @items')
+        
+        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('nombre_Jp in @items')
+        
         items=indices("k",self.K)
         self.file['df_niveles']=self.file['df_niveles'].query('servicio_K in @items')
         self.file['df_capac']=self.file['df_capac'].query('servicio_K in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('servicio_K in @items')
         self.file['df_sigma_max']=self.file['df_sigma_max'].query('servicio_K in @items')
-    
+        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('servicio_K in @items')
+
+        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('servicio_Kp in @items')
+
     
     def merge_niveles_capac(self,_post_optima,current_solution=None):
         #Agrego las columna nivel de atención y ubicaciones
@@ -499,6 +506,7 @@ class Network():
         df_asignacion=self.file['df_asignacion']
         df_w_ij=self.file['df_w_ij']
         df_sigma_max=self.file['df_sigma_max']
+        df_flujos_jkjk=self.file['df_flujos_jkjk']
         
         # Si estoy usando Local_Search entonces escribo los sigma como parámetros
         # if "Local_Search" in self.name_problem:
@@ -581,6 +589,14 @@ class Network():
         
         file.write("param %s := \n"%"J_size")
         file.write(str(J))
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"congest_min")
+        file.write(df_sigma_max[['servicio_K','congest_min']].to_string(header=False,index=False))
+        file.write(";\n\n")
+        
+        file.write("param %s := \n"%"y_jkjk")
+        file.write(df_flujos_jkjk[['nombre_J','servicio_K','nombre_Jp','servicio_Kp','y_jkjk']].to_string(header=False,index=False))
         file.write(";\n\n")
         
         file.close()

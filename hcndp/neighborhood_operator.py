@@ -23,12 +23,37 @@ def incremento1_decremento1_exhaust (vector_original_sigmas):
         
         for j in range(len(vector_original_sigmas)):
             copia_vector_original_sigmas=vector_original_sigmas.copy()
-            if i != j:
+            if i != j and copia_vector_original_sigmas[j] != 0:
                 copia_vector_original_sigmas[i]= vector_original_sigmas[i]+1
                 copia_vector_original_sigmas[j]= vector_original_sigmas[j]-1
                 #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
                 
                 lista_sigmas_perturbados.append(copia_vector_original_sigmas)
+    return lista_sigmas_perturbados 
+
+
+
+def incremento1_decremento1_parejas (vector_original_sigmas):
+    # # Obtengo los nodos perturbados para el servicio _k
+    lista_sigmas_perturbados=[]
+    
+    
+    # Aplico operador al vector codificado
+    # Selecciono todas las permutaciones de dos elementos de vector_original.
+    # Cada permutación es de dos elementos sigma_1 y sigma_2.
+    # Sumo 1 a sigma_1 y resto 1 a sigma_2.
+    # Este operador no cambia la cantidad total de servidores asignados.
+    # Por lo tanto no supera el valor de sigma_max.
+    
+    for i in range(len(vector_original_sigmas)-1):
+        
+        copia_vector_original_sigmas=vector_original_sigmas.copy()
+        if copia_vector_original_sigmas[i+1] != 0:    
+            copia_vector_original_sigmas[i]= vector_original_sigmas[i]+1
+            copia_vector_original_sigmas[i+1]= vector_original_sigmas[i+1]-1
+            #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
+                    
+            lista_sigmas_perturbados.append(copia_vector_original_sigmas)
     return lista_sigmas_perturbados 
     #return lista_nodes_perturbados
 
@@ -115,7 +140,7 @@ def incremento2_decremento2_exhaust (vector_original_sigmas):
         
         for j in range(len(vector_original_sigmas)):
             copia_vector_original_sigmas=vector_original_sigmas.copy()
-            if i != j:
+            if i != j and copia_vector_original_sigmas[j] != 0:
                 copia_vector_original_sigmas[i]= vector_original_sigmas[i]+2
                 copia_vector_original_sigmas[j]= vector_original_sigmas[j]-2
                 #print (f'Sigma {i} era {vector_original_sigmas[i]} y sigma {j} era {vector_original_sigmas[j]}, Nuevo vector es {copia_vector_original_sigmas}')
@@ -162,7 +187,8 @@ def chain_reaction_exhaust_plus_minus (vector_original_sigmas):
 
     copia_vector_original_sigmas=vector_original_sigmas.copy()
     copia_vector_original_sigmas = [x + y for x, y in zip(copia_vector_original_sigmas, vectorcadena)]
-    
+    # Remplazo valores negativos por cero
+    copia_vector_original_sigmas = [x if x >=0 else 0 for x in copia_vector_original_sigmas ]    
     #print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
     
     lista_sigmas_perturbados.append(copia_vector_original_sigmas)
@@ -174,16 +200,19 @@ def chain_reaction_exhaust_minus_plus (vector_original_sigmas):
     lista_sigmas_perturbados=[]
     
     # Aplico operador al vector codificado
-    # Creo un vectorcadena  +1 -1 +1 -1 ... del mismo tamaño de vector sigmas
+    # Creo un vectorcadena  -1 +1 -1 +1 ... del mismo tamaño de vector sigmas
     # Sumo vector sigmas a vectorcadena
     # Este operador no cambia la cantidad total de servidores asignados.
     # Por lo tanto no supera el valor de sigma_max.
     
     vectorcadena = [-1 if i % 2 == 0 else 1 for i in range(len(vector_original_sigmas))]
-
+    
     copia_vector_original_sigmas=vector_original_sigmas.copy()
     copia_vector_original_sigmas = [x + y for x, y in zip(copia_vector_original_sigmas, vectorcadena)]
     
+    # Remplazo valores negativos por cero
+    copia_vector_original_sigmas = [x if x >=0 else 0 for x in copia_vector_original_sigmas ]    
+
     #print (f'Vector original era {vector_original_sigmas}. Nuevo vector es {copia_vector_original_sigmas}')
     
     lista_sigmas_perturbados.append(copia_vector_original_sigmas)

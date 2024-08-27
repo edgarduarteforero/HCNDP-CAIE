@@ -5,6 +5,10 @@ Created on Tue Dec  5 16:30:26 2023
 @author: edgar
 """
 
+# Permite explorar objetos con alta recursión
+import sys
+sys.setrecursionlimit(10000)
+
 #%%  Bienvenida
 import textwrap
 print ("#" * 60)
@@ -82,7 +86,6 @@ print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
 
 #%%  Menú tipo de problema (mono o multi)
 
-import textwrap
 while True:
     print("\n----------------------------------------------------------")
     print("Indica qué tipo de problema quieres estudiar.")

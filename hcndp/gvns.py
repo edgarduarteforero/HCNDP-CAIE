@@ -26,24 +26,24 @@ def gvns_search(current_solution,network_original):
        
     # operadores VNS
     operadores = {
-    #1:'incremento1_decremento1_exhaust', 
-    #2:'incremento1_exhaust',
-    #3:'incremento1_all',
-    #4:'incremento2_decremento1_exhaust', 
-    1:'incremento2_decremento2_exhaust', 
-    #6:'incremento3_decremento3_exhaust', 
-    2:'chain_reaction_exhaust_plus_minus',
+    #2:'incremento1_decremento1_exhaust', 
+    1:'incremento1_exhaust',
+    2:'incremento1_all',
+    #2:'incremento2_decremento1_exhaust', 
+    #2:'incremento2_decremento2_exhaust', 
+    #3:'incremento3_decremento3_exhaust', 
+    #2:'chain_reaction_exhaust_plus_minus',
     #8:'chain_reaction_exhaust_minus_plus'
     }
     
     operadoresVND = {
-    1:'incremento1_decremento1_exhaust', 
-    2:'incremento1_exhaust',
-    #3:'incremento1_all',
-    #4:'incremento2_decremento1_exhaust', 
-    #5:'incremento2_decremento2_exhaust', 
+    #2:'incremento1_all',
+    3:'incremento1_decremento1_exhaust', 
+    #1:'incremento1_exhaust',
+    #3:'incremento2_decremento1_exhaust', 
+    1:'incremento2_decremento2_exhaust', 
     #6:'incremento3_decremento3_exhaust', 
-    #7:'chain_reaction_exhaust_plus_minus',
+    2:'incremento1_decremento1_parejas',
     #8:'chain_reaction_exhaust_minus_plus'
     }
     
@@ -98,7 +98,7 @@ def gvns_search(current_solution,network_original):
     # W-rule: maximum number of consecutive iterations without improvement in the value of the incumbent solution 
     stopping_condition_W_rule = False 
     iterations_without_improvement = 0
-    max_iterations_without_improve = 3
+    max_iterations_without_improve = 5
 
     # K-rule: maximum number of neighborhood operators
     stopping_condition_K_rule = False
@@ -112,13 +112,16 @@ def gvns_search(current_solution,network_original):
 
     while stopping_condition_W_rule == False:
         
+        
         # Inicio el orden de los operadores        
         num_operador=1
         
         # Examino todos los operadores
         while num_operador <= k_max:
+            
             operador = operadores[num_operador]
-            print (f'Vecindario número = {contador}')       
+            print (f'Operador GVNS = {operador}')       
+            print (f'Vecindario GVNS número = {contador}')       
         
             # Generar vecindario a partir de la solución hallada
             # neighbor es un objeto solución (contiene matrices, nodos, arcos, etc)
@@ -162,6 +165,7 @@ def gvns_search(current_solution,network_original):
             
             
             # Aplico VND
+            print (f"Inicio VND")
             best_of_neighborhood,qual_best_of_neighborhood =\
             VND (best_of_neighborhood,best_of_neighborhood_cod,
                      qual_best_of_neighborhood,best_neighbor, qual_best,
@@ -174,7 +178,9 @@ def gvns_search(current_solution,network_original):
                                     best_of_neighborhood , qual_best_of_neighborhood, 
                                     landscape , operador, operadores,num_operador,
                                     iterations_without_improvement)
-            print (f"Operador GVNS: {operador}")
+            
+            
+            print (f"Fin Operador GVNS: {operador}")
             
         # Actualizo el criterio de parada
         # Criterio de parada es W rule
@@ -231,8 +237,8 @@ def VND (best_of_neighborhood, best_of_neighborhood_cod, qual_best_of_neighborho
     # Examino todos los oeradores
     while num_operador_VND <= k_max_VND:                
         operador = operadores[num_operador_VND]
-        
-        print (f'Vecindario VND  = {num_operador_VND}')       
+        print (f'  Operador VND  = {operador}')       
+        print (f'  Vecindario VND  = {num_operador_VND}')       
     
         # Generar vecindario a partir de la solución hallada
         # neighbor es un objeto solución (contiene matrices, nodos, arcos, etc)
@@ -279,7 +285,7 @@ def VND (best_of_neighborhood, best_of_neighborhood_cod, qual_best_of_neighborho
             find_best_of_neighborhood (neighborhood_feasible,
                                         neighbor,
                                         landscape,current_solution)
-        print (f'Mejor solución del vecindario VND {num_operador_VND}: {qual_best_of_neighborhood}')
+        print (f'  Mejor solución del vecindario VND {num_operador_VND}: {qual_best_of_neighborhood}')
             
 
         # Comparo la mejor solución del vecindario con la mejor solución obtenida.
@@ -292,7 +298,7 @@ def VND (best_of_neighborhood, best_of_neighborhood_cod, qual_best_of_neighborho
                                 landscape , operador, operadores,num_operador_VND,
                                 iterations_without_improvement_VND)
                 
-        print (f"Operador VND: {operador}")
+        print (f"  Fin operador VND: {operador}")
         
     return best_neighbor,qual_best
 
@@ -302,11 +308,11 @@ def shake(neighborhood_feasible, neighbor,current_solution):
     valor_aleatorio = random.choice(neighborhood_feasible)
     
     best_of_neighborhood_cod = valor_aleatorio
-    #best_of_neighborhood_cod = codificar_solucion(best_of_neighborhood,'sigma')
+
     best_of_neighborhood = optimizacion(best_of_neighborhood_cod, neighbor , current_solution)
     calcular_kpi_local_search(best_of_neighborhood)# Calculo KPIs
     qual_best_of_neighborhood=best_of_neighborhood.value_optimal_solution['Func_obj'] 
-    
+    best_of_neighborhood_cod= codificar_solucion(best_of_neighborhood,'sigma')
     print (f'Solución del vecindario obtenida por shake: {qual_best_of_neighborhood}')
     
     return best_of_neighborhood,best_of_neighborhood_cod,qual_best_of_neighborhood
@@ -803,7 +809,7 @@ def optimizacion(vecino_codificado,neighbor,current_solution):
         if not fila.empty:
             # Si hay coincidencias, remplazar el sigma existente por c
             neighbor_copy.network_copy.file['df_capac'].loc[fila.index, 'sigma_jk'] = c
-    
+            # La actualización de los sigmas se da dentro de df_capac
     # Procedo a aplicar modelo de optimización para hallar flujos
     # Creo el modelo abstracto en pyomo - Gurobi
     neighbor_copy.construct_model()
@@ -836,7 +842,8 @@ if __name__ == "__main__":
         # Obtener el directorio padre (un nivel más arriba)
         directorio_padre = os.path.dirname(directorio_actual)
         
-        archivo=directorio_padre+'/data/red_original/'+"datos_i16_j10_k10_base.txt"
+        #archivo=directorio_padre+'/data/red_original/'+"datos_i16_j10_k10_base.txt"
+        archivo=directorio_padre+'/data/red_original/'+"datos_i16_j10_k10_base.xlsx"
         #archivo = r"C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\Códigos Python\HcNDP\Health-Care-Network-Design-Problem\hcndp/data/red_original/datos_i16_j10_k10_base.xlsx"
         
         # Borro carpeta con resultados de ejecuciones previas 
@@ -849,7 +856,7 @@ if __name__ == "__main__":
         problems_dict={} #Diccionario con los problemas y las soluciones a la red del programa
 
         # Definimos valores I,J,K
-        I,J,K= [5,5,5]
+        I,J,K= [3,3,3]
         
         
         # Creamos un objeto network
@@ -861,7 +868,8 @@ if __name__ == "__main__":
 
 
         # Llenar objeto con datos (En este caso, datos .txt)
-        networks_dict[_name].read_file_txt(archivo)
+        #networks_dict[_name].read_file_txt(archivo)
+        networks_dict[_name].read_file_excel(archivo)
         networks_dict[_name].delete_surplus_data() #Borro los datos que sobren
         networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name) #Corrijo errores en sigma_max
 
@@ -877,9 +885,9 @@ if __name__ == "__main__":
         # Defino objetivo y método
         current_solution.optimizar=True
         current_solution.tecnica="GVNS"
-        _objective_and_description =['1', 'Minimizar congestión máxima (rho)']
+        #_objective_and_description =['1', 'Minimizar congestión máxima (rho)']
         #_objective_and_description =['2', 'Maximizar accesibilidad mínima (alpha)']
-        #_objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
+        _objective_and_description =['3', 'Maximizar continuidad mínima (delta)']
         current_solution.objective = _objective_and_description[0]
         current_solution.description_objective = _objective_and_description[1]
         current_solution.name_problem = _objective_and_description[1]+" "+current_solution.tecnica
