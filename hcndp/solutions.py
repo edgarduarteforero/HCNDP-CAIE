@@ -563,7 +563,7 @@ class Problem:
         # opt.options['MarkowitzTol']=0.9 # Threshold pivoting tolerance 
         # opt.options['MIQCPMethod']= 1 # 1 outer approx, 0 continuous qcp relax -1 chooses automatically ###################
         # opt.options["NumericFocus"]=0
-        # opt.options['OptimalityTol']=0.01 # Dual feasibility tolerance ###### Este generó un cambio importante
+        opt.options['OptimalityTol']=0.01 # Dual feasibility tolerance ###### Este generó un cambio importante
         opt.options['MIPGap']=0.01
         # opt.options['SimplexPricing']=-1
         # opt.options['PreQLinearize']=1 # 1 produce a MILP reformulation with strong LP relaxation

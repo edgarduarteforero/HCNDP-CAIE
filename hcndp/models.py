@@ -92,7 +92,7 @@ class Model_pyomo:
         # Accesibilidad de cada nodo de demanda ik
     
         model.rho_jk = pyo.Var(
-            model.J, model.K, domain=pyo.NonNegativeReals, bounds=(0.00, 0.9999),initialize=0) #initialize=0, 
+            model.J, model.K, domain=pyo.NonNegativeReals, bounds=(0.00, 0.999999),initialize=0) #initialize=0, 
         
         #model.psi = pyo.Var(model.I, model.J, model.K,
         #                    domain=pyo.Integers,) #, initialize=0
@@ -195,10 +195,14 @@ class Model_pyomo:
         model.restr_nueve_aux = pyo.Constraint(
             model.J, model.K, rule=restr_nueve_rule_aux)
     
+        
         def restr_nueve_rule_aux_2(model, j, k):
             return model.theta[j, k] <= (model.rho_jk[j, k]) + (1-model.e)
         model.restr_nueve_aux_2 = pyo.Constraint(
             model.J, model.K, rule=restr_nueve_rule_aux_2)
+    
+        
+        
         # Nueva restricción
         # Nueva restricción
     
@@ -228,8 +232,8 @@ class Model_pyomo:
             # Si no hay capacidad sigma en jk, beta es cero.
             #return model.beta_ijk[i, j, k] <= model.M*model.theta[j, k]
             return model.beta_jk[j, k] <= model.M*model.theta[j, k]
-        model.restr_diez_aux_2 = pyo.Constraint(
-            model.I, model.J, model.K, rule=restr_diez_rule_aux_2)
+        #model.restr_diez_aux_2 = pyo.Constraint(
+        #    model.I, model.J, model.K, rule=restr_diez_rule_aux_2)
     
         def restr_once_rule(model, i, k):
             # Cálculo del alpha min
@@ -248,12 +252,12 @@ class Model_pyomo:
         def restr_trece_rule(model, j, k):
             # Existe flujo tao_ijk si hay capacidad en jk (theta_jk)
             return sum(model.l_ijk[i, j, k] for i in model.I) / (model.sigma_max[k]*model.c[j, k]) <= model.theta[j, k]
-        model.retr_trece = pyo.Constraint(model.J, model.K, rule=restr_trece_rule)
+        #model.retr_trece = pyo.Constraint(model.J, model.K, rule=restr_trece_rule)
     
         def restr_trece_aux_2_rule(model, j, k):
             return model.theta[j, k] <= (sum(model.l_ijk[i, j, k] for i in model.I) / (model.sigma_max[k]*model.c[j, k])) + (1-model.e)
-        model.restr_trece_aux_2 = pyo.Constraint(
-            model.J, model.K, rule=restr_trece_aux_2_rule)
+        #model.restr_trece_aux_2 = pyo.Constraint(
+        #    model.J, model.K, rule=restr_trece_aux_2_rule)
     
         #def restr_trece_aux_3_rule(model, j, k):
         #    return sum(model.l_ijk[i, j, k] for i in model.I) / (model.sigma_max[k]*model.c[j, k]) <= model.theta[j, k]

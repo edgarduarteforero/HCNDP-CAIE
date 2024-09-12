@@ -449,9 +449,12 @@ class Multiobjective:
         _alpha_min_1=self.anclas[3][3]
         denominador_s2=abs(_alpha_min_0-_alpha_min_1)
         
-        model.obj = pyo.Objective(expr=model.rho_max * 100 + (10**-6) * (model.s2)/denominador_s2
+        try:
+            model.obj = pyo.Objective(expr=model.rho_max * 100 + (10**-6) * (model.s2)/denominador_s2
                             , sense=pyo.minimize) #/ 348 ,sense=minimize)
-        
+        except:
+            model.obj = pyo.Objective(expr=model.rho_max * 100 + (10**-6) * (model.s2)
+                            , sense=pyo.minimize) #/ 348 ,sense=minimize)
         # # Construyo la instancia
         # principal_problem.construct_instance()
         
@@ -501,7 +504,7 @@ class Multiobjective:
         while len(salida_resultados) <= puntos_requeridos:
             self.current_solution = copy.deepcopy(self.problems_multi_dict['principal'])
             global precision
-            precision = 10
+            precision = 15
             
             #Calculo un punto medio epsilon
             epsilon=self.calculo_i2(fila,factor,points_used)
@@ -539,7 +542,7 @@ class Multiobjective:
             #Verifico si el punto obtenido es dominado. En tal caso, altero.
             dominado=self.dominancia(punto_obtenido[0],punto_obtenido[2],points_used[fila,2],points_used[fila,3],points_used[fila,0],points_used[fila,1])
             punto_repetido=self.repetido(punto_obtenido[0:4],salida_resultados)
-            winsound.Beep(500, 1000)
+            #winsound.Beep(500, 1000)
             #if len(salida_resultados)>= 20:
             #    input("Press Enter to continue...")
             print (dominado,punto_repetido)
@@ -721,7 +724,7 @@ class Multiobjective:
                     
                     
                     # Encuentro los puntos con la mayor distancia euclideana
-                    print ("puntos_mayor",puntos_mayor)
+                    #print ("puntos_mayor",puntos_mayor)
                     
                     # Verifico si los puntos con la mayor distancia euclideana están en points_used en una misma  línea
                     existe_punto_en_points_used=0
@@ -774,10 +777,10 @@ class Multiobjective:
             x=salida_resultados[:,0]
             y=salida_resultados[:,1]
             fig = plt.figure(figsize=(8,6))
-            #plt.plot(x, y, 'o', color='darkred')
-            #plt.xlabel(r'$\rho_{max}$',fontsize=20)
-            #plt.ylabel(r"$A_{min}$", fontsize=20)
-            #plt.legend(["Pareto front solutions"])
+            plt.plot(x, y, 'o', color='darkred')
+            plt.xlabel(r'$\rho_{max}$',fontsize=20)
+            plt.ylabel(r"$A_{min}$", fontsize=20)
+            plt.legend(["Pareto front solutions"])
             #input()
             
             print ("termino iteración con",len(salida_resultados), " puntos.")
