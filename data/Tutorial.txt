@@ -1,0 +1,6 @@
+Servicio-610 es el shape de la división político administrativa de Colombia
+Descargado de: https://www.colombiaenmapas.gov.co/#
+
+SHP_MGN_ANM_MPIOS es el shape de la población del Censo 2018 según el DANE
+https://geoportal.dane.gov.co/servicios/descarga-y-metadatos/datos-geoestadisticos/?cod=4
+

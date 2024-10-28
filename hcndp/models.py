@@ -213,6 +213,7 @@ class Model_pyomo:
             #                                    for j in model.J)
             #return model.alpha_ik[i, k] == sum(model.beta_ijk[i, j, k] * model.d[i, j, k] for j in model.J)#*100 #*model.gamma[i, j, k]
             return model.alpha_ik[i, k] == sum(model.beta_jk[j, k] * model.d[i, j, k] for j in model.J)#*100
+            
         #*model.gamma[i, j, k] * model.l_ijk[i,j,k]
         model.restr_diez = pyo.Constraint(model.I, model.K, rule=restr_diez_rule)
     
@@ -365,7 +366,7 @@ class Model_pyomo:
         
         def restr_veinticuatro_rule (model,j,k):
             return model.rho_jk[j,k] >= model.congest_min[k]*model.theta[j,k]
-        model.restr_veinticuatro = pyo.Constraint(model.J, model.K, rule=restr_veinticuatro_rule)
+        #model.restr_veinticuatro = pyo.Constraint(model.J, model.K, rule=restr_veinticuatro_rule)
         
         def restr_veinticinco_rule (model,i,j):
             return sum(model.l_ijk[i,j,k] for k in model.K) / sum (model.s[j,k] for k in model.K) <= model.delta_ij[i,j]

@@ -195,16 +195,13 @@ def set_lambda_jk (current_solution, network,_post_optima):
     # generada por el código. Por lo tanto lee los datos desde salida_optimizacion.xlsx
     # También puedo leer los datos desde df_l_jk pues 
     if _post_optima==True:
-        
+        # Actualizo los l_jk en df_Capac
         if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
             current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
             data = current_solution.df_l_jk # Puedo leer desde best_neighbor. df_l_ijk
         else:
             data = pd.read_excel (path,sheet_name='l_jk',names=['nombre_J','servicio_K','lambda_jk'],index_col=0)     
-        
         df_capac=network.file['df_capac']
-
-        #data = path['l_jk']
         df_capac=df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')
         # Reemplazar los valores de la columna lambda_jk de df_capac por los nuevos valores de data
         try: # Utilizo try por si acaso no se crea un lambda_jk_y o lambda_jk_x
@@ -221,7 +218,7 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac = df_capac.drop(columns=['lambda_jk'])
         df_capac['r']=df_capac['lambdas']/df_capac['c_jk'] #c_jk es la tasa de atención, es decir mu
         
-        #Actualizo los sigma
+        #Actualizo los sigma en df_capac
         
         if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
             current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
@@ -229,7 +226,6 @@ def set_lambda_jk (current_solution, network,_post_optima):
         else:
             data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                              index_col=0)
-        
         if 'nombre_J' not in data.columns:
             data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})       
         df_capac = df_capac.merge(data, on=['nombre_J', 'servicio_K'], how='left')        
@@ -244,12 +240,69 @@ def set_lambda_jk (current_solution, network,_post_optima):
         df_capac['rho']=df_capac['lambdas']/(df_capac['c_jk']*df_capac['sigma_jk']) # 
         df_capac.fillna(0,inplace=True)
         df_capac.replace([np.inf, -np.inf], 0, inplace=True)
-        
-        #df_capac.reset_index(drop=True,inplace=True)
+       
+        #Actualizo los sigma en df_asignacion
         df_asignacion.reset_index(inplace=True)
         
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
+            current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
+            data = current_solution.df_sigma # Puedo leer desde best_neighbor. df_l_ijk
+        else:
+            data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
+                             index_col=0)
+        if 'nombre_J' not in data.columns:
+            data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})       
+        df_asignacion = df_asignacion.merge(data, on=['nombre_J', 'servicio_K'], how='left')        
+        try: 
+            df_asignacion.drop(['sigma_jk_x'],axis=1,inplace=True)
+            df_asignacion.insert(7,'sigma_jk',df_asignacion.pop('sigma_jk_y'))
+        except KeyError as e:
+            pass            
+        
+        df_asignacion['sigma_jk'] = df_asignacion['sigma_jk'].round(0).astype('int')
+        network.file['df_asignacion']=df_asignacion
+
+        
+        # Actualizo los p_jjkk
+        df_arcos=network.file['df_arcos']
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
+            current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
+            data = current_solution.df_arcos # Puedo leer desde best_neighbor. df_l_ijk
+        else:
+            data = pd.read_excel (path,sheet_name='prob_fi_jkjk',names=['nombre_J','servicio_K','nombre_Jp','servicio_Kp','p_jjkk'],
+                             index_col=0)
+        #if 'nombre_J' not in data.columns:
+        #    data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})       
+        df_arcos = df_arcos.merge(data, on=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'], how='left')        
+        try: 
+            df_arcos.drop(['p_jjkk_x'],axis=1,inplace=True)
+            df_arcos.insert(6,'p_jjkk',df_arcos.pop('p_jjkk_y'))
+        except KeyError as e:
+            pass            
+        
+
+        # Actualizo los tao_ijk
+        if current_solution.tecnica=="Local_Search" or current_solution.tecnica=="Tabu_Search" or\
+            current_solution.tecnica=="Aproximación" or current_solution.tecnica=="VND" or current_solution.tecnica=="GVNS":
+            data = current_solution.df_asignacion # Puedo leer desde best_neighbor. df_l_ijk
+        else:
+            data = pd.read_excel (path,sheet_name='f_ijk',names=['nombre_I','nombre_J','servicio_K','tao_ijk'],
+                             index_col=0)
+        #if 'nombre_J' not in data.columns:
+        #    data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})       
+        df_asignacion = df_asignacion.merge(data, on=['nombre_I','nombre_J','servicio_K'], how='left')        
+        try: 
+            df_asignacion.drop(['tao_ijk_x'],axis=1,inplace=True)
+            df_asignacion.insert(21,'tao_ijk',df_asignacion.pop('tao_ijk_y'))
+        except KeyError as e:
+            pass            
+
+
+
+
         network.file['df_capac']=df_capac
         network.file['df_asignacion']=df_asignacion
+        network.file['df_arcos']=df_arcos
         
         
         #print ("\n Se actualizaron exitosamente los lambda_jk")
@@ -292,6 +345,7 @@ def set_lambda_ijk (solution, network,_post_optima):
         #print ("\n Se actualizaron exitosamente los lambda_ijk")
     
     if _post_optima==True and solution.tecnica=="Exacta":
+        
         for i in df_asignacion.index.levels[0]: 
             df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
             _i+=1
@@ -484,12 +538,13 @@ def set_e2sfca(network):
     df_asignacion['Pf']=df_asignacion['lambda_ijk']*df_asignacion['f_dij'] 
     
     # Los denominadores son sumatorias dejando fijos k y j y modificando i. 
-    df_asignacion ['Pf_grup'] = df_asignacion .groupby(['servicio_K','nombre_J'])['Pf'].transform('sum')
+    df_asignacion ['Pf_grup'] = df_asignacion.groupby(['servicio_K','nombre_J'])['Pf'].transform('sum')
     
     # Calculo las accesibilidades R de cada combinación i j k
     
     #df_asignacion['R']=df_asignacion['Sff']*(df_asignacion['lambda_ijk']!=0)*100/df_asignacion['Pf_grup']
-    df_asignacion['R']=df_asignacion['Sff']*(df_asignacion['lambda_ijk']!=0)/df_asignacion['Pf_grup']
+    #df_asignacion['R']=df_asignacion['Sff']*(df_asignacion['lambda_ijk']!=0)/df_asignacion['Pf_grup']
+    df_asignacion['R']=df_asignacion['Sff']/df_asignacion['Pf_grup']
     df_asignacion.fillna(0,inplace=True)
     df_asignacion.replace([np.inf, -np.inf], 0, inplace=True)
     

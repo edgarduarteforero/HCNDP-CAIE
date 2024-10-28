@@ -53,8 +53,9 @@ class Network():
     def read_file_excel(self,path):
         #print ("Leyendo datos del archivo de Excel.")
         
-        self.file = pd.read_excel(path, sheet_name=None)
-    
+        self.file= pd.read_excel(path, sheet_name=None)
+        
+
     def read_file_txt(self,path):
         #print ("Leyendo datos del archivo de text.")
         
@@ -131,7 +132,7 @@ class Network():
         self.file['df_dist_ij']=self.file['df_dist_ij'].query('nombre_I in @items')
         self.file['df_w_ij']=self.file['df_w_ij'].query('nombre_I in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('nombre_I in @items')
-        
+        self.file['df_dist_ij_k']=self.file['df_dist_ij_k'].query('nombre_I in @items')
     
         items=indices("j",self.J)
         self.file['df_oferta']=self.file['df_oferta'].query('nombre_J in @items')
@@ -140,21 +141,39 @@ class Network():
         self.file['df_w_ij']=self.file['df_w_ij'].query('nombre_J in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('nombre_J in @items')
         self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('nombre_J in @items')
+        self.file['df_dist_ij_k']=self.file['df_dist_ij_k'].query('nombre_J in @items')
+
         
         self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('nombre_Jp in @items')
-        
+        self.file['dist_ij_k']=self.file['df_dist_ij_k'].query('nombre_J in @items')
+
         items=indices("k",self.K)
         self.file['df_niveles']=self.file['df_niveles'].query('servicio_K in @items')
         self.file['df_capac']=self.file['df_capac'].query('servicio_K in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('servicio_K in @items')
         self.file['df_sigma_max']=self.file['df_sigma_max'].query('servicio_K in @items')
         self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('servicio_K in @items')
+        self.file['df_dist_ij_k']=self.file['df_dist_ij_k'].query('servicio_K in @items')
 
         self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('servicio_Kp in @items')
 
-    
+
+        
+        # Crear una lista de claves a eliminar
+        claves_eliminar = []
+        for key in self.file:
+            if key not in ['df_demanda','df_dist_ij','df_dist_ij_k','df_w_ij',
+                           'flujos_jj','df_flujos_ijk','df_oferta','df_capac','df_flujos_jkjk',
+                           'df_niveles','df_sigma_max','prob_serv']:
+                claves_eliminar.append(key)
+        
+        # Eliminar las claves no deseadas del diccionario
+        for key in claves_eliminar:
+            del self.file[key]
+        
+        
+    #Agrego las columna nivel de atención y ubicaciones
     def merge_niveles_capac(self,_post_optima,current_solution=None):
-        #Agrego las columna nivel de atención y ubicaciones
         
         if _post_optima==True:
             
@@ -168,7 +187,6 @@ class Network():
             else:
                 data = pd.read_excel (output_file,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
-            
             if 'nombre_J' not in data.columns:
                 data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})
             self.file['df_capac']= pd.merge(self.file['df_capac'].set_index(['nombre_J','servicio_K']),data.set_index(['nombre_J','servicio_K']),left_index=True,right_index=True)
@@ -208,11 +226,12 @@ class Network():
                                                    self.file['df_dist_ij'].set_index(['nombre_J']),
                                                    left_index=True,right_index=True,how='outer').sort_values('dist_IJ').reset_index()
             
+            #Borrar este código
             #Creo una matriz con las distancias de cobertura que se digitaron como parámetros
-            self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], 
-                                                   self.file['df_demanda'].reset_index()[['nombre_I','ubicacionesI_x','ubicacionesI_y']],
-                                                   on='nombre_I',how='inner').drop_duplicates()
-             
+            #self.file['df_asignacion']=pd.merge(self.file['df_asignacion'], 
+            #                                       self.file['df_demanda'].reset_index()[['nombre_I','ubicacionesI_x','ubicacionesI_y']],
+            #                                       on='nombre_I',how='inner').drop_duplicates()
+            ### 
             # Calculo las distancias ajustadas por la función de decaimiento con el título f_dij
             self.file['df_asignacion']['f_dij']=self.file['df_asignacion'].apply(lambda row: decay_gauss(row["dist_IJ"],row["d_o_k"]),axis='columns')
             self.file['df_asignacion']=self.file['df_asignacion'].set_index(['nombre_J','servicio_K'])        
@@ -235,7 +254,6 @@ class Network():
                 archivo_salida_optim = pd.read_excel(path, sheet_name=None)
                 self.file['df_flujos_ijk']=archivo_salida_optim['f_ijk']
                 self.file['df_fi_ijkjk'] = archivo_salida_optim['fi_ijkjk']
-            
             # Elimino los flujos que no quiero contemplar en el ejercicio
             #import delete_surplus_data
             self.delete_surplus_data()
@@ -275,7 +293,6 @@ class Network():
             else:
                 data = pd.read_excel (path,sheet_name='sigma',names=['nombre_J','servicio_K','sigma_jk'],
                                      index_col=0)
-                
             if 'nombre_J' not in data.columns:
                 data=data.rename(columns={'0':'nombre_J','1':'servicio_K','2':'sigma_jk'})            
             
@@ -359,7 +376,6 @@ class Network():
                 path=os.getcwd()+'/output/'+self.name_problem+'/salida_optimizacion.xlsx'
                 archivo_salida_optim = pd.read_excel(path, sheet_name=None)
                 data = archivo_salida_optim['prob_fi_jkjk']
-            
                 #data = pd.read_excel (archivo, sheet_name='df_probs')
                 #data = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/FLNDP/datos.xlsx',sheet_name='probs')
                 data= data.drop(['Unnamed: 0'], axis=1)

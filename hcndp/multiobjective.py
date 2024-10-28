@@ -5,7 +5,6 @@ Created on Wed Jan  3 11:15:17 2024
 @author: edgar
 """
 
-
 import textwrap
 from hcndp import solutions
 import pyomo.environ as pyo
@@ -13,9 +12,10 @@ import numpy as np
 import time 
 import winsound
 import copy
+import pandas as pd
 import matplotlib.pyplot as plt
 from hcndp import kpi
-
+import random
 
 def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
 
@@ -86,19 +86,32 @@ def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
                 # Calculo las soluciones al problema
                 current_moo_problem.calculate_pareto_front()
                 
+                
                 input("Pulsa una tecla para continuar.")
                 
             except AssertionError as error:
                 print(error)
                 print ("No puedo relizar el procedimiento.")
 
-
         elif opcion1 == "10":
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
-
-
+            
+    try:
+        return pd.DataFrame(resultados_pareto_front,columns=['Red',
+                                                         'α_min',
+                                                         'α_max',
+                                                         'α_mean',  
+                                                         'α_desvest',
+                                                         'ρ_min', 'ρ_max','ρ_prom','ρ_desvest',
+                                                         'τ_ijk','w_ij','ϕ_jkjk',
+                                                         'arcos_jk_j','I','J','grado_prom',
+                                                         'grado_max','grado_min',
+                                                         'tiempo_acum',])
+    except:
+        print()
+    
 # %% <codecell> Crear multiobjective optimization problem
 
 
@@ -310,8 +323,9 @@ class Multiobjective:
                 valores = i[1:]
                 self.diccionario_anclas[clave] = valores
          
-         
-         print (self.anclas)  
+         print ("Nombre objetivo, objetivo, rho_max, alpha_min, delta_min")
+         for i in self.anclas:
+             print (i)        
     
     def lexicograf(self,model,_var_obj_anterior,_func_obj_anterior, operador):
         if operador=="<=":
@@ -390,22 +404,32 @@ class Multiobjective:
         
     def calculate_pareto_front(self):
         
-        # Construyo puntos ancla
+        # Construyo puntos ancla. Creo objetos self.ancho_alpha_rho y anchor_rho_alpha con puntos ancla
         # [Orden, Objetivo, model.objetivo, sentido alfanumérico, objetivo, sentido numérico]
+        
+        self.soluciones=[] #Lista con las estadísticas de cada solución encontrada
+        
         if self.objectives_sequence==1: #Rho --> Alpha 
             matrix_problems_lexi=[[1,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1],
                                   [2,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],]
-            
-            
+                       
             self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
             self.anchor_points(matrix_problems_lexi,objective_lexi=1)
-        
+            self.anchor_min_rho_max=copy.deepcopy(self.problems_multi_dict['Min_Rho_Max'])
+            
+            self.current_solution=self.anchor_min_rho_max
+            self.analisis_solucion(0) # Calculo KPI de los puntos ancla y los agrego a self.soluciones
+            
             matrix_problems_lexi=[[1,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],
-                                  [2,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1]]
-            
-            
+                                  [2,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1]]            
+
             self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
             self.anchor_points(matrix_problems_lexi,objective_lexi=1)
+            self.anchor_max_alpha_min=copy.deepcopy(self.problems_multi_dict['Max_Alpha_Min'])
+        
+            self.current_solution=self.anchor_max_alpha_min
+            self.analisis_solucion(0)# Calculo KPI de los puntos ancla y los agrego a self.soluciones
+            
         
         # Construyo un objeto model llamado 'principal'
             
@@ -465,12 +489,10 @@ class Multiobjective:
         # Número de puntos a obtener
         #puntos_requeridos= int(input("\nIngresa el número de puntos para la frontera:")) 
         puntos_requeridos=10
-        
+            
         # Soluciones del lexicográfico
-        #rho_opt=self.diccionario_anclas['Min_Rho_Max'][1:3]
         rho_opt=self.anclas[3][2:4]
         rho_opt[0]*=100
-        #acc_opt=self.diccionario_anclas['Max_Alpha_Min'][1:3]
         acc_opt=self.anclas[1][2:4]
         acc_opt[0]*=100
         
@@ -480,10 +502,138 @@ class Multiobjective:
         self.points_used=np.array([rho_opt+acc_opt+[1,1]])
         
         self.puntos_revisados = np.vstack((np.array([rho_opt]), acc_opt))
-        self.soluciones=[] #Lista con las estadísticas de cada solución encontrada
-        
+
         self.pareto_front=self.adaptive_bisection_augmecon(puntos_requeridos)
+        
+
+        
         print (self.pareto_front)
+        global resultados_pareto_front
+        resultados_pareto_front=self.soluciones
+   
+    def analisis_solucion(self,epsilon):
+      
+       
+       # Si hay función objetivo (resultado de optimización)
+       _post_optima=True
+       kpi.calculate_kpi(self.current_solution,_post_optima)
+       current_solution=self.current_solution
+       print("Se calcularon los KPI de la solución.")
+       #print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
+       #figures.show_menu_figures(current_solution)
+       #export.export_data(current_solution.network_copy)
+       #export.create_index_sheet(current_solution.network_copy)
+       #print (f"\Gráficos y archivo de datos exportados a la carpeta de la soución {solucion_elegida}")
+   
+       #Importo los resultados de calculate kpi
+       I=current_solution.network_copy.I 
+       J=current_solution.network_copy.J
+       K=current_solution.network_copy.K
+       df_accesibilidad=current_solution.network_copy.file['df_accesibilidad']
+       df_capac=current_solution.network_copy.file['df_capac']
+       df_asignacion=current_solution.network_copy.file['df_asignacion']
+       df_w_ij=current_solution.network_copy.file['df_w_ij']
+       df_flujos_jkjk=current_solution.network_copy.file['df_flujos_jkjk']
+       df_fi_ijkjk=current_solution.network_copy.file['df_flujos_ijkjk']
+       
+       # Agrego estadísticas de la solución a la lista "soluciones"
+       self.soluciones.append(
+        [str(I)+str(J)+str(K),
+            df_accesibilidad['R'].min(),
+            df_accesibilidad['R'].max(), #
+            df_accesibilidad['R'].mean(),
+            df_accesibilidad['R'].std(),
+            df_capac['rho'].min(),
+            df_capac['rho'].max(),
+            df_capac['rho'].mean(),
+            df_capac['rho'].std(),
+            df_asignacion['tao_ijk'][df_asignacion['tao_ijk'] > 0].count(), #Arcos asignados ij para k=1
+            df_w_ij['w_ij'][df_w_ij['w_ij']>0].count(), #Arcos posibles w_ij
+            df_flujos_jkjk['p_jjkk'][df_flujos_jkjk['p_jjkk']>0].count(), #Arcos asignados jkjk. Son los mismos phi 
+            df_flujos_jkjk['p_kkp_True_False'][df_flujos_jkjk['p_kkp_True_False']>0].count(), #Arcos posibles jkj 
+            I, #Número de nodos de demanda
+            J, #Número de nodos de servicio
+            df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
+             groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().mean(), #Grado promedio de nodos de servicio (se usa el j, no el jk)
+            df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
+             groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().max(), #Grado máximo de nodos de servicio (se usa el j, no el jk)
+            df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
+             groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().min(), #Grado mínimo de nodos de servicio (se usa el j, no el jk)
+        ])
+       print ()
+       
+       
+       
+       '''
+       # Verifico si df_soluciones_rho existe
+       df_soluciones_rho=self.df_soluciones_rho
+       if len(df_soluciones_rho.columns)== 0:
+           df_soluciones_rho=df_capac.loc[:,df_capac.columns=='rho'] #Creo un dataframe para almacenar los rho jk que se van generando
+           df_soluciones_rho=df_soluciones_rho.set_axis([*df_soluciones_rho.columns[:-1], epsilon], axis=1)
+       else:
+           df_soluciones_rho=pd.merge(df_soluciones_rho,df_capac['rho'],left_on=['nombre_J','servicio_K'],right_on=['nombre_J','servicio_K'], how='left')
+           df_soluciones_rho=df_soluciones_rho.set_axis([*df_soluciones_rho.columns[:-1], epsilon], axis=1)
+       
+       # Verifico si df_soluciones_alpha_ik existe
+       df_soluciones_alpha_ik=self.df_soluciones_alpha_ik
+       if len(df_soluciones_alpha_ik.columns)== 0:
+           df_soluciones_alpha_ik=df_accesibilidad.loc[:,df_accesibilidad.columns=='R'] #Creo un dataframe para almacenar los alpha_ik que se van generando
+           df_soluciones_alpha_ik=df_soluciones_alpha_ik.set_axis([*df_soluciones_alpha_ik.columns[:-1], epsilon], axis=1)
+       else:
+           df_soluciones_alpha_ik=pd.merge(df_soluciones_alpha_ik,df_accesibilidad['R'],left_on=['nombre_I','servicio_K'],right_on=['nombre_I','servicio_K'], how='left')
+           df_soluciones_alpha_ik=df_soluciones_alpha_ik.set_axis([*df_soluciones_alpha_ik.columns[:-1], epsilon], axis=1)
+           
+       
+       # Verifico si df_soluciones_tao_ijk existe
+       global df_soluciones_tao_ijk
+       if len(df_soluciones_tao_ijk.columns)== 0:
+           print (len (df_asignacion))
+           print (df_asignacion.columns)
+           #df_soluciones_tao_ijk=df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False).loc[:,df_asignacion.columns=='tao_ijk'] #Remplacé 'y_ijk' por 'tao_ijk' en todo el código     
+           print(df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False)['tao_ijk'])
+           df_soluciones_tao_ijk=df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False)['tao_ijk']
+           #df_soluciones_tao_ijk=df_soluciones_tao_ijk.set_axis([*df_soluciones_tao_ijk.columns[:-1], epsilon], axis=1)
+       else:
+           df_soluciones_tao_ijk=pd.merge(df_soluciones_tao_ijk,
+                                          df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False)['tao_ijk'],
+                                          left_on=['nombre_I','nombre_J','servicio_K'],right_on=['nombre_I','nombre_J','servicio_K'], how='left')
+           df_soluciones_tao_ijk=df_soluciones_tao_ijk.set_axis([*df_soluciones_tao_ijk.columns[:-1], epsilon], axis=1) #prueba
+           
+       
+       # Verifico si df_soluciones_fi_jkjk existe
+       global df_soluciones_fi_jkjk
+       if len(df_soluciones_fi_jkjk.columns)== 0:
+           df_soluciones_fi_jkjk=df_flujos_jkjk.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False).loc[:,df_flujos_jkjk.columns=='p_jjkk']        
+           df_soluciones_fi_jkjk=df_soluciones_fi_jkjk.set_axis([*df_soluciones_fi_jkjk.columns[:-1], epsilon], axis=1)
+   
+       else:
+           df_soluciones_fi_jkjk=pd.merge(df_soluciones_fi_jkjk,
+                                          df_flujos_jkjk.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False)['p_jjkk'],
+                                          left_on=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'],right_on=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'], how='left')
+           df_soluciones_fi_jkjk=df_soluciones_fi_jkjk.set_axis([*df_soluciones_fi_jkjk.columns[:-1], epsilon], axis=1) #prueba
+           
+       
+       # Verifico si df_soluciones_sigma existe
+       global df_soluciones_sigma
+       if len(df_soluciones_sigma.columns)== 0:
+           df_soluciones_sigma=df_capac.loc[:,df_capac.columns=='sigma_jk'] #Creo un dataframe para almacenar los sigma jk que se van generando
+           df_soluciones_sigma=df_soluciones_sigma.set_axis([*df_soluciones_sigma.columns[:-1], epsilon], axis=1)
+       else:
+           df_soluciones_sigma=pd.merge(df_soluciones_sigma,df_capac['sigma_jk'],left_on=['nombre_J','servicio_K'],right_on=['nombre_J','servicio_K'], how='left')
+           df_soluciones_sigma=df_soluciones_sigma.set_axis([*df_soluciones_sigma.columns[:-1], epsilon], axis=1)
+       
+       # Verifico si df_soluciones_fi_ijkjk existe
+       global df_soluciones_fi_ijkjk
+       if len(df_soluciones_fi_ijkjk.columns)== 0:
+           df_soluciones_fi_ijkjk=df_fi_ijkjk.set_index(['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False).loc[:,df_fi_ijkjk.columns=='fi_ijkjk'] #Creo un dataframe para almacenar los fi_ijkjk que se van generando
+           df_soluciones_fi_ijkjk.set_axis([*df_soluciones_fi_ijkjk.columns[:-1], epsilon], axis=1, inplace=True)
+       else:
+           df_soluciones_fi_ijkjk=pd.merge(df_soluciones_fi_ijkjk,
+                                           df_fi_ijkjk.set_index(['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False)['fi_ijkjk'],
+                                           left_on=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'],right_on=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'], how='left')
+           df_soluciones_fi_ijkjk.set_axis([*df_soluciones_fi_ijkjk.columns[:-1], epsilon], axis=1, inplace=True)
+       '''    
+   
     
     def adaptive_bisection_augmecon(self,puntos_requeridos):
         
@@ -504,7 +654,7 @@ class Multiobjective:
         while len(salida_resultados) <= puntos_requeridos:
             self.current_solution = copy.deepcopy(self.problems_multi_dict['principal'])
             global precision
-            precision = 15
+            precision = 10# Original 15
             
             #Calculo un punto medio epsilon
             epsilon=self.calculo_i2(fila,factor,points_used)
@@ -531,10 +681,12 @@ class Multiobjective:
             else: #Obtengo un punto obtenido desde optimización
                 print ("Punto no evaluado, procedo a optimización")
                 self.current_solution.epsilon=float(f'{epsilon:.{3}f}')
-                punto_obtenido=self.punto_en_frontera(val2=epsilon,val3=3,problem=self.current_solution)
-                
-                
-                
+                self.current_solution.out="MaxTimeLimit"
+                while self.current_solution.out == "MaxTimeLimit": # Repito hasta hallar una solución en el tiempo establecido
+                    try:    
+                        punto_obtenido=self.punto_en_frontera(val2=epsilon,val3=3,problem=self.current_solution)                        
+                    except:
+                        epsilon=epsilon + random.uniform(-0.000001, 0.000001) #Perturbo epsilon para evitar infactibles
                 puntos_revisados=np.vstack((puntos_revisados,[punto_obtenido[0],punto_obtenido[2]])) #Agrego los puntos hallados a una matriz de puntos_Revisados
             print ("El nuevo punto es:", punto_obtenido[0:4])
             #input()
@@ -590,11 +742,12 @@ class Multiobjective:
                 #input()
                 salida_resultados=np.vstack((salida_resultados,[punto_obtenido[0],punto_obtenido[2]])) #... agrego a salida_resultados
                 print ("agrego solución a salida_resultados",[punto_obtenido[0],punto_obtenido[2]] )
-                print ("tiempo", time.time()-start_time)
-                tiempo.append(time.time() - start_time)
+                self.tiempo_solucion=time.time() - start_time
+                print ("tiempo", self.tiempo_solucion)
+                tiempo.append(self.tiempo_solucion)
                 
                 # LÍNEA ELIMINADA!!!!!
-                #self.analisis_solucion(epsilon) #Analizo la solución obtenida y la agrego a la lista soluciones[]
+                self.analisis_solucion(epsilon) #Analizo la solución obtenida y la agrego a la lista soluciones[]
                 
                 #Grabo la solución obtenida como un nuevo objeto en problems_multi_dict
                 #numero_soluciones=len(self.problems_multi_dict)
@@ -615,15 +768,21 @@ class Multiobjective:
                     # Encuentro la mayor distancia euclideana
                     contador=0
                     distance_mayor=0
-                    while contador < len(salida_resultados)-1:
+                    while contador <= len(salida_resultados)-1:
                         #PAra calcular las distancias tengo que normalizar los datos encontrados
                         salida_resultados_estand=(salida_resultados-salida_resultados.min(axis=0))/(salida_resultados.max(axis=0)-salida_resultados.min(axis=0))
-                        distance =abs(salida_resultados_estand[contador][1]-salida_resultados_estand[contador+1][1])
-                        #distance =np.linalg.norm(salida_resultados_estand[contador]-salida_resultados_estand[contador+1])
-                        print ("distancia",distance)
-                        if (salida_resultados_estand[contador,1]-salida_resultados_estand[contador+1,1])/salida_resultados_estand[contador+1,1] <= 0.0001:
-                            distance=0
-                            print ("Distancia ajustada por ser muy corta.")
+                        #distance =abs(salida_resultados_estand[contador][1]-salida_resultados_estand[contador+1][1])
+                        try:
+                            distance =np.linalg.norm(salida_resultados_estand[contador]-salida_resultados_estand[contador+1])
+                            print ("distancia",distance)
+                        except:
+                            print ()
+                        #if salida_resultados_estand[contador+1,1] == 0:
+                        #    distance=0
+                        #    print ("Distancia ajustada por división por cero.")
+                        #elif (salida_resultados_estand[contador,1]-salida_resultados_estand[contador+1,1])/salida_resultados_estand[contador+1,1] <= 0.0001:
+                        #    distance=0
+                        #    print ("Distancia ajustada por ser muy corta.")
                         if distance > distance_mayor and salida_resultados[contador][1] - salida_resultados[contador+1][1] > 10**(-precision):
                             distance_mayor = distance 
                             puntos_mayor = np.hstack((salida_resultados [contador], salida_resultados[contador+1]))
@@ -786,7 +945,7 @@ class Multiobjective:
             print ("termino iteración con",len(salida_resultados), " puntos.")
             #input("Press Enter to analyze the obtained solution...")
             #input()    
-        return salida_resultados, points_used, puntos_revisados
+        return salida_resultados, points_used, puntos_revisados, self.soluciones
         
     # Fórmula adaptada para asegurar mejores resultados
     def calculo_i2 (self,fila,factor,points_used):
@@ -915,10 +1074,10 @@ class Multiobjective:
         y2=round(y2,precision)
         x3=round(x3,precision)
         y3=round(y3,precision)
-        if x1>x2 and y1<y2:
+        if x1>=x2 and y1<=y2:
             #tengo un punto dominado
             return "dominado"
-        elif x3>x1 :
+        elif x3>=x1 :
             return "dominado" #En este caso hay un error en ipopt y está generando un punto que no está en la frontera.
         else:
             return "no dominado"     
@@ -933,129 +1092,6 @@ class Multiobjective:
         else:
             repetido="No"
         return repetido
-    
-    def analisis_solucion(self,epsilon):
-       
-        
-        # Si hay función objetivo (resultado de optimización)
-        _post_optima=True
-        kpi.calculate_kpi(self.current_solution,_post_optima)
-        current_solution=self.current_solution
-        print("Se calcularon los KPI de la solución.")
-        #print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
-        #figures.show_menu_figures(current_solution)
-        #export.export_data(current_solution.network_copy)
-        #export.create_index_sheet(current_solution.network_copy)
-        #print (f"\Gráficos y archivo de datos exportados a la carpeta de la soución {solucion_elegida}")
-    
-        #Importo los resultados de calculate kpi
-        I=current_solution.network_copy.I 
-        J=current_solution.network_copy.J
-        K=current_solution.network_copy.K
-        df_accesibilidad=current_solution.network_copy.file['df_accesibilidad']
-        df_capac=current_solution.network_copy.file['df_capac']
-        df_asignacion=current_solution.network_copy.file['df_asignacion']
-        df_w_ij=current_solution.network_copy.file['df_w_ij']
-        df_flujos_jkjk=current_solution.network_copy.file['df_flujos_jkjk']
-        df_fi_ijkjk=current_solution.network_copy.file['df_flujos_ijkjk']
-        
-        # Agrego estadísticas de la solución a la lista "soluciones"
-        self.soluciones.append(
-         [str(I)+str(J)+str(K),
-             df_accesibilidad['R'].min(),
-             df_accesibilidad['R'].max(), #
-             df_accesibilidad['R'].mean(),
-             df_accesibilidad['R'].std(),
-             df_capac['rho'].min(),
-             df_capac['rho'].max(),
-             df_capac['rho'].mean(),
-             df_capac['rho'].std(),
-             df_asignacion['tao_ijk'][df_asignacion['tao_ijk'] > 0].count(), #Arcos asignados ij para k=1
-             df_w_ij['w_ij'][df_w_ij['w_ij']>0].count(), #Arcos posibles w_ij
-             df_flujos_jkjk['p_jjkk'][df_flujos_jkjk['p_jjkk']>0].count(), #Arcos asignados jkjk. Son los mismos phi 
-             df_flujos_jkjk['p_kkp_True_False'][df_flujos_jkjk['p_kkp_True_False']>0].count(), #Arcos posibles jkj 
-             I, #Número de nodos de demanda
-             J, #Número de nodos de servicio
-             df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
-              groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().mean(), #Grado promedio de nodos de servicio (se usa el j, no el jk)
-             df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
-              groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().max(), #Grado máximo de nodos de servicio (se usa el j, no el jk)
-             df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
-              groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().min(), #Grado mínimo de nodos de servicio (se usa el j, no el jk)
-         ])
-        print ()
-        
-        
-        
-        '''
-        # Verifico si df_soluciones_rho existe
-        df_soluciones_rho=self.df_soluciones_rho
-        if len(df_soluciones_rho.columns)== 0:
-            df_soluciones_rho=df_capac.loc[:,df_capac.columns=='rho'] #Creo un dataframe para almacenar los rho jk que se van generando
-            df_soluciones_rho=df_soluciones_rho.set_axis([*df_soluciones_rho.columns[:-1], epsilon], axis=1)
-        else:
-            df_soluciones_rho=pd.merge(df_soluciones_rho,df_capac['rho'],left_on=['nombre_J','servicio_K'],right_on=['nombre_J','servicio_K'], how='left')
-            df_soluciones_rho=df_soluciones_rho.set_axis([*df_soluciones_rho.columns[:-1], epsilon], axis=1)
-        
-        # Verifico si df_soluciones_alpha_ik existe
-        df_soluciones_alpha_ik=self.df_soluciones_alpha_ik
-        if len(df_soluciones_alpha_ik.columns)== 0:
-            df_soluciones_alpha_ik=df_accesibilidad.loc[:,df_accesibilidad.columns=='R'] #Creo un dataframe para almacenar los alpha_ik que se van generando
-            df_soluciones_alpha_ik=df_soluciones_alpha_ik.set_axis([*df_soluciones_alpha_ik.columns[:-1], epsilon], axis=1)
-        else:
-            df_soluciones_alpha_ik=pd.merge(df_soluciones_alpha_ik,df_accesibilidad['R'],left_on=['nombre_I','servicio_K'],right_on=['nombre_I','servicio_K'], how='left')
-            df_soluciones_alpha_ik=df_soluciones_alpha_ik.set_axis([*df_soluciones_alpha_ik.columns[:-1], epsilon], axis=1)
-            
-        
-        # Verifico si df_soluciones_tao_ijk existe
-        global df_soluciones_tao_ijk
-        if len(df_soluciones_tao_ijk.columns)== 0:
-            print (len (df_asignacion))
-            print (df_asignacion.columns)
-            #df_soluciones_tao_ijk=df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False).loc[:,df_asignacion.columns=='tao_ijk'] #Remplacé 'y_ijk' por 'tao_ijk' en todo el código     
-            print(df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False)['tao_ijk'])
-            df_soluciones_tao_ijk=df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False)['tao_ijk']
-            #df_soluciones_tao_ijk=df_soluciones_tao_ijk.set_axis([*df_soluciones_tao_ijk.columns[:-1], epsilon], axis=1)
-        else:
-            df_soluciones_tao_ijk=pd.merge(df_soluciones_tao_ijk,
-                                           df_asignacion.set_index(['nombre_I','nombre_J','servicio_K'],drop=False)['tao_ijk'],
-                                           left_on=['nombre_I','nombre_J','servicio_K'],right_on=['nombre_I','nombre_J','servicio_K'], how='left')
-            df_soluciones_tao_ijk=df_soluciones_tao_ijk.set_axis([*df_soluciones_tao_ijk.columns[:-1], epsilon], axis=1) #prueba
-            
-        
-        # Verifico si df_soluciones_fi_jkjk existe
-        global df_soluciones_fi_jkjk
-        if len(df_soluciones_fi_jkjk.columns)== 0:
-            df_soluciones_fi_jkjk=df_flujos_jkjk.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False).loc[:,df_flujos_jkjk.columns=='p_jjkk']        
-            df_soluciones_fi_jkjk=df_soluciones_fi_jkjk.set_axis([*df_soluciones_fi_jkjk.columns[:-1], epsilon], axis=1)
-    
-        else:
-            df_soluciones_fi_jkjk=pd.merge(df_soluciones_fi_jkjk,
-                                           df_flujos_jkjk.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False)['p_jjkk'],
-                                           left_on=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'],right_on=['nombre_J','servicio_K','nombre_Jp','servicio_Kp'], how='left')
-            df_soluciones_fi_jkjk=df_soluciones_fi_jkjk.set_axis([*df_soluciones_fi_jkjk.columns[:-1], epsilon], axis=1) #prueba
-            
-        
-        # Verifico si df_soluciones_sigma existe
-        global df_soluciones_sigma
-        if len(df_soluciones_sigma.columns)== 0:
-            df_soluciones_sigma=df_capac.loc[:,df_capac.columns=='sigma_jk'] #Creo un dataframe para almacenar los sigma jk que se van generando
-            df_soluciones_sigma=df_soluciones_sigma.set_axis([*df_soluciones_sigma.columns[:-1], epsilon], axis=1)
-        else:
-            df_soluciones_sigma=pd.merge(df_soluciones_sigma,df_capac['sigma_jk'],left_on=['nombre_J','servicio_K'],right_on=['nombre_J','servicio_K'], how='left')
-            df_soluciones_sigma=df_soluciones_sigma.set_axis([*df_soluciones_sigma.columns[:-1], epsilon], axis=1)
-        
-        # Verifico si df_soluciones_fi_ijkjk existe
-        global df_soluciones_fi_ijkjk
-        if len(df_soluciones_fi_ijkjk.columns)== 0:
-            df_soluciones_fi_ijkjk=df_fi_ijkjk.set_index(['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False).loc[:,df_fi_ijkjk.columns=='fi_ijkjk'] #Creo un dataframe para almacenar los fi_ijkjk que se van generando
-            df_soluciones_fi_ijkjk.set_axis([*df_soluciones_fi_ijkjk.columns[:-1], epsilon], axis=1, inplace=True)
-        else:
-            df_soluciones_fi_ijkjk=pd.merge(df_soluciones_fi_ijkjk,
-                                            df_fi_ijkjk.set_index(['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'],drop=False)['fi_ijkjk'],
-                                            left_on=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'],right_on=['nombre_I','nombre_J','servicio_K','nombre_Jp','servicio_Kp'], how='left')
-            df_soluciones_fi_ijkjk.set_axis([*df_soluciones_fi_ijkjk.columns[:-1], epsilon], axis=1, inplace=True)
-        '''
     
     # Función para generar los factores de las bisecciones:
     def funcion_bisec(self,factor):

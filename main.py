@@ -7,7 +7,7 @@ Created on Tue Dec  5 16:30:26 2023
 
 # Permite explorar objetos con alta recursión
 import sys
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(50000)
 
 #%%  Bienvenida
 import textwrap
@@ -75,6 +75,7 @@ if archivo.endswith('xlsx'):
 elif archivo.endswith('txt'):
     networks_dict[_name].read_file_txt(archivo)
 
+
 networks_dict[_name].delete_surplus_data()
 
 # Esta sección actualiza los sigma_max para que sean inferiores a la suma de los s_jk
@@ -111,11 +112,11 @@ while True:
 
         from hcndp import multiobjective
         # Indicamos origen de datos y definimos valores I,J,K
-        multiobjective.menu_multiobjective(network_original=networks_dict[_name],
+        resultados_pareto_front=multiobjective.menu_multiobjective(network_original=networks_dict[_name],
                                  problems_dict=problems_dict,
                                  multiobjective_dict=multiobjective_dict
                                  )
-    
+        
     #%%  Salir
     elif _opcion == "10":
             break

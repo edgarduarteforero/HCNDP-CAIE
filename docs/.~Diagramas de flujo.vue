@@ -1,14 +1,14 @@
 <!-- Tufts VUE 3.3.0 concept-map (Diagramas de flujo.vue) 2024-07-25 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/C:/Program%20Files%20(x86)/VUE/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Thu Jul 25 14:23:08 COT 2024 by edgar on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
+<!-- Do Not Remove: Saved date Thu Jul 25 22:01:34 COT 2024 by edgar on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built October 8 2015 at 1658 by tomadm on Linux 2.6.32-504.23.4.el6.x86_64 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0"
     label="Diagramas de flujo.vue" created="1704812190924" x="0.0"
-    y="0.0" width="6100.289" height="4495.508" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1721935388169" size="852805"
+    y="0.0" width="10240.436" height="4675.255" strokeWidth="0.0" autoSized="false">
+    <resource referenceCreated="1721962894697" size="872336"
         spec="C:\Users\edgar\OneDrive - Universidad Libre\Doctorado\C&#xf3;digos Python\HcNDP\Health-Care-Network-Design-Problem\docs\Diagramas de flujo.vue"
         type="1" xsi:type="URLResource">
         <title>Diagramas de flujo.vue</title>

@@ -19,9 +19,8 @@ import os
 #from idaes.core.util.model_statistics import report_statistics
 #import xlsxwriter
 #import os
-#import openpyxl
-import xlsxwriter
 import openpyxl
+import xlsxwriter
 from hcndp import kpi
 from hcndp import network
 import copy
@@ -51,6 +50,10 @@ def menu_solutions(network_original, problems_dict):
 
         opcion = input("Selecciona una opción: \n")
 
+
+
+# %% <codecell> Mostrar soluciones y operadores
+
         def mostrar_soluciones(problems_dict,opcion):
             
             if opcion == "4": 
@@ -69,8 +72,7 @@ def menu_solutions(network_original, problems_dict):
                         if ('Exacta' != descripcion.tecnica
                             and 'Aproximación' != descripcion.tecnica):                    
                             print(f"{i}. {clave}")
-         
-        
+                 
         def mostrar_operadores():
             while True:
                 # Solicito al usuario la función objetivo que desea utilizar
@@ -107,7 +109,9 @@ def menu_solutions(network_original, problems_dict):
                   
                 else:
                     print("Opción no válida. Inténtalo de nuevo.")
-             
+
+# %% <codecell> Opciones menú optimización
+
 
         if opcion == "1":
             print("Has seleccionado la Opción 1.")
@@ -551,9 +555,9 @@ class Problem:
         # Resolver el modelo con salida detallada
         opt = pyo.SolverFactory('gurobi')
         opt.options['NonConvex'] = 2
-        opt.options['TimeLimit'] = 3600
+        opt.options['TimeLimit'] = 60
         
-        opt.options['MIPFocus'] = 3 #1 Find feasible, 2 prove optimality, 3 very slow
+        opt.options['MIPFocus'] = 1 #1 Find feasible, 2 prove optimality, 3 very slow
         # opt.options['Heuristics'] = 0.20  #Tiempo usado en heurísticas
         # opt.options['BarConvTol']=1 ### Genera cambbio paulatino
         # opt.options['BarQCPConvTol'] = 1  ### Genera cambbio paulatino
@@ -572,7 +576,7 @@ class Problem:
         # opt.options['Presolve']= 2 #2 agresive #1 conservative Generó cambio importnte con nivel 2
         # opt.options['ScaleFlag']=2 #,1,2,3
         # opt.options['Threads'] = 4  # Usa 4 núcleos
-        opt.options['LogFile'] = 'gurobi_log.log'
+        # opt.options['LogFile'] = 'gurobi_log.log'
 
         global out
         out = 0
@@ -922,6 +926,7 @@ class Problem:
         if self.tecnica=='Exacta':
             with pd.ExcelWriter(path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
                 writer.workbook = openpyxl.load_workbook(path)
+                
                 pd.DataFrame(l_jk).to_excel(writer, sheet_name='l_jk')
                 pd.DataFrame(l_ijk).to_excel(writer, sheet_name='l_ijk')
                 pd.DataFrame(f_ijk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'tao_ijk']).to_excel(
@@ -931,8 +936,22 @@ class Problem:
                     writer, sheet_name='prob_fi_jkjk')
     
                 pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
-                pd.DataFrame(fi_ijkjk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
-                             'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
+                    
+                try:
+                    pd.DataFrame(fi_ijkjk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
+                                 'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
+                except:
+                    # Un posible error es que el número de filas sea mayor a la capacidad de filas Excel.
+                    # Filtrar filas donde 'fi_ijkjk' sea diferente de cero
+                    
+                    #df_filtered = fi_ijkjk[fi_ijkjk['fi_ijkjk'] != 0]
+                    df_filtered = fi_ijkjk[np.float64(fi_ijkjk[:, 5]) != 0.0]
+                    
+                    pd.DataFrame(df_filtered, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
+                                 'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
+
+                    pass
+                    
                 
                 # Crear una nueva hoja para el tiempo
                 tiempo_data = pd.DataFrame({'Tiempo': [self.pyo_model.solution['Tiempo']]})
@@ -950,7 +969,16 @@ class Problem:
                     writer, sheet_name='prob_fi_jkjk')
     
                 sigma_jk.to_excel(writer, sheet_name='sigma')
-                fi_ijkjk.to_excel(writer, sheet_name='fi_ijkjk')
+                
+                
+                try:
+                    fi_ijkjk.to_excel(writer, sheet_name='fi_ijkjk')
+
+                except:
+                    
+                    print ("No se pudo guardar la información de fi_ijkjk, tamaño de archivo demasiado grande")
+
+                    pass
         
         print(f"Se exportó exitosamente el archivo de Excel en {path}.\n")
         
@@ -1441,7 +1469,7 @@ class Problem:
             # Exportar resultados
             self.network_copy.create_folders()
             self.set_solution_excel()
-            self.set_solution_txt()
+            #self.set_solution_txt()
             self.state="Optimizado"
 
     

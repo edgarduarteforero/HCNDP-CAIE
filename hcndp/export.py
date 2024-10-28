@@ -5,9 +5,10 @@ Created on Tue Dec 19 18:29:12 2023
 @author: edgar
 """
 
-import openpyxl
+#import openpyxl
 import os
-from openpyxl.styles import NamedStyle, Font, colors
+import pandas as pd
+#from openpyxl.styles import NamedStyle, Font, colors
    
 def export_data(network):
     import pandas as pd
@@ -19,7 +20,15 @@ def export_data(network):
         # Iterar a través del diccionario y escribir cada DataFrame en una hoja
         for sheet_name, df in network.file.items():
             if isinstance(df, pd.DataFrame):
-                df.to_excel(writer, sheet_name=sheet_name, index=True)
+                try:
+                    df.to_excel(writer, sheet_name=sheet_name, index=True)
+                except:
+                    # Un posible error es que el número de filas sea mayor a la capacidad de filas Excel.
+                    # Filtrar filas donde 'fi_ijkjk' sea diferente de cero
+                    print ("No se pudo guardar una hoja")
+                    print ("Tamaño del archivo de Excel demasiado grande")
+                   
+                    pass
 
 def create_index_sheet(network):
     # TODO Personalizar el texto que explica cada hoja. 
@@ -31,7 +40,7 @@ def create_index_sheet(network):
     #from openpyxl.styles import Hyperlink
 
 
-    hyperlink_style = NamedStyle(name='Hyperlink', font=Font(color=colors.BLUE, underline='single'))
+    #hyperlink_style = NamedStyle(name='Hyperlink', font=Font(color=colors.BLUE, underline='single'))
 
 
     
@@ -39,7 +48,8 @@ def create_index_sheet(network):
     excel_file = os.getcwd()+'/output/'+network.name_problem+'/salida_medicion.xlsx'
     
     # Cargar el archivo existente
-    workbook = openpyxl.load_workbook(excel_file)
+    #workbook = openpyxl.load_workbook(excel_file)
+    workbook = pd.read_file(excel_file)
     
     # Crear una nueva hoja para el índice
     index_sheet = workbook.create_sheet('Índice', 0)
@@ -59,7 +69,7 @@ def create_index_sheet(network):
         index_sheet.cell(row=row, column=1, value=sheet_name)
         index_sheet.cell(row=row, column=2, value=sheet_ref)
         #index_sheet.cell(row=row, column=3, value=sheet_link)
-        index_sheet.cell(row=row, column=3, value=sheet_link).style = hyperlink_style
+        #index_sheet.cell(row=row, column=3, value=sheet_link).style = hyperlink_style
         index_sheet.cell(row=row, column=3).hyperlink = sheet_link
         
     # Guardar el archivo actualizado
