@@ -13,8 +13,8 @@ import time
 import winsound
 import copy
 import pandas as pd
-import matplotlib.pyplot as plt
-from hcndp import kpi
+#import matplotlib.pyplot as plt
+#from hcndp import kpi
 import random
 
 def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
@@ -86,7 +86,7 @@ def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
                 # Calculo las soluciones al problema
                 current_moo_problem.calculate_pareto_front()
                 
-                
+                winsound.Beep(1000, 400)    
                 input("Pulsa una tecla para continuar.")
                 
             except AssertionError as error:
@@ -108,10 +108,17 @@ def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
                                                          'τ_ijk','w_ij','ϕ_jkjk',
                                                          'arcos_jk_j','I','J','grado_prom',
                                                          'grado_max','grado_min',
-                                                         'tiempo_acum',])
+                                                         'tiempo',
+                                                         'Worst_alpha_betas_d_ijk',
+                                                         'Worst_alpha_node',
+                                                         'Worst_alpha_node_alpha',
+                                                         'Worst_rho_node',
+                                                         'Worst_rho_node_l_jk',
+                                                         'Worst_rho_node_sigma',])
     except:
         print()
     
+
 # %% <codecell> Crear multiobjective optimization problem
 
 
@@ -300,6 +307,25 @@ class Multiobjective:
          current_solution.network_copy.create_data_dat()
          current_solution.construct_instance()
          current_solution.execute_solver()
+         
+#         current_solution.out="MaxTimeLimit"
+#         while current_solution.out == "MaxTimeLimit": # Repito hasta hallar una solución en el tiempo establecido
+#             try:    
+#                 #punto_obtenido=self.punto_en_frontera(val2=epsilon,val3=3,problem=self.current_solution)                        
+#                 current_solution.execute_solver()
+#             except: #Desarrollo mecanismo de perturbación porque he superado el tiempo máximo
+#                 if hasattr(current_solution.pyo_model.instance, 'restriccion_rho_max'):
+#                     restriccion_para_perturbar=current_solution.pyo_model.instance.restriccion_rho_max
+#                     restriccion_para_perturbar.set_value(restriccion_para_perturbar.body <= restriccion_para_perturbar.upper + random.uniform(-0.001, 0.001))
+#                 elif hasattr(current_solution.pyo_model.instance, 'restriccion_alpha_min'):
+#                    restriccion_para_perturbar=current_solution.pyo_model.instance.restriccion_alpha_min
+#                     restriccion_para_perturbar.set_value(restriccion_para_perturbar.body >= restriccion_para_perturbar.lower + random.uniform(-0.0001, 0.0001))
+#                 elif hasattr(current_solution.pyo_model.instance, 'restriccion_delta_min'):
+#                     restriccion_para_perturbar=current_solution.pyo_model.instance.restriccion_delta_min
+#                     restriccion_para_perturbar.set_value(restriccion_para_perturbar.body >= restriccion_para_perturbar.lower + random.uniform(-0.0001, 0.0001))
+                    #epsilon=epsilon + random.uniform(-0.000001, 0.000001) #Perturbo epsilon para evitar infactibles
+                 #model.f'restriccion_{_var_obj_anterior}'.set_value(model.f'restriccion_{_var_obj_anterior}'.body <= model.f'restriccion_{_var_obj_anterior}'.upper + 1)
+
          _rho_max=pyo.value(current_solution.pyo_model.instance.rho_max)
          _alpha_min=pyo.value(current_solution.pyo_model.instance.alpha_min)
          _delta_min=pyo.value(current_solution.pyo_model.instance.delta_min)
@@ -418,7 +444,7 @@ class Multiobjective:
             self.anchor_min_rho_max=copy.deepcopy(self.problems_multi_dict['Min_Rho_Max'])
             
             self.current_solution=self.anchor_min_rho_max
-            self.analisis_solucion(0) # Calculo KPI de los puntos ancla y los agrego a self.soluciones
+            self.analisis_solucion(0) # Agrego los KPI del punto ancla a self.soluciones
             
             matrix_problems_lexi=[[1,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],
                                   [2,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1]]            
@@ -428,7 +454,7 @@ class Multiobjective:
             self.anchor_max_alpha_min=copy.deepcopy(self.problems_multi_dict['Max_Alpha_Min'])
         
             self.current_solution=self.anchor_max_alpha_min
-            self.analisis_solucion(0)# Calculo KPI de los puntos ancla y los agrego a self.soluciones
+            self.analisis_solucion(0) # Agrego los KPI del punto ancla a self.soluciones
             
         
         # Construyo un objeto model llamado 'principal'
@@ -479,8 +505,8 @@ class Multiobjective:
         except:
             model.obj = pyo.Objective(expr=model.rho_max * 100 + (10**-6) * (model.s2)
                             , sense=pyo.minimize) #/ 348 ,sense=minimize)
-        # # Construyo la instancia
-        # principal_problem.construct_instance()
+
+
         
         # Construyo matrices para guardar resultados
         global df_soluciones_rho, df_soluciones_alpha_ik,df_soluciones_tao_ijk
@@ -488,8 +514,8 @@ class Multiobjective:
 
         # Número de puntos a obtener
         #puntos_requeridos= int(input("\nIngresa el número de puntos para la frontera:")) 
-        puntos_requeridos=10
-            
+        puntos_requeridos=25
+        
         # Soluciones del lexicográfico
         rho_opt=self.anclas[3][2:4]
         rho_opt[0]*=100
@@ -515,8 +541,8 @@ class Multiobjective:
       
        
        # Si hay función objetivo (resultado de optimización)
-       _post_optima=True
-       kpi.calculate_kpi(self.current_solution,_post_optima)
+       #_post_optima=True
+       #kpi.calculate_kpi(self.current_solution,_post_optima)
        current_solution=self.current_solution
        print("Se calcularon los KPI de la solución.")
        #print (f"\Ahora escoge el gráfico que deseas para la solución {solucion_elegida}")
@@ -534,9 +560,10 @@ class Multiobjective:
        df_asignacion=current_solution.network_copy.file['df_asignacion']
        df_w_ij=current_solution.network_copy.file['df_w_ij']
        df_flujos_jkjk=current_solution.network_copy.file['df_flujos_jkjk']
-       df_fi_ijkjk=current_solution.network_copy.file['df_flujos_ijkjk']
+       #df_fi_ijkjk=current_solution.network_copy.file['df_flujos_ijkjk']
        
        # Agrego estadísticas de la solución a la lista "soluciones"
+       # Estadísticas tomadas de kpi.calculate generado por gurobi
        self.soluciones.append(
         [str(I)+str(J)+str(K),
             df_accesibilidad['R'].min(),
@@ -559,7 +586,14 @@ class Multiobjective:
              groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().max(), #Grado máximo de nodos de servicio (se usa el j, no el jk)
             df_flujos_jkjk[df_flujos_jkjk['nombre_J']!=df_flujos_jkjk['nombre_Jp']].
              groupby(['nombre_J','nombre_Jp'])['p_jjkk_True_False'].sum().min(), #Grado mínimo de nodos de servicio (se usa el j, no el jk)
-        ])
+            current_solution.detailed_solution['tiempo'].iloc[0,0] ,
+            current_solution.value_optimal_solution['Worst_alpha_betas_d_ijk'],
+            current_solution.value_optimal_solution['Worst_alpha_node'],
+            current_solution.value_optimal_solution['Worst_alpha_node_alpha'],
+            current_solution.value_optimal_solution['Worst_rho_node'],
+            current_solution.value_optimal_solution['Worst_rho_node_l_jk'],
+            current_solution.value_optimal_solution['Worst_rho_node_sigma'],
+             ])
        print ()
        
        
@@ -929,10 +963,10 @@ class Multiobjective:
                 print ("ocurrió un error en pyomo")
                 factor=factor+1
                 print ("ahora factor es: ", factor)
-                input()
+                
                 
             ### Imprimo gráfico 
-           
+            '''
             x=salida_resultados[:,0]
             y=salida_resultados[:,1]
             fig = plt.figure(figsize=(8,6))
@@ -940,6 +974,7 @@ class Multiobjective:
             plt.xlabel(r'$\rho_{max}$',fontsize=20)
             plt.ylabel(r"$A_{min}$", fontsize=20)
             plt.legend(["Pareto front solutions"])
+            '''
             #input()
             
             print ("termino iteración con",len(salida_resultados), " puntos.")

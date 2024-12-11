@@ -8,6 +8,7 @@ Created on Tue Dec 19 18:29:12 2023
 #import openpyxl
 import os
 import pandas as pd
+import openpyxl
 #from openpyxl.styles import NamedStyle, Font, colors
    
 def export_data(network):
@@ -48,8 +49,8 @@ def create_index_sheet(network):
     excel_file = os.getcwd()+'/output/'+network.name_problem+'/salida_medicion.xlsx'
     
     # Cargar el archivo existente
-    #workbook = openpyxl.load_workbook(excel_file)
-    workbook = pd.read_file(excel_file)
+    workbook = openpyxl.load_workbook(excel_file)
+    #workbook = pd.read_excel(excel_file)
     
     # Crear una nueva hoja para el índice
     index_sheet = workbook.create_sheet('Índice', 0)

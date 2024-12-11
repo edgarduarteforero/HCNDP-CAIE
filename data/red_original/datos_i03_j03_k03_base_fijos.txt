@@ -1,0 +1,333 @@
+# df_oferta
+nombre_J	ubicacionesJ_x	ubicacionesJ_y
+j01	10	10
+j02	12	12
+j03	8	12
+
+
+# df_capac
+nombre_J	servicio_K	s_jk	sigma_jk	c_jk	s_jk*c_jk	nombre_Jservicio_K
+j01	k01	80	80	1	80	j01k01
+j02	k01	40	40	1	40	j02k01
+j03	k01	80	80	1	80	j03k01
+j01	k02	70	70	1	70	j01k02
+j02	k02	60	60	1	60	j02k02
+j03	k02	40	40	1	40	j03k02
+j01	k03	70	70	1	70	j01k03
+j02	k03	50	50	1	50	j02k03
+j03	k03	60	60	1	60	j03k03
+
+
+# df_niveles
+servicio_K	Servicio	sigma_max	d_o_k
+k01	Consulta general diagnóstico	150	6
+k02	Mamografía y ecografía	150	6
+k03	Consulta especializada	150	7
+
+
+# df_demanda
+nombre_I	servicio_K	ubicacionesI_x	ubicacionesI_y	demanda_i
+i01	k01	10	10	15
+i02	k01	12	12	15
+i03	k01	8	12	15
+
+
+# df_sigma_max
+servicio_K	sigma_max	congest_min	suma_sjk
+k01	180	0.2	200
+k02	150	0.2	170
+k03	150	0.2	180
+
+
+# df_dist_ij_k
+nombre_I	nombre_J	servicio_K	enlace_ij	f_dij	dist_ij	d_o_k
+i01	j01	k01	i01j01	1.0	0	6
+i02	j01	k01	i02j01	0.9649454688235423	1	6
+i03	j01	k01	i03j01	0.9649454688235423	1	6
+i01	j02	k01	i01j02	0.9649454688235423	1	6
+i02	j02	k01	i02j02	1.0	0	6
+i03	j02	k01	i03j02	0.9649454688235423	1	6
+i01	j03	k01	i01j03	0.9649454688235423	1	6
+i02	j03	k01	i02j03	0.9649454688235423	1	6
+i03	j03	k01	i03j03	1.0	0	6
+i01	j01	k02	i01j01	1.0	0	6
+i02	j01	k02	i02j01	0.9649454688235423	1	6
+i03	j01	k02	i03j01	0.9649454688235423	1	6
+i01	j02	k02	i01j02	0.9649454688235423	1	6
+i02	j02	k02	i02j02	1.0	0	6
+i03	j02	k02	i03j02	0.9649454688235423	1	6
+i01	j03	k02	i01j03	0.9649454688235423	1	6
+i02	j03	k02	i02j03	0.9649454688235423	1	6
+i03	j03	k02	i03j03	1.0	0	6
+i01	j01	k03	i01j01	1.0	0	7
+i02	j01	k03	i02j01	0.9741982523623018	1	7
+i03	j01	k03	i03j01	0.9741982523623018	1	7
+i01	j02	k03	i01j02	0.9741982523623018	1	7
+i02	j02	k03	i02j02	1.0	0	7
+i03	j02	k03	i03j02	0.9741982523623018	1	7
+i01	j03	k03	i01j03	0.9741982523623018	1	7
+i02	j03	k03	i02j03	0.9741982523623018	1	7
+i03	j03	k03	i03j03	1.0	0	7
+
+
+# df_dist_ij
+nombre_I	nombre_J	dist_IJ	i-j
+i01	j01	0	i01j01
+i02	j01	1	i02j01
+i03	j01	2	i03j01
+i01	j02	1	i01j02
+i02	j02	0	i02j02
+i03	j02	1	i03j02
+i01	j03	2	i01j03
+i02	j03	1	i02j03
+i03	j03	0	i03j03
+
+
+# df_w_ij
+nombre_I	nombre_J	w_ij
+i01	j01	1
+i02	j01	0
+i03	j01	0
+i01	j02	0
+i02	j02	1
+i03	j02	0
+i01	j03	0
+i02	j03	0
+i03	j03	1
+
+
+# flujos_jj
+Unnamed: 0	j01	j02	j03
+j01	1	0	0
+j02	1	1	1
+j03	1	0	1
+
+
+# df_flujos_jkjk
+nombre_J	servicio_K	nombre_Jp	servicio_Kp	y_jkjk	Posible_enlace	Formula_original
+j01	k01	j01	k01	1	1	
+j01	k01	j01	k02	1	1	
+j01	k01	j01	k03	0	0	
+j01	k01	j02	k01	0	0	
+j01	k01	j02	k02	0	0	
+j01	k01	j02	k03	0	0	
+j01	k01	j03	k01	0	0	
+j01	k01	j03	k02	0	0	
+j01	k01	j03	k03	0	0	
+j01	k02	j01	k01	0	0	
+j01	k02	j01	k02	0	0	
+j01	k02	j01	k03	1	1	
+j01	k02	j02	k01	0	0	
+j01	k02	j02	k02	0	0	
+j01	k02	j02	k03	0	0	
+j01	k02	j03	k01	0	0	
+j01	k02	j03	k02	0	0	
+j01	k02	j03	k03	0	0	
+j01	k03	j01	k01	0	0	
+j01	k03	j01	k02	0	0	
+j01	k03	j01	k03	0	0	
+j01	k03	j02	k01	0	0	
+j01	k03	j02	k02	0	0	
+j01	k03	j02	k03	0	0	
+j01	k03	j03	k01	0	0	
+j01	k03	j03	k02	0	0	
+j01	k03	j03	k03	0	0	
+j02	k01	j01	k01	0	1	
+j02	k01	j01	k02	0	1	
+j02	k01	j01	k03	0	0	
+j02	k01	j02	k01	1	1	
+j02	k01	j02	k02	1	1	
+j02	k01	j02	k03	0	0	
+j02	k01	j03	k01	0	1	
+j02	k01	j03	k02	0	1	
+j02	k01	j03	k03	0	0	
+j02	k02	j01	k01	0	0	
+j02	k02	j01	k02	0	0	
+j02	k02	j01	k03	0	1	
+j02	k02	j01	k04	1	1	
+j02	k02	j01	k05	1	1	
+j02	k02	j01	k06	1	1	
+j02	k02	j01	k07	1	1	
+j02	k02	j01	k08	1	1	
+j02	k02	j01	k09	1	1	
+j02	k02	j01	k10	1	1	
+j02	k02	j02	k01	0	0	
+j02	k02	j02	k02	0	0	
+j02	k02	j02	k03	1	1	
+j02	k02	j02	k04	1	1	
+j02	k02	j02	k05	1	1	
+j02	k02	j02	k06	1	1	
+j02	k02	j02	k07	1	1	
+j02	k02	j02	k08	1	1	
+j02	k02	j02	k09	1	1	
+j02	k02	j02	k10	1	1	
+j02	k02	j03	k01	0	0	
+j02	k02	j03	k02	0	0	
+j02	k02	j03	k03	0	1	
+j02	k02	j03	k04	1	1	
+j02	k02	j03	k05	1	1	
+j02	k02	j03	k06	1	1	
+j02	k02	j03	k07	1	1	
+j02	k02	j03	k08	1	1	
+j02	k02	j03	k09	1	1	
+j02	k02	j03	k10	1	1	
+j02	k03	j01	k01	0	0	
+j02	k03	j01	k02	0	0	
+j02	k03	j01	k03	0	0	
+j02	k03	j01	k04	0	0	
+j02	k03	j01	k05	0	0	
+j02	k03	j01	k06	0	0	
+j02	k03	j01	k07	0	0	
+j02	k03	j01	k08	0	0	
+j02	k03	j01	k09	0	0	
+j02	k03	j01	k10	0	0	
+j02	k03	j02	k01	0	0	
+j02	k03	j02	k02	0	0	
+j02	k03	j02	k03	0	0	
+j02	k03	j02	k04	0	0	
+j02	k03	j02	k05	0	0	
+j02	k03	j02	k06	0	0	
+j02	k03	j02	k07	0	0	
+j02	k03	j02	k08	0	0	
+j02	k03	j02	k09	0	0	
+j02	k03	j02	k10	0	0	
+j02	k03	j03	k01	0	0	
+j02	k03	j03	k02	0	0	
+j02	k03	j03	k03	0	0	
+j02	k03	j03	k04	0	0	
+j02	k03	j03	k05	0	0	
+j02	k03	j03	k06	0	0	
+j02	k03	j03	k07	0	0	
+j02	k03	j03	k08	0	0	
+j02	k03	j03	k09	0	0	
+j02	k03	j03	k10	0	0	
+j03	k01	j01	k01	0	1	
+j03	k01	j01	k02	0	1	
+j03	k01	j01	k03	0	0	
+j03	k01	j01	k04	0	0	
+j03	k01	j01	k05	0	0	
+j03	k01	j01	k06	0	0	
+j03	k01	j01	k07	0	0	
+j03	k01	j01	k08	0	0	
+j03	k01	j01	k09	0	0	
+j03	k01	j01	k10	0	0	
+j03	k01	j02	k01	0	0	
+j03	k01	j02	k02	0	0	
+j03	k01	j02	k03	0	0	
+j03	k01	j02	k04	0	0	
+j03	k01	j02	k05	0	0	
+j03	k01	j02	k06	0	0	
+j03	k01	j02	k07	0	0	
+j03	k01	j02	k08	0	0	
+j03	k01	j02	k09	0	0	
+j03	k01	j02	k10	0	0	
+j03	k01	j03	k01	1	1	
+j03	k01	j03	k02	1	1	
+j03	k01	j03	k03	0	0	
+j03	k01	j03	k04	0	0	
+j03	k01	j03	k05	0	0	
+j03	k01	j03	k06	0	0	
+j03	k01	j03	k07	0	0	
+j03	k01	j03	k08	0	0	
+j03	k01	j03	k09	0	0	
+j03	k01	j03	k10	0	0	
+j03	k02	j01	k01	0	0	
+j03	k02	j01	k02	0	0	
+j03	k02	j01	k03	0	1	
+j03	k02	j01	k04	1	1	
+j03	k02	j01	k05	1	1	
+j03	k02	j01	k06	1	1	
+j03	k02	j01	k07	1	1	
+j03	k02	j01	k08	1	1	
+j03	k02	j01	k09	1	1	
+j03	k02	j01	k10	1	1	
+j03	k02	j02	k01	0	0	
+j03	k02	j02	k02	0	0	
+j03	k02	j02	k03	0	0	
+j03	k02	j02	k04	0	0	
+j03	k02	j02	k05	0	0	
+j03	k02	j02	k06	0	0	
+j03	k02	j02	k07	0	0	
+j03	k02	j02	k08	0	0	
+j03	k02	j02	k09	0	0	
+j03	k02	j02	k10	0	0	
+j03	k02	j03	k01	0	0	
+j03	k02	j03	k02	0	0	
+j03	k02	j03	k03	1	1	
+j03	k02	j03	k04	1	1	
+j03	k02	j03	k05	1	1	
+j03	k02	j03	k06	1	1	
+j03	k02	j03	k07	1	1	
+j03	k02	j03	k08	1	1	
+j03	k02	j03	k09	1	1	
+j03	k02	j03	k10	1	1	
+j03	k03	j01	k01	0	0	
+j03	k03	j01	k02	0	0	
+j03	k03	j01	k03	0	0	
+j03	k03	j01	k04	0	0	
+j03	k03	j01	k05	0	0	
+j03	k03	j01	k06	0	0	
+j03	k03	j01	k07	0	0	
+j03	k03	j01	k08	0	0	
+j03	k03	j01	k09	0	0	
+j03	k03	j01	k10	0	0	
+j03	k03	j02	k01	0	0	
+j03	k03	j02	k02	0	0	
+j03	k03	j02	k03	0	0	
+j03	k03	j02	k04	0	0	
+j03	k03	j02	k05	0	0	
+j03	k03	j02	k06	0	0	
+j03	k03	j02	k07	0	0	
+j03	k03	j02	k08	0	0	
+j03	k03	j02	k09	0	0	
+j03	k03	j02	k10	0	0	
+j03	k03	j03	k01	0	0	
+j03	k03	j03	k02	0	0	
+j03	k03	j03	k03	0	0	
+j03	k03	j03	k04	0	0	
+j03	k03	j03	k05	0	0	
+j03	k03	j03	k06	0	0	
+j03	k03	j03	k07	0	0	
+j03	k03	j03	k08	0	0	
+j03	k03	j03	k09	0	0	
+j03	k03	j03	k10	0	0	
+
+
+# df_flujos_ijk
+nombre_I	nombre_J	servicio_K	tao_ijk	z_ijk
+i01	j01	k01	15	1
+i02	j01	k01	8	1
+i03	j01	k01	8	1
+i01	j02	k01	0	0
+i02	j02	k01	7	1
+i03	j02	k01	0	0
+i01	j03	k01	0	0
+i02	j03	k01	0	0
+i03	j03	k01	7	1
+i01	j01	k02	0	0
+i02	j01	k02	0	0
+i03	j01	k02	0	0
+i01	j02	k02	0	0
+i02	j02	k02	0	0
+i03	j02	k02	0	0
+i01	j03	k02	0	0
+i02	j03	k02	0	0
+i03	j03	k02	0	0
+i01	j01	k03	0	0
+i02	j01	k03	0	0
+i03	j01	k03	0	0
+i01	j02	k03	0	0
+i02	j02	k03	0	0
+i03	j02	k03	0	0
+i01	j03	k03	0	0
+i02	j03	k03	0	0
+i03	j03	k03	0	0
+
+
+# prob_serv
+Unnamed: 0	1	2	3
+1	0.1	0.9	0
+2	0.0	0.0	1
+3	0.0	0.0	0
+
+

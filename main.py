@@ -6,9 +6,9 @@ Created on Tue Dec  5 16:30:26 2023
 """
 
 # Permite explorar objetos con alta recursión
-import sys
-sys.setrecursionlimit(50000)
-
+#import sys
+#sys.setrecursionlimit(50000)
+#import winsound
 #%%  Bienvenida
 import textwrap
 print ("#" * 60)
@@ -116,7 +116,6 @@ while True:
                                  problems_dict=problems_dict,
                                  multiobjective_dict=multiobjective_dict
                                  )
-        
     #%%  Salir
     elif _opcion == "10":
             break

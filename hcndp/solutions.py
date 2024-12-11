@@ -328,7 +328,7 @@ def menu_solutions(network_original, problems_dict):
 
 def create_problem_object(network_original, problems_dict, name_problem):
 
-    # Creamos un objeto solution
+    # Creamos un objeto problem
     new_name_problem = name_problem
     problems_dict[new_name_problem] = Problem(name_problem=new_name_problem,
                                                  objective="Nulo",
@@ -555,7 +555,7 @@ class Problem:
         # Resolver el modelo con salida detallada
         opt = pyo.SolverFactory('gurobi')
         opt.options['NonConvex'] = 2
-        opt.options['TimeLimit'] = 60
+        #opt.options['TimeLimit'] = 7200
         
         opt.options['MIPFocus'] = 1 #1 Find feasible, 2 prove optimality, 3 very slow
         # opt.options['Heuristics'] = 0.20  #Tiempo usado en heurísticas
@@ -563,20 +563,25 @@ class Problem:
         # opt.options['BarQCPConvTol'] = 1  ### Genera cambbio paulatino
         # opt.options['FeasibilityTol']=0.01 # Primal feasibility tolerance 
         # opt.options['IntFeasTol']=0.1 # Integer feasibility tolerance   ##### Generó cambio importante
-        # opt.options['Method']=-1 # Default -1 Algoritmo para modelos continuos 4
+        opt.options['Method']=1 # 1 recommended for QP. Default -1 Algoritmo para modelos continuos 4
+        opt.options['NodefileStart']=0.5 # Recomended: https://support.gurobi.com/hc/en-us/community/posts/17033516216209-Please-help-me-with-out-of-memory
         # opt.options['MarkowitzTol']=0.9 # Threshold pivoting tolerance 
         # opt.options['MIQCPMethod']= 1 # 1 outer approx, 0 continuous qcp relax -1 chooses automatically ###################
         # opt.options["NumericFocus"]=0
-        opt.options['OptimalityTol']=0.01 # Dual feasibility tolerance ###### Este generó un cambio importante
-        opt.options['MIPGap']=0.01
+        # opt.options['OptimalityTol']=0.01 # Dual feasibility tolerance ###### Este generó un cambio importante
+        opt.options['MIPGap']=0.001
         # opt.options['SimplexPricing']=-1
         # opt.options['PreQLinearize']=1 # 1 produce a MILP reformulation with strong LP relaxation
         # opt.options['GomoryPasses']= 1 #-1 Default
         # opt.options['PrePasses']= 5 # -1 Default
         # opt.options['Presolve']= 2 #2 agresive #1 conservative Generó cambio importnte con nivel 2
         # opt.options['ScaleFlag']=2 #,1,2,3
-        # opt.options['Threads'] = 4  # Usa 4 núcleos
-        # opt.options['LogFile'] = 'gurobi_log.log'
+        opt.options['Threads'] = 3  # Usa 4 núcleos
+        #with open('gurobi_log.log', 'w'):
+        #    pass
+        #opt.options['LogFile'] = 'gurobi_log.log'
+
+
 
         global out
         out = 0
@@ -626,6 +631,23 @@ class Problem:
             model.solution['delta_min'] = pyo.value(instance.delta_min)
             model.solution['Func_obj'] = pyo.value(instance.obj)
             model.solution['Tiempo'] = tiempo_cpu
+            model.solution['Worst_rho_node']=max(model.instance.rho_jk._data, key=lambda k: model.instance.rho_jk._data[k]._value)
+            model.solution['Worst_rho_node_sigma']=model.instance.sigma._data[model.solution['Worst_rho_node']]._value
+            model.solution['Worst_alpha_node']=min(model.instance.alpha_ik._data, key=lambda k: model.instance.alpha_ik._data[k]._value)
+            model.solution['Worst_alpha_node_alpha']=model.instance.alpha_ik._data[model.solution['Worst_alpha_node']]._value
+            
+            _suma=0
+            for _i,_j in model.instance.l_ijk._data.items():
+                if model.solution['Worst_rho_node'][0] in _i and model.solution['Worst_rho_node'][1] in _i:
+                    _suma+=_j._value
+            model.solution['Worst_rho_node_l_jk']=_suma
+            
+            _lista=[] 
+            for _i,_j in model.instance.beta_jk._data.items():
+                if model.solution['Worst_alpha_node'][1] in _i:
+                    # Lista con el jk , beta y d_ijk
+                    _lista.append([_i,_j._value],)
+            model.solution['Worst_alpha_betas_d_ijk']=_lista
             
             self.value_optimal_solution=model.solution
             # Export to LP
@@ -790,7 +812,7 @@ class Problem:
         # Borro el dataframe df_prob_fi_ijkjk porque no logro actualizarlo
         try: 
             del self.df_prob_fi_ijkjk
-        except AttributeError as e:
+        except AttributeError: # as e:
             pass
     
     def set_solution_in_object_network_repr(self):
@@ -823,10 +845,19 @@ class Problem:
             s_jk = np.array([[j, k, pyo.value(instance.s[j, k])]
                             for j in instance.J for k in instance.K])
     
-            fi_ijkjk = np.array([[i, j, k, jp, kp, pyo.value(instance.fi[i, j, k, jp, kp])]
-                                for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
+            
+            #fi_ijkjk = np.array([[i, j, k, jp, kp, pyo.value(instance.fi[i, j, k, jp, kp])]
+            #                    for i in instance.I for j in instance.J for k in instance.K for jp in instance.J for kp in instance.K])
+            
+            fi_ijkjk = pd.DataFrame(
+                [[i, j, k, jp, kp, pyo.value(instance.fi[i, j, k, jp, kp])]
+                    for i in instance.I for j in instance.J for k in instance.K 
+                    for jp in instance.J for kp in instance.K], 
+                columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp', 'fi_jkjk'])
+            
             df_l_ijk = pd.DataFrame(
                 l_ijk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'lambda_ijk'])
+            
             fi_jkjk = pd.DataFrame(fi_ijkjk, columns=[
                                    'nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp', 'servicio_Kp', 'fi_jkjk'])
             fi_jkjk = fi_jkjk.merge(
@@ -936,7 +967,8 @@ class Problem:
                     writer, sheet_name='prob_fi_jkjk')
     
                 pd.DataFrame(sigma_jk).to_excel(writer, sheet_name='sigma')
-                    
+                pd.DataFrame(alpha_ik).to_excel(writer, sheet_name='alpha')
+                pd.DataFrame(rho_jk).to_excel(writer, sheet_name='rho')
                 try:
                     pd.DataFrame(fi_ijkjk, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
                                  'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
@@ -945,14 +977,13 @@ class Problem:
                     # Filtrar filas donde 'fi_ijkjk' sea diferente de cero
                     
                     #df_filtered = fi_ijkjk[fi_ijkjk['fi_ijkjk'] != 0]
-                    df_filtered = fi_ijkjk[np.float64(fi_ijkjk[:, 5]) != 0.0]
+                    df_filtered = fi_ijkjk[np.float64(fi_ijkjk.iloc[:, 5]) != 0.0]
                     
                     pd.DataFrame(df_filtered, columns=['nombre_I', 'nombre_J', 'servicio_K', 'nombre_Jp',
                                  'servicio_Kp', 'fi_ijkjk']).to_excel(writer, sheet_name='fi_ijkjk')
 
                     pass
-                    
-                
+                                    
                 # Crear una nueva hoja para el tiempo
                 tiempo_data = pd.DataFrame({'Tiempo': [self.pyo_model.solution['Tiempo']]})
                 tiempo_data.to_excel(writer, sheet_name='Tiempo')
@@ -1363,8 +1394,7 @@ class Problem:
                     local_search.calcular_kpi_local_search(self)
                     
         return  self
-        # %% Exportar resultados 
-        #self.set_solution_excel()
+
         
     # %% Crear modelo abstracto
     def construct_model(self):
@@ -1433,7 +1463,14 @@ class Problem:
                           / sum(self.pyo_model.instance.h[i, k] for i in self.pyo_model.instance.I
                           for k in self.pyo_model.instance.K)
             self.pyo_model.instance.obj = pyo.Objective(expr=obj_expr, sense=pyo.maximize)
+        
+        # Número de variables
+        self.num_variables = len([v for v in self.pyo_model.instance.component_data_objects(pyo.Var)])
+        
 
+        # Número de restricciones
+        self.num_restricciones = len([c for c in self.pyo_model.instance.component_data_objects(pyo.Constraint)])
+        
 
     # %% Resolver
     
@@ -1471,7 +1508,7 @@ class Problem:
             self.set_solution_excel()
             #self.set_solution_txt()
             self.state="Optimizado"
-
+            kpi.calculate_kpi(self,_post_optima=True)
     
     # %% Exportar solución
     def create_folders_problem(self):
@@ -1489,7 +1526,7 @@ class Problem:
 def update_solution_post_optima(original_network, new_network):
 
     print("Ejecutando update_solution_post_optima")
-    input()
+    
     new_network.create_folders()
     path = os.getcwd()+'/data/'+original_network.name+'/'+new_network.archivo
 

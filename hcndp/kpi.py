@@ -13,7 +13,7 @@ import copy
 from hcndp.data_functions import indices
 import math
 import sys    
-
+import networkx
 
 #%% Calcular kpi para una solución
 
@@ -75,8 +75,8 @@ def p_0(sum_y,s,c): #Probabilidad de estado 0
     s=int(s)
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
-    p=((1-rho)*math.factorial(s)) and ((r)**s)/((1-rho)*math.factorial(s)) or 0
-    suma = sum([((r)**j)/(math.factorial(j)) for j in range (int(s))])
+    p=((1-rho)*math.factorial(abs(s))) and ((r)**s)/((1-rho)*math.factorial(abs(s))) or 0
+    suma = sum([((r)**j)/(math.factorial(abs(j))) for j in range (int(s))])
     p=1/(p+suma)
     return p
 
@@ -86,35 +86,35 @@ def p_f1(p_0,sum_y,s,c,f): #Probabilidad de estado f<=s
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
     rho = rho -sys.float_info.epsilon #Resto epsilon para no tener rho=1
-    p=p_0*((r)**f)/math.factorial(f)
+    p=p_0*((r)**f)/math.factorial(abs(f))
     return p
 
 def p_f2(p_0,sum_y,s,c,f): #Probabilidad de estado f>s
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
     rho = rho -sys.float_info.epsilon #Resto epsilon para no tener rho=1
     r = (c) and sum_y / (c) or 0 # Division by zero equals zero
-    p=p_0*((r)**f)/(math.factorial(s)*(s**(f-s)))
+    p=p_0*((r)**f)/(math.factorial(abs(s))*(s**(f-s)))
     return p
 
 def p_total(sum_y,s,c,f): #Suma de probabilidades en estado estable hasta un estado f
     #Se interpreta como la probabilidad de tener f o menos personas en el sistema
     s=int(s)
-    p_total=0
+    p_total_value=0
     p__0=p_0(sum_y,s,c)
     if sum_y<=(s*c) and (s*c)!=0: #Valido que se pueda calcular p_total
         for i in range(int(f+1)):
             if i==0:
-                p_total+=p__0
+                p_total_value+=p__0
                 
             elif 0<i<s:
-                p_total+=p_f1(p__0,sum_y,s,c,i)
+                p_total_value+=p_f1(p__0,sum_y,s,c,i)
                 
             elif i>=s:
-                p_total+=p_f2(p__0,sum_y,s,c,i)
+                p_total_value+=p_f2(p__0,sum_y,s,c,i)
                 
     else:
-        p_total=float('NaN')
-    return p_total
+        p_total_value=float('NaN')
+    return p_total_value
 
 def p_wqt(sum_y,s,c,t):
     
@@ -122,22 +122,31 @@ def p_wqt(sum_y,s,c,t):
     rho = (s*c) and sum_y / (s*c) or 0 # Division by zero equals zero
     rho = rho -sys.float_info.epsilon #Resto epsilon para no tener rho=1
     if rho < 1 and (s*c)!=0 : #Valido que se pueda calcular p_total
-        p__0=p_0(sum_y,s,c)   
-        r = (c) and sum_y / (c) or 0 # Division by zero equals zero
-        p_wqt=math.exp(-(s*c-sum_y)*t)
-        s=int(s)
-        p_wqt=1-(r**s)*p__0*p_wqt/(math.factorial(s)*(1-rho))
+        try: 
+            p__0=p_0(sum_y,s,c)   
+            r = (c) and sum_y / (c) or 0 # Division by zero equals zero
+            p_wqt=math.exp(-(s*c-sum_y)*t)
+            s=int(s)
+            
+            p_wqt=  1 - (r**s)*p__0*p_wqt/(math.factorial(abs(s))*(1-rho))
+            #factor = math.exp(s * math.log(r))
+            #p_wqt = 1 - (factor * p__0 * p_wqt) / (math.factorial(s) * (1 - rho))
+        except:
+            p_wqt=float('NaN')
     else:
         
         p_wqt=float('NaN')
     return p_wqt
-# 
 
-def L_q(r,rho,s,c,p_o):
-    s=int(s)
-    Lq=(math.factorial(s)*(1-rho)**2) and ((r**s)*rho/(math.factorial(s)*(1-rho)**2))*p_o or 0
-    return Lq
 
+def L_q(r,rho,s,c,p_cero):
+    try : 
+        s=int(s)
+        Lq=(math.factorial(abs(s))*(1-rho)**2) and ((r**s)*rho/(math.factorial(abs(s))*(1-rho)**2))*p_cero or 0
+        return Lq
+    except:
+        return float('NaN')
+    
 def W_q(L_q,lambdas,rho):
     if pd.isna(L_q) or lambdas==0: #Valido que se pueda calcular p_total
        W_q=float('NaN')
@@ -232,7 +241,7 @@ def set_lambda_jk (current_solution, network,_post_optima):
         try: 
             df_capac.drop(['sigma_jk_x'],axis=1,inplace=True)
             df_capac.insert(4,'sigma_jk',df_capac.pop('sigma_jk_y'))
-        except KeyError as e:
+        except KeyError: # as e:
             pass            
         
         df_capac['sigma_jk'] = df_capac['sigma_jk'].round(0).astype('int')
@@ -256,7 +265,7 @@ def set_lambda_jk (current_solution, network,_post_optima):
         try: 
             df_asignacion.drop(['sigma_jk_x'],axis=1,inplace=True)
             df_asignacion.insert(7,'sigma_jk',df_asignacion.pop('sigma_jk_y'))
-        except KeyError as e:
+        except KeyError: # as e:
             pass            
         
         df_asignacion['sigma_jk'] = df_asignacion['sigma_jk'].round(0).astype('int')
@@ -277,7 +286,7 @@ def set_lambda_jk (current_solution, network,_post_optima):
         try: 
             df_arcos.drop(['p_jjkk_x'],axis=1,inplace=True)
             df_arcos.insert(6,'p_jjkk',df_arcos.pop('p_jjkk_y'))
-        except KeyError as e:
+        except KeyError: # as e:
             pass            
         
 
@@ -294,26 +303,21 @@ def set_lambda_jk (current_solution, network,_post_optima):
         try: 
             df_asignacion.drop(['tao_ijk_x'],axis=1,inplace=True)
             df_asignacion.insert(21,'tao_ijk',df_asignacion.pop('tao_ijk_y'))
-        except KeyError as e:
-            pass            
-
-
-
+        except KeyError: # as e:
+            pass      
+        df_asignacion['z_ijk'] = np.where(df_asignacion['tao_ijk'] > 0, 1, 0)    
 
         network.file['df_capac']=df_capac
         network.file['df_asignacion']=df_asignacion
         network.file['df_arcos']=df_arcos
-        
-        
-        #print ("\n Se actualizaron exitosamente los lambda_jk")
-        
+                       
 def set_lambda_ijk (solution, network,_post_optima):
     
-
     # Calculo los lambdas para cada ijk
-    # Se calculan a través de un loop asumiendo que solo hay arribos 
-    # en cada i
+    # Se calculan tomando los datos de la optimización
     
+    path=os.getcwd()+'/output/'+solution.name_problem+'/salida_optimizacion.xlsx'
+
     df_asignacion=network.file['df_asignacion']
     df_asignacion.set_index(['nombre_I', 'nombre_J', 'servicio_K'], inplace=True)
     df_asignacion = df_asignacion.sort_index(level=[0, 1, 2])
@@ -321,13 +325,16 @@ def set_lambda_ijk (solution, network,_post_optima):
     g=reshape_matrix(g, network.I, network.J*network.K)# Matriz de arribos externos de i por (jk)    
 
     df_asignacion["lambda_ijk"] = 0.0
-    
-    
+        
     df_arcos=network.file['df_arcos']
     df_arcos.set_index(['nombre_J','servicio_K','nombre_Jp','servicio_Kp'], inplace=True)    
     df_arcos=df_arcos.sort_index(level=[0,1,2,3])
     probs=df_arcos['p_jjkk']
     probs=reshape_matrix(probs, network.J*network.K, network.J*network.K)
+    
+    df_flujos_ijk=network.file['df_flujos_ijk']
+    df_flujos_ijk.set_index(['nombre_I','nombre_J','servicio_K'], inplace=True)    
+        
     
     #Para cada red i calculo un conjunto de lambda ijk
     _i=0
@@ -345,10 +352,30 @@ def set_lambda_ijk (solution, network,_post_optima):
         #print ("\n Se actualizaron exitosamente los lambda_ijk")
     
     if _post_optima==True and solution.tecnica=="Exacta":
+        data = pd.read_excel (path,sheet_name='l_ijk',names=['nombre_I','nombre_J','servicio_K','l_ijk'],
+                         index_col=0)
+        df_asignacion = df_asignacion.merge(data, on=['nombre_I','nombre_J','servicio_K'], how='left')        
         
-        for i in df_asignacion.index.levels[0]: 
-            df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
-            _i+=1
+        if 'l_ijk_x' in df_asignacion.columns:
+            try: # Corrijo nombres de columnas
+                df_asignacion.drop(['l_ijk_x'],axis=1,inplace=True)
+                df_asignacion.insert(21,'l_ijk',df_asignacion.pop('l_ijk_y'))
+                df_asignacion.rename(columns={'l_ijk':'lambda_ijk'},inplace=True)
+            except KeyError: # as e:
+                pass      
+        
+        else:
+            try: # Corrijo nombres de columnas
+                df_asignacion.drop(['lambda_ijk'],axis=1,inplace=True)
+                df_asignacion.insert(21,'l_ijk',df_asignacion.pop('l_ijk'))
+                df_asignacion.rename(columns={'l_ijk':'lambda_ijk'},inplace=True)
+            except KeyError: # as e:
+                pass   
+        
+        #for i in df_asignacion.index.levels[0]: 
+        #    df_asignacion.loc[i,'lambda_ijk']=np.matmul(g[_i],np.linalg.inv(np.identity(len(probs))-(probs)))
+        #    _i+=1
+        
         #print ("\n Se actualizaron exitosamente los lambda_ijk")
     
     # Actualizo prop_tao_ijk
@@ -358,11 +385,29 @@ def set_lambda_ijk (solution, network,_post_optima):
                                            left_index=True,right_index=True)
     df_asignacion['prop_tao_ijk']=df_asignacion['tao_ijk']/df_asignacion['demanda_i']
     
+    
+    # Actualizo tao_ijk y z_ijk en df_flujos_ijk
+    df_flujos_ijk = df_flujos_ijk.drop(columns=['tao_ijk'])
+
+    #df_flujos_ijk=pd.merge(df_flujos_ijk,df_asignacion.reset_index().set_index(['nombre_I','nombre_J','servicio_K'])['tao_ijk'],
+    #                                   left_index=True,right_index=True)
+        
+    df_flujos_ijk=pd.merge(df_flujos_ijk.reset_index().set_index(['nombre_I','nombre_J','servicio_K']),
+                           df_asignacion.reset_index().set_index(['nombre_I','nombre_J','servicio_K'])['tao_ijk'],
+                                   left_index=True,right_index=True)
+
+    df_flujos_ijk['z_ijk'] = np.where(df_flujos_ijk['tao_ijk'] > 0, 1, 0)
+    
     df_arcos.reset_index(inplace=True)
     df_asignacion.reset_index(inplace=True)
+    df_flujos_ijk.reset_index(inplace=True)
+    
+    if "level_0" in df_asignacion.columns:
+        df_asignacion = df_asignacion.drop(columns=["level_0"])
     
     network.file['df_arcos']=copy.deepcopy(df_arcos)
     network.file['df_asignacion']=copy.deepcopy(df_asignacion)
+    network.file['df_flujos_ijk']=copy.deepcopy(df_flujos_ijk)
     
 def set_phi_ijkjk (solution,network):
     #Calculo flujos fi_ijkjk. Estos fi vienen de lambda según la fórmula de abajo:
@@ -553,24 +598,35 @@ def set_e2sfca(network):
     df_accesibilidad=df_asignacion.groupby(['nombre_I','servicio_K']).R.sum()
     
     #df_demanda=pd.merge(df_demanda,df_accesibilidad,on=['nombre_I','servicio_K'],how='left',suffixes=('_old', ''))
+    
+    # Verificar si existe la columna "acces_H2SFCA" y eliminarla si está presente
+    if "acces_H2SFCA" in df_demanda.columns:
+        df_demanda = df_demanda.drop(columns=["acces_H2SFCA"])
+
+    # Actualizar R y renombrar la columna "R" como "acces_H2SFCA"
     df_demanda=pd.merge(df_demanda.set_index(['nombre_I','servicio_K']),df_accesibilidad,left_index=True, right_index=True).reset_index()
     df_demanda=df_demanda.rename(columns={"R":"acces_H2SFCA"})
     
+    
+    # Actualizar R y renombrar la columna "R" como "acces_H2SFCA"
+    if "acces_H2SFCA" in network.file['df_demanda_ik'].columns:
+        network.file['df_demanda_ik'] = network.file['df_demanda_ik'].drop(columns=["acces_H2SFCA"])
+    
     network.file['df_demanda_ik']=pd.merge(network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K']),df_accesibilidad,left_index=True, right_index=True).reset_index()
     network.file['df_demanda_ik']=    network.file['df_demanda_ik'].rename(columns={"R":"acces_H2SFCA"})
-    
+        
     
     #df_demanda['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum') 
     #network.file['df_demanda_ik']['acces_H2SFCA'] = df_asignacion.reset_index().groupby(['nombre_I','servicio_K'])['R'].transform('sum')
     #Agrego las demandas a df_accesibildiad
-    df_accesibilidad = pd.merge(df_accesibilidad,network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K']),left_index=True, right_index=True)
+    df_accesibilidad = pd.merge(df_accesibilidad,network.file['df_demanda_ik'].set_index(['nombre_I','servicio_K'])['h_ik'],left_index=True, right_index=True)
     #df_accesibilidad = pd.merge(df_accesibilidad.reset_index().set_index('nombre_I'),
     #                            df_demanda.groupby(['nombre_I']).demanda_i.sum(),
     #                            left_index=True, 
     #                            right_index=True, 
     #                            suffixes=('_old', '')
     #                           ).set_index(['servicio_K'], append=True)
-    
+    df_accesibilidad=    df_accesibilidad.rename(columns={"h_ik":"demanda_i"})
     df_accesibilidad['Acc_ponderado']=df_accesibilidad['R']*df_accesibilidad['demanda_i']
     
     df_asignacion.reset_index(inplace=True)
@@ -734,22 +790,239 @@ def set_df_grafo_flujo_jkjk(network):
     df_flujos_jkjk['p_jjkk_True_False']=df_flujos_jkjk['p_jjkk']>0 #Flujos asignados
     network.file['df_flujos_jkjk']=df_flujos_jkjk
 
+
+#%% <codecell> Funciones para métricas de una instancia
+
+def metrics_instance(network):
+    import networkx as nx
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm  # Importar el módulo para paletas de colores
+
+    network.grafo=nx.DiGraph()
+    
+    #creo los arcos entre nodos origen y nodos oferta
+    df=network.file['df_flujos_ijk']
+    df=df[df['Flujo_w_ij']==1]
+    for _, row in df.iterrows():
+        
+        nodo_origen = (row['nombre_I'], row['servicio_K'])
+        nodo_destino = (row['nombre_J'], row['servicio_K'])
+        if nodo_origen[1] == 'k01':
+            network.grafo.add_edge(nodo_origen, nodo_destino)
+    
+    #creo los arcos entre nodos oferta y nodos oferta
+    df=network.file['df_y_jkjk']
+    df=df[df['y_jkjk']==1]
+    
+    for _, row in df.iterrows():
+        nodo_origen = (row['nombre_J'], row['servicio_K'])
+        nodo_destino = (row['nombre_Jp'], row['servicio_Kp'])
+        network.grafo.add_edge(nodo_origen, nodo_destino)
+    
+    
+    
+    G=network.grafo
+    print (G.number_of_nodes())
+    print (G.number_of_edges())
+    #print (list(G.nodes)) #Imprime los nodos existentes en el grafo
+    #print (list(G.edges)) # Imprimir los arcos existentes
+        
+    # Crear un diccionario para asignar índices a cada valor único de servicio_K
+    servicio_unicos = list(set([node[1] for node in G.nodes() if node[0].startswith('j')]))
+    servicio_indices = {servicio: idx for idx, servicio in enumerate(servicio_unicos)}
+    
+    # Elegir una paleta de colores (por ejemplo, viridis)
+    palette = cm.get_cmap('hot', len(servicio_indices) + 1)
+    
+    # Crear el mapa de colores para los nodos
+    color_map = []
+    for node in G.nodes():
+        nombre, servicio = node  # Extraer nombre y servicio
+        if nombre.startswith('i'):  # Nodo de tipo nombre_I
+            color_map.append(palette(0))  # Un color específico para los nodos de tipo nombre_I
+        elif nombre.startswith('j'):  # Nodo de tipo nombre_J
+            # Asignar el color de acuerdo con el índice del servicio en la paleta
+            color_index = servicio_indices.get(servicio, len(servicio_indices))  # Color para cada servicio
+            color_map.append(palette(color_index / len(servicio_indices)))  # Normalizar color
+
+    # Dibujar la red
+    plt.figure(figsize=(10, 8))
+    #pos = nx.spring_layout(G, seed=42)  # Ajustar el diseño de los nodos
+    pos = nx.kamada_kawai_layout(G)  # Ajustar el diseño de los nodos
+    
+    nx.draw(G, pos, node_color=color_map, with_labels=True,font_weight='bold', 
+            node_size=700, font_size=10,alpha=0.5)
+
+    # Mostrar el gráfico
+    plt.title("Red de nodos origen y destino con colores por tipo y servicio")
+    path=os.getcwd()+'/output/'+network.name_problem+'/network_x.png'
+    plt.savefig(path,dpi=300)    
+    plt.show()
+
+    # Calcular métricas del grafo
+    # 1. Densidad de la red: número de arcos / número posible de arcos
+    network.densidad = nx.density(G)
+    print("Densidad de la red:", network.densidad)
+    
+    # 2. Grado promedio de los nodos
+    network.grado_promedio = sum(dict(G.out_degree()).values()) / G.number_of_nodes()
+    print("Grado saliente promedio de los nodos:", network.grado_promedio)
+    
+    # 3. Diámetro de la red (solo si la red es conexa)
+    if nx.is_connected(G.to_undirected()):  # Convertir a no dirigida para calcular el diámetro en redes dirigidas
+        network.diametro = nx.diameter(G.to_undirected())
+        print("Diámetro de la red:", network.diametro)
+    else:
+        print("La red no es conexa, el diámetro no se puede calcular.")
+    
+    # 4. Distribución de los grados
+    grados = [G.out_degree(n) for n in G.nodes()]
+    plt.hist(grados, bins=range(1, max(grados) + 2), color='skyblue', edgecolor='black', align='left')
+    plt.xlabel("Grado")
+    plt.ylabel("Frecuencia")
+    plt.title("Distribución de los grados")
+    path=os.getcwd()+'/output/'+network.name_problem+'/grades_distribution.png'
+    plt.savefig(path,dpi=300)    
+    plt.show()
+    
+    # 5. Coeficiente de agrupamiento (clustering)
+    network.coef_agrupamiento = nx.average_clustering(G.to_undirected())  # Convertir a no dirigida si es una red dirigida
+    print("Coeficiente de agrupamiento promedio:", network.coef_agrupamiento)
+    
+    # 6. Centralidad de los nodos
+    # Puedes calcular varios tipos de centralidad (grado, cercanía, intermediación)
+    network.centralidad_grado = nx.degree_centrality(G)
+    network.centralidad_cercania = nx.closeness_centrality(G)
+    network.centralidad_intermediacion = nx.betweenness_centrality(G)
+    
+    print("Centralidad de grado:", network.centralidad_grado)
+    print("Centralidad de cercanía:", network.centralidad_cercania)
+    print("Centralidad de intermediación:", network.centralidad_intermediacion)
+    
+    # 7. Resiliencia de la red
+    # La resiliencia se evalúa eliminando nodos y verificando la conectividad
+    # Aquí calcularemos el tamaño del componente más grande después de eliminar el nodo de mayor grado
+    G_copy = G.copy()
+    nodo_mayor_grado = max(G_copy.degree, key=lambda x: x[1])[0]  # Nodo con mayor grado
+    G_copy.remove_node(nodo_mayor_grado)
+    if nx.is_connected(G_copy.to_undirected()):
+        network.tamaño_componente_mayor = len(max(nx.connected_components(G_copy.to_undirected()), key=len))
+    else:
+        network.tamaño_componente_mayor = "La red se desconectó por completo."
+    
+    print("Tamaño del componente más grande tras eliminar el nodo de mayor grado:", network.tamaño_componente_mayor)
+
+
+    # 8. Coeficiente de variación de los grados
+    import numpy as np
+    grados = [G.degree(n) for n in G.nodes()]
+    desviacion_estandar = np.std(grados)
+    print("Desviación estándar de los grados:", desviacion_estandar)
+    grado_promedio = np.mean(grados)
+    network.coeficiente_variacion = desviacion_estandar / grado_promedio
+    print("Coeficiente de variación de los grados:", network.coeficiente_variacion)
+    
+    # 9. Número de nodos y arcos
+    network.nodos=G.number_of_nodes()
+    network.arcos=G.number_of_edges()
+    print ("Número de nodos", network.nodos)
+    print ("Número de arcos", network.arcos)
 #%% <codecell> Main    
 if __name__ == "__main__":
-    import hcndp
-    from hcndp import network_data
-    from hcndp.read_data import read_file_excel
-    from hcndp.network_data import _I,_J,_K,_archivo 
-    from hcndp.figures import figure_network_cartesian
-    import os
+    #import hcndp
+    from hcndp import network
+    from hcndp import read_data
+    #from hcndp.network import _I,_J,_K,_archivo 
+    #from hcndp.figures import figure_network_cartesian
+    #import os
+  
+    networks_dict={} #Diccionario con las redes utilizadas en el programa
+    problems_dict={} #  
+  
+    I,J,K,archivo = read_data.menu_select_file(I=0) #I=0 sirve para condicionar la salida del menú
+    I, J, K= map(int, [I, J, K])
+    _name="red_original"
+
+    networks_dict[_name] = network.Network(I,J,K,archivo,_name)
+    networks_dict[_name].create_folders()
     
-    network=network_data.Network(_I,_J,_K,_archivo)
+    network=network.Network(I,J,K,archivo,'red_original')
     path=os.path.dirname(os.getcwd())+'/data/'+network.name+'/'+network.archivo
-    read_file_excel(network,path)
-    #read_data.read_parameters(network)
-    read_file_excel(network,path)
-    hcndp.read_data.delete_surplus_data(network)
-    hcndp.read_data.merge_niveles_capac(network)
-    hcndp.read_data.create_df_asignacion(network)
-    hcndp.read_data.create_df_probs_kk(network)
-    hcndp.read_data.create_df_arcos(network)
+
+    if archivo.endswith('xlsx'):
+        networks_dict[_name].read_file_excel(archivo)
+        
+    elif archivo.endswith('txt'):
+        networks_dict[_name].read_file_txt(archivo)
+    
+    
+    networks_dict[_name].delete_surplus_data()
+    
+    # Esta sección actualiza los sigma_max para que sean inferiores a la suma de los s_jk
+    networks_dict[_name]=read_data.fix_sigma_max(networks_dict, _name)
+    
+    print ("#" * 60)
+    print (f"\nSe han cargado exitosamente los datos en el objeto {_name}.")
+
+
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    networks_dict['red_original'].grafo=nx.DiGraph()
+    
+    #creo los arcos entre nodos origen y nodos oferta
+    df=networks_dict['red_original'].file['df_flujos_ijk']
+    df=df[df['Flujo_w_ij']==1]
+    for _, row in df.iterrows():
+        
+        nodo_origen = (row['nombre_I'], row['servicio_K'])
+        nodo_destino = (row['nombre_J'], row['servicio_K'])
+        if nodo_origen[1] == 'k01':
+            networks_dict['red_original'].grafo.add_edge(nodo_origen, nodo_destino)
+    
+    #creo los arcos entre nodos oferta y nodos oferta
+    df=networks_dict['red_original'].file['df_y_jkjk']
+    df=df[df['y_jkjk']==1]
+    
+    for _, row in df.iterrows():
+        nodo_origen = (row['nombre_J'], row['servicio_K'])
+        nodo_destino = (row['nombre_Jp'], row['servicio_Kp'])
+        networks_dict['red_original'].grafo.add_edge(nodo_origen, nodo_destino)
+    
+    
+    
+    G=networks_dict['red_original'].grafo
+    print (G.number_of_nodes())
+    print (G.number_of_edges())
+    print (list(G.nodes)) #Imprime los nodos existentes en el grafo
+    print (list(G.edges)) # Imprimir los arcos existentes
+    
+    # Asignar colores a los nodos según el tipo y el valor de servicio_K
+    color_map = []
+    for node in G.nodes():
+        nombre, servicio = node  # Extraer nombre_I o nombre_J y servicio_K
+        if nombre.startswith('i'):  # Nodo de tipo nombre_I
+            color_map.append('skyblue')
+        elif nombre.startswith('j'):  # Nodo de tipo nombre_J
+            # Asignar color según el valor de servicio_K
+            if servicio == 'k01':
+                color_map.append('lightgreen')
+            elif servicio == 'k02':
+                color_map.append('salmon')
+            elif servicio == 'k03':
+                color_map.append('orange')
+            elif servicio == 'k04':
+                color_map.append('purple')
+            else:
+                color_map.append('gray')  # Color por defecto para otros valores
+
+    # Dibujar la red
+    plt.figure(figsize=(10, 8))
+    #pos = nx.spring_layout(G, seed=42)  # Ajustar el diseño de los nodos
+    pos = nx.kamada_kawai_layout(G)  # Ajustar el diseño de los nodos
+    
+    nx.draw(G, pos, node_color=color_map, with_labels=True, font_weight='bold', node_size=700, font_size=10)
+
+    # Mostrar el gráfico
+    plt.title("Red de nodos origen y destino con colores por tipo y servicio")
+    plt.show()

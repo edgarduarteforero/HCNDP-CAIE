@@ -4,10 +4,8 @@ Created on Sat Dec  9 17:42:37 2023
 
 @author: edgar
 """
-
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import os
 import seaborn as sns
 import numpy as np
@@ -42,7 +40,8 @@ def show_menu_figures(solution):
         print(" 7. Distancias gaussianas")
         print(" 8. Accesibilidad en cartesiano, mapa de calor y nodos")
         print(" 9. Flujos entre ik y jk")
-        print("10. Salir")
+        print("10. KPI de la instancia")
+        print("11. Salir")
         opcion1 = input("Selecciona una opción: \n")
         if opcion1 == "1":
             print("Has seleccionado la Opción 1.")
@@ -143,8 +142,19 @@ def show_menu_figures(solution):
                 print(error)
                 print ("No puedo imprimir las imágenes.")
                 print ("Revisa si has obtenido los KPI.")
-         
+        
         elif opcion1 == "10":
+            print("Has seleccionado la Opción 10.")
+            try:
+                from hcndp import kpi
+                kpi.metrics_instance(network)
+
+            except AssertionError as error:
+                print(error)
+                print ("No puedo imprimir las imágenes.")
+                print ("Revisa si has obtenido los KPI.")
+            
+        elif opcion1 == "11":
             break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
@@ -153,8 +163,6 @@ def show_menu_figures(solution):
 
 def figure_network_cartesian(network):
     # Gráfico de la red completo (incluye flujos de ij y de jj')
-    
-
     fig, ax = plt.subplots(1,figsize=(6,6*1),constrained_layout=True) #Figura con 1 axes, que contiene toda la red
     fig.suptitle('Direcciones de flujos entre nodos',fontsize=14,weight="bold")
 
@@ -184,6 +192,10 @@ def figure_network_cartesian(network):
                     left_on=['nombre_I','nombre_J'],
                     right_on=['nombre_I','nombre_J'], how='left')
     prueba=prueba[(prueba['w_ij']>0)]
+    prueba=pd.merge(prueba.set_index(['nombre_I']),demanda.set_index(['nombre_I'])[['ubicacionesI_x','ubicacionesI_y']],left_on=['nombre_I'],
+    right_on=['nombre_I'], how='left').reset_index()
+    
+    
     # Dibujo una flecha para cada arco posible existente en prueba.
     prueba.apply(lambda row: ax.arrow(row['ubicacionesI_x'],row['ubicacionesI_y'],
                                       row['ubicacionesJ_x']-row['ubicacionesI_x'],
@@ -740,7 +752,7 @@ def figure_heatmap_accessibility(network):
     # Construyo gráficos de calor para analizar la accesibilidad para cada par i k
     df_accesibilidad=network.file['df_accesibilidad']
     #df_temporal = df_accesibilidad.pivot_table( index='nombre_I', columns='servicio_K', values='Acc_ponderado')
-    df_temporal = df_accesibilidad.pivot_table( index='nombre_I', columns='servicio_K', values='acces_H2SFCA')
+    df_temporal = df_accesibilidad.pivot_table( index='nombre_I', columns='servicio_K', values='R')
     df_temporal=df_temporal.fillna(0)
     sns.set(rc = {'figure.figsize':(5.5,5.5)})
     

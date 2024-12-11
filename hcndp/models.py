@@ -172,7 +172,10 @@ class Model_pyomo:
     
         def restr_siete_rule(model, j, k):
             # Límites superiores para sigma
-            return model.sigma[j, k] <= model.s[j, k]
+            if pyo.value(model.s[j,k])==0:
+                return model.sigma[j, k]==0
+            else:
+                return model.sigma[j, k] <= model.s[j, k]
         model.restr_siete = pyo.Constraint(model.J, model.K, rule=restr_siete_rule)
     
         def restr_ocho_rule(model, j, k):
@@ -202,9 +205,7 @@ class Model_pyomo:
             model.J, model.K, rule=restr_nueve_rule_aux_2)
     
         
-        
-        # Nueva restricción
-        # Nueva restricción
+    
     
         def restr_diez_rule(model, i, k):
             # Cálculo de alpha_ik
@@ -217,7 +218,7 @@ class Model_pyomo:
         #*model.gamma[i, j, k] * model.l_ijk[i,j,k]
         model.restr_diez = pyo.Constraint(model.I, model.K, rule=restr_diez_rule)
     
-        def restr_diez_rule_aux(model, i, j, k):
+        def restr_diez_rule_aux(model, j, k):
             # Cálculo de alpha_ik
             # return model.beta_ijk[i,j,k]*sum(model.l_ijk[ip,j,kp]*model.d[ip,j,kp] for ip in model.I for kp in model.K) == model.sigma[j,k]*model.d[i,j,k]*model.gamma[i,j,k]
             #return model.beta_ijk[i, j, k]*sum(model.l_ijk[ip, j, k]*model.d[ip, j, k] for ip in model.I) == model.sigma[j, k]
@@ -226,15 +227,14 @@ class Model_pyomo:
             else:
                 return model.beta_jk[j, k]*sum(model.l_ijk[ip, j, k]*model.d[ip, j, k] for ip in model.I) == model.sigma[j, k]
                 #return model.beta_jk[j, k]*sum(model.h[ip,k]*model.d[ip, j, k] for ip in model.I) == model.sigma[j, k]
-        model.restr_diez_aux = pyo.Constraint(
-            model.I, model.J, model.K, rule=restr_diez_rule_aux)
+        model.restr_diez_aux = pyo.Constraint(model.J, model.K, rule=restr_diez_rule_aux)
     
-        def restr_diez_rule_aux_2(model, i, j, k):
+        def restr_diez_rule_aux_2(model, j, k):
             # Si no hay capacidad sigma en jk, beta es cero.
             #return model.beta_ijk[i, j, k] <= model.M*model.theta[j, k]
             return model.beta_jk[j, k] <= model.M*model.theta[j, k]
-        #model.restr_diez_aux_2 = pyo.Constraint(
-        #    model.I, model.J, model.K, rule=restr_diez_rule_aux_2)
+        model.restr_diez_aux_2 = pyo.Constraint(
+            model.J, model.K, rule=restr_diez_rule_aux_2)
     
         def restr_once_rule(model, i, k):
             # Cálculo del alpha min
@@ -243,17 +243,23 @@ class Model_pyomo:
     
         def restr_doce_rule(model, j, k):
             return model.sigma[j, k] / model.M <= model.theta[j, k]
-        #model.restr_doce = pyo.Constraint(model.J, model.K, rule=restr_doce_rule)
+        model.restr_doce = pyo.Constraint(model.J, model.K, rule=restr_doce_rule)
     
         def restr_doce_aux_2_rule(model, j, k):
             return model.theta[j, k] <= (model.sigma[j, k] / model.M) + (1-model.e)
-        #model.restr_doce_aux_2 = pyo.Constraint(
-        #    model.J, model.K, rule=restr_doce_aux_2_rule)
+        model.restr_doce_aux_2 = pyo.Constraint(
+            model.J, model.K, rule=restr_doce_aux_2_rule)
     
-        def restr_trece_rule(model, j, k):
+        def restr_trece_rule(model, i, j, k):
             # Existe flujo tao_ijk si hay capacidad en jk (theta_jk)
-            return sum(model.l_ijk[i, j, k] for i in model.I) / (model.sigma_max[k]*model.c[j, k]) <= model.theta[j, k]
-        #model.retr_trece = pyo.Constraint(model.J, model.K, rule=restr_trece_rule)
+            if pyo.value(model.s[j, k]) == 0:
+                return model.tao[i, j, k] == 0
+            else:
+                return pyo.Constraint.Skip
+            #return sum(model.l_ijk[i, j, k] for i in model.I) / (model.sigma_max[k]*model.c[j, k]) <= model.theta[j, k]
+        
+        
+        model.retr_trece = pyo.Constraint(model.I, model.J, model.K, rule=restr_trece_rule)
     
         def restr_trece_aux_2_rule(model, j, k):
             return model.theta[j, k] <= (sum(model.l_ijk[i, j, k] for i in model.I) / (model.sigma_max[k]*model.c[j, k])) + (1-model.e)
@@ -320,6 +326,19 @@ class Model_pyomo:
                 return pyo.Constraint.Skip
         #model.restr_dieciocho = pyo.Constraint(
         #    model.I, model.J, model.K, rule=restr_dieciocho_rule)
+
+
+
+        def restr_dieciocho_2_rule(model, i, j, k):
+            # La distancia a recorrer por un usuario debe ser menor a la cobertura para que tenga servicio
+            if pyo.value(model.s[j, k]) == 0:
+                return model.l_ijk[i, j, k] == 0
+            else:
+                return pyo.Constraint.Skip
+        model.restr_dieciocho_2 = pyo.Constraint(
+            model.I, model.J, model.K, rule=restr_dieciocho_2_rule)
+    
+    
     
         def restr_diecinueve_rule(model, i, j, k):
             # Si existe flujo de clientes i en jk, gamma_ijk es 1.

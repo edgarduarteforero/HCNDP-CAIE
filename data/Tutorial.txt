@@ -4,3 +4,5 @@ Descargado de: https://www.colombiaenmapas.gov.co/#
 SHP_MGN_ANM_MPIOS es el shape de la población del Censo 2018 según el DANE
 https://geoportal.dane.gov.co/servicios/descarga-y-metadatos/datos-geoestadisticos/?cod=4
 
+Para pasar los datos de Excel a un txt utilizo el archivo convert_xls_txt.pyServicio
+No obstante debo revisar que el archivo original de Excel 4410 base.

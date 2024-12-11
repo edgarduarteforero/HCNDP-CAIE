@@ -76,16 +76,23 @@ class Network():
             if line.startswith("#"):  # Reconocer los encabezados de sección
                 if current_section:
                     # Crear un dataframe para la sección actual
-                    sections[current_section] = pd.read_csv(StringIO("\n".join(current_data)),sep='\t')
+                    #sections[current_section] = pd.read_csv(StringIO("\n".join(current_data)),sep='\t')
+                    df = pd.read_csv(StringIO("\n".join(current_data)), sep='\t')
+                    #df = df.loc[:, ~df.columns.str.contains('Unnamed: 0')]
+                    sections[current_section] = df
                 current_section = line[2:]  # Remover el '#' y el espacio
                 current_data = []
             else:
                 if current_section:  # Acumular datos para la sección actual
                     current_data.append(line)
+   
         
         # Agregar la última sección al diccionario
         if current_section and current_data:
-            sections[current_section] = pd.read_csv(StringIO("\n".join(current_data)),sep='\t')
+            df = pd.read_csv(StringIO("\n".join(current_data)), sep='\t')
+            #df = df.loc[:, ~df.columns.str.contains('Unnamed: 0')]
+            sections[current_section] = df
+            #sections[current_section] = pd.read_csv(StringIO("\n".join(current_data)),sep='\t')
         
         # Ahora puedes acceder a los dataframes por nombre de sección
         self.file['df_oferta'] = sections['df_oferta']
@@ -97,11 +104,12 @@ class Network():
         self.file['df_sigma_max']= sections['df_sigma_max']
         self.file['df_w_ij']= sections['df_w_ij']
         self.file['df_flujos_ijk']= sections['df_flujos_ijk']
+        self.file['df_y_jkjk']= sections['df_y_jkjk']
         self.file['flujos_jj']= sections['flujos_jj']
         self.file['prob_serv']= sections['prob_serv']
 
-        self.file['flujos_jj']=self.file['flujos_jj'].reset_index().rename(columns={'index':'Unnamed: 0'})
-        self.file['prob_serv']=self.file['prob_serv'].reset_index().rename(columns={'index':'Unnamed: 0'})
+        #self.file['flujos_jj']=self.file['flujos_jj'].reset_index().rename(columns={'index':'Unnamed: 0'})
+        #self.file['prob_serv']=self.file['prob_serv'].reset_index().rename(columns={'index':'Unnamed: 0'})
         
         
         # Función para verificar si los nombres de un dataframe son números enteros
@@ -140,11 +148,11 @@ class Network():
         self.file['df_dist_ij']=self.file['df_dist_ij'].query('nombre_J in @items')
         self.file['df_w_ij']=self.file['df_w_ij'].query('nombre_J in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('nombre_J in @items')
-        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('nombre_J in @items')
+        self.file['df_y_jkjk']=self.file['df_y_jkjk'].query('nombre_J in @items')
         self.file['df_dist_ij_k']=self.file['df_dist_ij_k'].query('nombre_J in @items')
 
         
-        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('nombre_Jp in @items')
+        self.file['df_y_jkjk']=self.file['df_y_jkjk'].query('nombre_Jp in @items')
         self.file['dist_ij_k']=self.file['df_dist_ij_k'].query('nombre_J in @items')
 
         items=indices("k",self.K)
@@ -152,19 +160,19 @@ class Network():
         self.file['df_capac']=self.file['df_capac'].query('servicio_K in @items')
         self.file['df_flujos_ijk']=self.file['df_flujos_ijk'].query('servicio_K in @items')
         self.file['df_sigma_max']=self.file['df_sigma_max'].query('servicio_K in @items')
-        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('servicio_K in @items')
+        self.file['df_y_jkjk']=self.file['df_y_jkjk'].query('servicio_K in @items')
         self.file['df_dist_ij_k']=self.file['df_dist_ij_k'].query('servicio_K in @items')
 
-        self.file['df_flujos_jkjk']=self.file['df_flujos_jkjk'].query('servicio_Kp in @items')
+        self.file['df_y_jkjk']=self.file['df_y_jkjk'].query('servicio_Kp in @items')
 
 
         
         # Crear una lista de claves a eliminar
         claves_eliminar = []
         for key in self.file:
-            if key not in ['df_demanda','df_dist_ij','df_dist_ij_k','df_w_ij',
-                           'flujos_jj','df_flujos_ijk','df_oferta','df_capac','df_flujos_jkjk',
-                           'df_niveles','df_sigma_max','prob_serv']:
+            if key not in ['df_demanda','df_demanda_ik','df_dist_ij','df_dist_ij_k','df_w_ij',
+                           'flujos_jj','df_flujos_ijk','df_oferta','df_capac','df_y_jkjk',
+                           'df_niveles','df_sigma_max','prob_serv','df_asignacion']:
                 claves_eliminar.append(key)
         
         # Eliminar las claves no deseadas del diccionario
@@ -194,7 +202,7 @@ class Network():
             try:  #Utilizo try porque al usar Local Search genera error.
                 self.file['df_capac'].drop(['sigma_jk_x'],axis=1,inplace=True)
                 self.file['df_capac'].insert(4,'sigma_jk',self.file['df_capac'].pop('sigma_jk_y'))    
-            except KeyError as e:
+            except KeyError: # as e:
                 pass
             
                 
@@ -265,7 +273,7 @@ class Network():
             
             # Creo copias de df_asignacion y df_w_ij
             df_asignacion=self.file['df_asignacion'].copy()
-            df_w_ij=self.file['df_w_ij'].copy()
+            #df_w_ij=self.file['df_w_ij'].copy()
             
             # Actualizo df_asignacion
             # Esta actualización es solamente de sigma y tao
@@ -302,7 +310,7 @@ class Network():
             try : # Utilizo try porque al ejecutar en Local Search genera error
                 df_asignacion.drop(['sigma_jk_x'],axis=1,inplace=True)
                 df_asignacion.insert(4,'sigma_jk',df_asignacion.pop('sigma_jk_y'))
-            except KeyError as e:
+            except KeyError: # as e:
                 pass 
             
             
@@ -522,7 +530,7 @@ class Network():
         df_asignacion=self.file['df_asignacion']
         df_w_ij=self.file['df_w_ij']
         df_sigma_max=self.file['df_sigma_max']
-        df_flujos_jkjk=self.file['df_flujos_jkjk']
+        df_y_jkjk=self.file['df_y_jkjk']
         
         # Si estoy usando Local_Search entonces escribo los sigma como parámetros
         # if "Local_Search" in self.name_problem:
@@ -588,7 +596,7 @@ class Network():
         file.write(";\n\n")
         
         file.write("param %s := \n"%"e")
-        file.write("10e-3")
+        file.write("10e-6")
         file.write(";\n\n")
         
         file.write("param %s := \n"%"r_bin_kk")
@@ -612,12 +620,12 @@ class Network():
         file.write(";\n\n")
         
         file.write("param %s := \n"%"y_jkjk")
-        file.write(df_flujos_jkjk[['nombre_J','servicio_K','nombre_Jp','servicio_Kp','y_jkjk']].to_string(header=False,index=False))
+        file.write(df_y_jkjk[['nombre_J','servicio_K','nombre_Jp','servicio_Kp','y_jkjk']].to_string(header=False,index=False))
         file.write(";\n\n")
         
         file.close()
     
-    # Uso getattr para que el objeto network_copy pueda acceder a los atributos del objeto padre 
+
 
 
 
