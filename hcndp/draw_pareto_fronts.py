@@ -76,12 +76,13 @@ plt.scatter(rho_max_values_9910, alpha_min_values_9910, color='#2166ac', label='
 plt.scatter(rho_max_values_101010, alpha_min_values_101010, color='#053061', label='10', marker='P')
 '''
 # Graficar una sola frontera
-plt.scatter(rho_max_values, alpha_min_values, color='#053061', label='10', marker='P')
+plt.scatter(rho_max_values, alpha_min_values, color='#053061', label='Pareto Front', marker='P')
 
-'''
+
 # Coordenadas del punto que quieres resaltar
-highlight_x = [0.725,0.73,0.7125,0.75, 0.713]
-highlight_y = [8.855694055,7.9, 6.81, 5.5, 3.75]
+highlight_x = [0.67826087, 0.99915065, 0.754297832, 0.911336171, 0.949968852]
+highlight_y = [0.233668215, 3.43587071, 1.234356494, 2.735388878, 0.501481472]
+labels=["A","B","C","D","E"]
 
 # Opciones para el punto resaltado
 marker_style = 'o'  # 'o' para un círculo
@@ -91,14 +92,26 @@ size = 250  # Tamaño del punto resaltado
 
 # Agregar el punto resaltado
 plt.scatter(
+    [0.949968852],
+    [0.501481472], 
+    color='#053061', label='Current Solution', marker='o')
+
+plt.scatter(
     highlight_x, 
     highlight_y, 
     s=size, 
+    label='Special Points',
     edgecolor=edge_color, 
-    facecolor=fill_color, 
-    label='Knee points'
-)
-'''
+    facecolor=fill_color)
+
+
+for x,y,label in zip(highlight_x,highlight_y,labels):
+    plt.text(
+        x+0.01,y-0.05,label,
+        fontsize=12,
+        color='black',
+        ha='left',
+        va='baseline')
 
 # Títulos de los ejes
 plt.xlabel(r'$\rho_{max}$')
@@ -107,9 +120,10 @@ plt.ylabel(r'$\sigma_{min}$')
 # Mostrar la grilla
 plt.grid(True, alpha=0.3)
 
-'''
+
 # Leyenda
-plt.legend(title='Locations',bbox_to_anchor=(1.05, 1), loc='upper left',)
-'''
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left',)
+#plt.legend(title='Locations',bbox_to_anchor=(1.05, 1), loc='upper left',)
+
 # Mostrar el gráfico
 plt.show()

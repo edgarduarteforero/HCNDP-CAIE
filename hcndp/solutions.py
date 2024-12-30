@@ -323,7 +323,7 @@ def menu_solutions(network_original, problems_dict):
         else:
             print("\nOpción no válida. Inténtalo de nuevo.")
 
-# %% <codecell> Crear objeto solución
+# %% <codecell> Crear objeto problema
 
 
 def create_problem_object(network_original, problems_dict, name_problem):

@@ -24,7 +24,9 @@ def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
         print("Selección del tipo de optimización multiobjetivo")
         print("----------------------------------------------------------\n")
         print(" 1. Método lexicográfico")
-        print(" 2. Frontera de Pareto e-constraint")
+        print(" 2. Solución subóptima con parámetro alfa")        
+        print(" 4. Solución óptima con parámetros alfa y rho")
+        print(" 5. Frontera de Pareto e-constraint")
         print("10. Salir")
         
         opcion1 = input("Selecciona una opción: \n")
@@ -59,39 +61,120 @@ def menu_multiobjective(network_original,problems_dict,multiobjective_dict):
             except AssertionError as error:
                 print(error)
                 print ("No puedo relizar el procedimiento.")
-
+        
         if opcion1 == "2":
             print("Has seleccionado la Opción 2.")
             try:     
-                print("Ejecuto procedimiento para construir frontera de Pareto")  
+                print("Obtengo solución subóptima con parámetro alfa")  
                 
+
                 # Creo el problema multiobjetivo    
                 name_moo_problem="temporal"
                 create_moo_problem_object(network_original,name_moo_problem, multiobjective_dict) 
                 current_moo_problem = multiobjective_dict["temporal"]
-                current_moo_problem.approach="Pareto"
+                current_moo_problem.approach="lexicographic"
 
                 # Pido al usuario los objetivos
-                current_moo_problem.select_objectives()
-                        
+                current_moo_problem.alpha_parametro=float(input("Ingresa la accesibilidad mínima:"))
+                current_moo_problem.typelexicog="Accesibilidad"
+                
                 #Pido al usuario la técnica (exacta o búsqueda local)
                 current_moo_problem.select_technique()
                 
                 # Actualizo nombre del problema en multiobjective_dict (Ya no es "temporal")
                 clave_temporal = 'temporal'
                 problem_temporal = multiobjective_dict[clave_temporal]
+                problem_temporal.objectives = ' Alpha --> Rho'
                 multiobjective_dict[problem_temporal.objectives] = multiobjective_dict.pop(
                     clave_temporal)
                 
                 # Calculo las soluciones al problema
-                current_moo_problem.calculate_pareto_front()
+                current_moo_problem.calculate_suboptimal_param_alpha()
                 
-                winsound.Beep(1000, 400)    
                 input("Pulsa una tecla para continuar.")
                 
             except AssertionError as error:
                 print(error)
                 print ("No puedo relizar el procedimiento.")
+        
+        
+       
+
+
+        if opcion1 == "4":
+            print("Has seleccionado la Opción 4.")
+            try:     
+                print("Obtengo solución subóptima con parámetro alfa")
+                print (" y con parámetro rho.")
+                
+        
+                # Creo el problema multiobjetivo    
+                name_moo_problem="temporal"
+                create_moo_problem_object(network_original,name_moo_problem, multiobjective_dict) 
+                current_moo_problem = multiobjective_dict["temporal"]
+                current_moo_problem.approach="lexicographic"
+                
+                # Pido al usuario los objetivos
+                current_moo_problem.alpha_parametro=float(input("Ingresa la accesibilidad mínima:"))
+                current_moo_problem.rho_parametro=float(input("Ingresa la congestión máxima:"))
+                current_moo_problem.typelexicog="Congestion_y_accesibilidad"
+                
+                #Pido al usuario la técnica (exacta o búsqueda local)
+                current_moo_problem.select_technique()
+                
+                # Actualizo nombre del problema en multiobjective_dict (Ya no es "temporal")
+                clave_temporal = 'temporal'
+                problem_temporal = multiobjective_dict[clave_temporal]
+                problem_temporal.objectives = ' Alpha --> Rho'
+                multiobjective_dict[problem_temporal.objectives] = multiobjective_dict.pop(
+                    clave_temporal)
+                
+                # Calculo las soluciones al problema
+                current_moo_problem.calculate_suboptimal_param_alpha_y_rho()
+                
+                input("Pulsa una tecla para continuar.")
+                
+            except AssertionError as error:
+                print(error)
+                print ("No puedo relizar el procedimiento.")
+
+
+
+
+            if opcion1 == "5":
+                 print("Has seleccionado la Opción 5.")
+                 try:     
+                     print("Ejecuto procedimiento para construir frontera de Pareto")  
+                     
+                     # Creo el problema multiobjetivo    
+                     name_moo_problem="temporal"
+                     create_moo_problem_object(network_original,name_moo_problem, multiobjective_dict) 
+                     current_moo_problem = multiobjective_dict["temporal"]
+                     current_moo_problem.approach="Pareto"
+            
+                     # Pido al usuario los objetivos
+                     current_moo_problem.select_objectives()
+                             
+                     #Pido al usuario la técnica (exacta o búsqueda local)
+                     current_moo_problem.select_technique()
+                     
+                     # Actualizo nombre del problema en multiobjective_dict (Ya no es "temporal")
+                     clave_temporal = 'temporal'
+                     problem_temporal = multiobjective_dict[clave_temporal]
+                     multiobjective_dict[problem_temporal.objectives] = multiobjective_dict.pop(
+                         clave_temporal)
+                     
+                     # Calculo las soluciones al problema
+                     current_moo_problem.calculate_pareto_front()
+                     
+                     winsound.Beep(1000, 400)    
+                     input("Pulsa una tecla para continuar.")
+                     
+                 except AssertionError as error:
+                     print(error)
+                     print ("No puedo relizar el procedimiento.")
+
+
 
         elif opcion1 == "10":
             break
@@ -357,12 +440,35 @@ class Multiobjective:
         if operador=="<=":
             restriccion = getattr(model, _var_obj_anterior) <= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
         elif operador == ">=":
-            restriccion = getattr(model, _var_obj_anterior) >= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
+            try: # Resultado por lexicográfico 
+                restriccion = getattr(model, _var_obj_anterior) >= pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
+            except: # Insertar restricción para solución subóptima con parámetro alpha
+                if self.typelexicog=="Accesibilidad":
+                    restriccion = getattr(model, _var_obj_anterior) >= self.alpha_parametro
+                elif self.typelexicog=="Congestion_y_accesibilidad":
+                    restriccion = getattr(model, _var_obj_anterior) >= self.alpha_parametro
+                    restriccion1 = getattr(model, 'rho_max') >= self.rho_parametro
         elif operador == "==":
             restriccion = getattr(model, _var_obj_anterior) == pyo.value(self.problems_multi_dict[_func_obj_anterior].pyo_model.instance.obj)
         
         setattr(model, f'restriccion_{_var_obj_anterior}', pyo.Constraint(expr=restriccion))
+        try: 
+            setattr(model, 'restriccion_1_rho_max', pyo.Constraint(expr=restriccion1))
+        except:
+            pass
+        
+    def calculate_suboptimal_param_alpha(self):
+        matrix_problems_lexi=[[1,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1],
+                              [2,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],]
+        #self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
+        self.anchor_points(matrix_problems_lexi,objective_lexi=1)
 
+    def calculate_suboptimal_param_alpha_y_rho(self):
+        matrix_problems_lexi=[[1,"Max_Alpha_Min","model.alpha_min","maximize","alpha_min",-1],
+                              [2,"Min_Rho_Max","model.rho_max","minimize","rho_max",1],]
+        #self.anchor_points(matrix_problems_lexi,objective_lexi=0)          
+        self.anchor_points(matrix_problems_lexi,objective_lexi=1)
+        
     
     def calculate_lexicographic(self):
         

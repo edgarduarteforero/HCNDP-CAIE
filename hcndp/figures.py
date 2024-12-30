@@ -467,11 +467,20 @@ def figure_service_rate_per_node(network):
     fig, ax = plt.subplots()
 
     df_capac=network.file['df_capac'] 
-    df_temporal = df_capac.pivot_table( index='nombre_J', columns='servicio_K', values='cap_total')
+    df_temporal = df_capac.pivot_table( index='nombre_J', columns='servicio_K', values='sigma_jk')
     
-    sns.set(rc = {'figure.figsize':(5,5)}) # Creo un gráfico de seaborn de 5x5 pulgadas
-    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,annot=False,annot_kws={"size": 10},cbar_kws={'label': 'Servidores asignados'})
-    ax.set(xlabel='Servicios (k)', ylabel='Nodos de oferta (j)')
+    sns.set(rc = {'figure.figsize':(6,6)}) # Creo un gráfico de seaborn de 5x5 pulgadas
+    ax=sns.heatmap(df_temporal,cmap="Oranges",linewidths=.5,robust=True,annot=False,annot_kws={"size": 8},cbar_kws={'label': 'Servers'})
+    
+    # Reducir tamaño de la fuente de los ejes
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=8)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=8)
+
+    
+    ax.set(xlabel='Services', ylabel='Supply nodes')
+    
+    # Ajustar el espacio para evitar recortes
+    fig.tight_layout()
     #path=os.getcwd()+'/output/'+network.name+'/service_rate_per_node.png'
     
     #if network.name_problem == "solución_subóptima":
